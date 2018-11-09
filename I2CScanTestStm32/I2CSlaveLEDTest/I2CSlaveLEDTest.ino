@@ -16,6 +16,10 @@ This example code is in the public domain.
 
 #define I2C_ADDR  4
 const int ledPin = PC13;
+const int led1   = PA8;
+const int led2   = PA9;
+const int led3   = PA10;
+int led_line = 0;
 
 void setup()
 {
@@ -23,6 +27,9 @@ void setup()
   Wire.onRequest(requestEvent); // register event
   Wire.onReceive(receiveEvent); // register event
   pinMode(ledPin, OUTPUT);
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);
   Serial.begin(9600);           // start serial for output
 }
 
@@ -35,11 +42,30 @@ void loop()
 // this function is registered as an event, see setup()
 void receiveEvent(int howMany)
 {
-  int x = Wire.read();        // receive byte as an integer
-  if(x == 1){
-    digitalWrite(ledPin,HIGH);          // print the integer
+  //int x = Wire.read();        // receive byte as an integer
+ 
+  //if(x == 1){
+  //  digitalWrite(ledPin,HIGH);          // print the integer
+  //}else{
+  // digitalWrite(ledPin, LOW);
+  //}
+  
+  ///while(1 < Wire.available()) //loop through all but the last
+  //{ 
+    int led_line = Wire.read(); //receive byte as a int
+  //}
+  if ((led_line % 3) == 2 ){
+    digitalWrite(led1, HIGH);
+    digitalWrite(led2, LOW);
+    digitalWrite(led3, LOW);
+  }else if ( (led_line % 3) == 1){
+    digitalWrite(led1,LOW);
+    digitalWrite(led2, HIGH);
+    digitalWrite(led3, LOW);
   }else{
-    digitalWrite(ledPin, LOW);
+    digitalWrite(led1, LOW);
+    digitalWrite(led2, LOW);
+    digitalWrite(led3, HIGH);
   }
 }
 
