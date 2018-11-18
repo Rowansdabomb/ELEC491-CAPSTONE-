@@ -51,6 +51,7 @@
 
 #include <Wire.h>
 #define MST_ADDR 3
+#define I2C_DEFAULT 0x42
 
 void setup() {
 
@@ -72,8 +73,8 @@ void loop() {
     // The i2c_scanner uses the return value of
     // the Write.endTransmisstion to see if
     // a device did acknowledge to the address.
-
     Wire.beginTransmission(address);
+    //Wire.write(0x69);
     error = Wire.endTransmission();
     
     if (error == 0) {
@@ -81,6 +82,15 @@ void loop() {
       if (address < 16) 
         Serial.print("0");
       Serial.println(address, HEX);
+      if (address == I2C_DEFAULT){
+        Wire.beginTransmission(address);
+        Wire.write(106);
+        int data_t = Wire.endTransmission();
+        Serial.print("sending data ");
+        Serial.print(address);
+        Serial.print(" result: ");
+        Serial.println(data_t);
+      }
 
       nDevices++;
     }
