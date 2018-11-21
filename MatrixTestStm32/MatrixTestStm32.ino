@@ -13,8 +13,8 @@
 //  DOTSTAR_BGR);
 
 // Pin setup
-const uint8_t MATRIX_DATA_PIN = 4;
-const uint8_t MATRIX_CLK_PIN = 7;
+const uint8_t MATRIX_DATA_PIN = PA8; 
+const uint8_t MATRIX_CLK_PIN = PB15;
 
 const uint8_t CHAR_WIDTH = 5;
 const uint8_t CHAR_HEIGHT = 8;
@@ -125,6 +125,8 @@ void loop() {
   // put your main code here, to run repeatedly:
  char text[] = "3 2 1";
  Serial.println(sizeof(text)/sizeof(text[0]));
+ Serial.println(PA8);
+ Serial.println(PB15);
  scrollText(10, text, sizeof(text)/sizeof(text[0]));
 // Serial.println("MAIN");
 //   testEachPixel(8);
