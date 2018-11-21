@@ -13,59 +13,88 @@ This example code is in the public domain.
 */
 
 #include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_DotStarMatrix.h>
+#include <Adafruit_DotStar.h>
 
-#define I2C_ADDR  4
-const int ledPin = PC13;
-const int led1   = PA8;
-const int led2   = PA9;
-const int led3   = PA10;
-int led_line = 0;
+// Pin setup
+const uint8_t MATRIX_DATA_PIN = 4;
+const uint8_t MATRIX_CLK_PIN = 7;
+#define LED1_PIN PA1
+#define LED2_PIN PA2
+#define LED3_PIN PA3
+#define LED4_PIN PA4
+int LED_array [4] = {LED1_PIN, LED2_PIN, LED3_PIN, LED4_PIN};
 
+// Size of each tile matrix
+const uint8_t MATRIX_WIDTH = 4;
+const uint8_t MATRIX_HEIGHT = 4;
+
+// Number of tile matrices
+const uint8_t tilesX = 1;
+const uint8_t tilesY = 1;
+
+#define I2C_ADDR  2
+/*
+void showColumn(uint8_t whichColumn, uint16_t color) {
+  //takes in an fps
+  matrix.fillScreen(0);
+  matrix.setCursor(0, 0);
+  matrix.drawLine(whichColumn, 0, whichColumn, MATRIX_HEIGHT, color );
+//  for (uint8_t i = 0; i < sizeof(columnLeds)/sizeof(columnLeds[0]); i++) {
+//    if (whichColumn % 2 == 0)
+//      matrix.drawPixel(columnLeds[i] - whichColumn, i, color);
+//    else
+//      matrix.drawPixel(columnLeds[i] + whichColumn, i, color);
+//  }
+  matrix.show();
+}
+*/
 void setup()
 {
+  #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000L)
+    clock_prescale_set(clock_div_1); // Enable 16 MHz on Trinket
+  #endif
+
+ // matrix.begin(); //initialize pins for output
+ // matrix.setBrightness(8); // Set max brightness 
+ // matrix.setTextWrap(false);
+// matrix.setTextColor(colors[0]);
+//  matrix.show()
   Wire.begin(I2C_ADDR);         // join i2c bus with address #2
   Wire.onRequest(requestEvent); // register event
   Wire.onReceive(receiveEvent); // register event
-  pinMode(ledPin, OUTPUT);
-  pinMode(led1, OUTPUT);
-  pinMode(led2, OUTPUT);
-  pinMode(led3, OUTPUT);
+
+  pinMode(LED1_PIN, OUTPUT);
+  pinMode(LED2_PIN, OUTPUT);
+  pinMode(LED3_PIN, OUTPUT);
+  pinMode(LED4_PIN, OUTPUT);
+  
   Serial.begin(9600);           // start serial for output
 }
 
+uint8_t column = MATRIX_WIDTH + 1;
+
 void loop()
 {
-  //Serial.println("I2CSLAVE");
+  //showColumn(column, colors[1];
+  digitalWrite(LED1_PIN,LOW);
+  digitalWrite(LED2_PIN,LOW);
+  digitalWrite(LED3_PIN,LOW);
+  digitalWrite(LED4_PIN,LOW);
+  if (column < MATRIX_WIDTH){
+    digitalWrite(LED_array[column],HIGH);
+  }
 }
 
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
 void receiveEvent(int howMany)
 {
-  //int x = Wire.read();        // receive byte as an integer
- 
-  //if(x == 1){
-  //  digitalWrite(ledPin,HIGH);          // print the integer
-  //}else{
-  // digitalWrite(ledPin, LOW);
-  //}
-  
-  ///while(1 < Wire.available()) //loop through all but the last
-  //{ 
-    int led_line = Wire.read(); //receive byte as a int
-  //}
-  if ((led_line % 3) == 2 ){
-    digitalWrite(led1, HIGH);
-    digitalWrite(led2, LOW);
-    digitalWrite(led3, LOW);
-  }else if ( (led_line % 3) == 1){
-    digitalWrite(led1,LOW);
-    digitalWrite(led2, HIGH);
-    digitalWrite(led3, LOW);
-  }else{
-    digitalWrite(led1, LOW);
-    digitalWrite(led2, LOW);
-    digitalWrite(led3, HIGH);
+  Serial.println("receiving data: ");
+  if(Wire.available()){
+    column = Wire.read(); //receive byte as a int
+    Serial.println(column);
   }
 }
 
