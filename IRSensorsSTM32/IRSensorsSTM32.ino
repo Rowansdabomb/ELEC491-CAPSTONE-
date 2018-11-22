@@ -1,16 +1,16 @@
 //#include "TimerOne.h"
 
-#define SENSOR_POLL_PERIOD 1000
+#define SENSOR_POLL_PERIOD 100
 
 const uint8_t sensorDataSize = 16;
 volatile int sensorData[sensorDataSize] = {0};
 
 const uint8_t led = PC13;
+const uint8_t testPin = PB12;
 
 const uint8_t matrixWidth = 4;
 const uint8_t matrixHeight = 4;
 
-const uint8_t timerInterval = 100;
 volatile bool interruptFlag = false;
 volatile unsigned long interruptTime = 0;
 
@@ -19,6 +19,7 @@ HardwareTimer timer(2);
 void setup() {
   // put your setup code here, to run once:
   pinMode(led, OUTPUT);
+  pinMode(testPin, OUTPUT);
   Serial.begin(38400);
   // set sensor polling interupt routine
   // Pause the timer while we're configuring it
@@ -40,39 +41,39 @@ void setup() {
 }
 
 void sensorRead() {
-  unsigned long temp = micros(); 
   uint8_t si = 0;
-  for(uint8_t i = 0; i < 10; i++) {
-    if(i < 8)
-      sensorData[(sensorDataSize - 1) - (i+1)] = analogRead(i);
-    else
-      sensorData[(sensorDataSize - 1) - (i+1)] = analogRead(i + 10);
+  uint8_t pin = 0;
+  gpio_write_bit(GPIOB, 12, HIGH);
+  for(uint8_t i = (sensorDataSize - 1); i > 5; --i) {
+    pin = (sensorDataSize - 1) - i;
+    if(pin < 8){
+      sensorData[i] = analogRead(pin)/16;
+//      sensorData[i] = pin;
+    }
+    else {
+      sensorData[i] = analogRead(pin + 10)/16;
+//      sensorData[i] = pin + 10;  
+    }
   }
-  interruptTime = micros() - temp;
+  gpio_write_bit(GPIOB, 12, LOW);
   interruptFlag = true;
 }
 
 void printSensorData() {
-  Serial.flush();
-  for (uint8_t i = 0; i < sensorDataSize; i++) {
-    Serial.print(i);
-    Serial.print(": ");
-    Serial.print(sensorData[i]);
-    Serial.print(", ");
-  }
-  Serial.println();
-  
-  for (uint8_t i = 0; i < matrixHeight; i++) {
-    for(uint8_t j = 0; j < matrixWidth; j++) {
-      if(j < matrixWidth - 1) {
-        Serial.print(sensorData[i + j*(matrixHeight - 1)]);
+  Serial.write(27);       // ESC command
+  Serial.print("[2J");    // clear screen command
+  Serial.write(27);
+  Serial.print("[H");     // cursor to home command
+
+  for (uint8_t i = 0; i < matrixWidth; i++) {
+    for(uint8_t j = 0; j < matrixHeight; j++) {
+      Serial.print(sensorData[i + j*(matrixHeight)]);
+      if(j < matrixHeight - 1)
         Serial.print(" | ");
-      }
       else
-        Serial.println(sensorData[i+j*(matrixHeight - 1)]);
+        Serial.println();
     }
   }
-  Serial.println(interruptTime);
   Serial.println();
 }
 
