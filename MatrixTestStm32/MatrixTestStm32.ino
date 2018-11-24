@@ -1,16 +1,17 @@
 // See https://learn.adafruit.com/adafruit-dotstar-leds/dotstarmatrix-library for more information
 
+/***************************************************************************************
+*	Title: MatrixTestStm32
+*	Author: Rowan Baker-French, Jimmy Wong
+*	Date: Nov 10, 2018
+*	Code version: 0.0.1
+*	Availability: https://github.com/Rowansdabomb/T25ELEC491/edit/master/MatrixTestStm32/MatrixTestStm32.ino
+***************************************************************************************/
+
+
 #include <Adafruit_GFX.h>
 #include <Adafruit_DotStarMatrix.h>
 #include <Adafruit_DotStar.h>
-
-
-//Adafruit_DotStarMatrix matrix = Adafruit_DotStarMatrix(
-//  4, 4,  // Width, height
-//  4, 7, // Data pin, clock pin
-//  DS_MATRIX_TOP     + DS_MATRIX_LEFT +
-//  DS_MATRIX_COLUMNS + DS_MATRIX_PROGRESSIVE,
-//  DOTSTAR_BGR);
 
 // Pin setup
 const uint8_t MATRIX_DATA_PIN = PB10; 
@@ -46,10 +47,6 @@ const uint16_t colors[] = {
 };
   
 void setup() {
-//  #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000L)
-//  clock_prescale_set(clock_div_1); // Enable 16 MHz on Trinket
-//  #endif
-
   pinMode(TEST_PIN, OUTPUT);
 
   matrix.begin(); // Initialize pins for output
@@ -87,11 +84,8 @@ void scrollText(uint8_t fps, char* text, int textLength) {
   matrix.fillScreen(0);
   matrix.setCursor(x, 0);
   matrix.print(F(text));
-//  Serial.println(x);
   if(--x < -textLength*CHAR_WIDTH) {
     x = matrix.width();
-//    if(++pass >= 3) pass = 0;
-//    matrix.setTextColor(colors[pass]);
   }
   matrix.show();
   gpio_write_bit(GPIOA, 7, LOW);
@@ -99,7 +93,6 @@ void scrollText(uint8_t fps, char* text, int textLength) {
 }
 
 void testEachPixel(uint8_t fps) {
-  //takes in an fps
   matrix.fillScreen(0);
   matrix.setCursor(x, 0);
   uint16_t color = colors[0];
@@ -126,13 +119,13 @@ void testAllPixels(uint8_t fps) {
   Serial.println(colorIndex);
   colorIndex++;
   if (colorIndex >= 4){
-    colorIndex = 0;
-//    matrix.setBrightness(255/(i*2));
-//    Serial.print("Color Brightness ");
-//    Serial.println(256/i);
-//    i*=2;
-//    if(i > 16)
-//      i = 1;
+     colorIndex = 0;
+     matrix.setBrightness(255/(i*2));
+     Serial.print("Color Brightness ");
+     Serial.println(256/i);
+     i*=2;
+     if(i > 16)
+       i = 1;
   }
   
   matrix.show();
@@ -157,20 +150,13 @@ void testGPIO() {
 }
 
 void loop() {
-  Serial.println(F_CPU);
-  Serial.println(clock_div_1);
-  // put your main code here, to run repeatedly:
- char text[] = "6 5 4 3 2 1";
-// Serial.println(sizeof(text)/sizeof(text[0]));
-// Serial.println(PA8);
-// Serial.println(PB15);
- scrollText(10, text, sizeof(text)/sizeof(text[0]));
-// delay(1);
+  char text[] = "6 5 4 3 2 1";
 
-//  testDigital();
-//  testGPIO();
+  scrollText(10, text, sizeof(text)/sizeof(text[0]));
 
-// Serial.println("MAIN");
+//   testDigital();
+//   testGPIO();
+
 //   testEachPixel(8);
 //   testAllPixels(1);
 }
