@@ -54,6 +54,7 @@ void setup() {
   pinMode(led, OUTPUT);
   pinMode(testPin, OUTPUT);
   Serial.begin(38400);
+  
   // set sensor polling interupt routine
   // Pause the timer while we're configuring it
   timer.pause();
@@ -125,27 +126,12 @@ void  LEDControl() {
         color = Color_Brightness(adjusted);
         matrix.drawPixel(i, j, color);
         matrix.show();
-//        matrix.fillRect(0, 0, matrixWidth, matrixHeight, color);
-//        Serial.println(color);
         }
      }
-//     
-//    int avg = 0;
-//    for(uint8_t i = 0; i < sensorDataSize; i++) {
-//      avg += sensorData[i];
-//    }
-//    avg = avg/sensorDataSize;
-//    
-//    color = Color_Brightness(avg);
-//    matrix.fillRect(0, 0, matrixWidth, matrixHeight, color);
-//    matrix.show();
 }
 
 //Simply a while loop that gets the sensor poll data and prints it on update
 void loop() {
-  // put your main code here, to run repeatedly:
-
-   
     if (interruptFlag){
 
       
