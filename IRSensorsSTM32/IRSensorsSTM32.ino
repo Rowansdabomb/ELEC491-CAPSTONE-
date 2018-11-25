@@ -1,5 +1,3 @@
-//#include "TimerOne.h"
-
 #define SENSOR_POLL_PERIOD 100
 
 const uint8_t sensorDataSize = 16;
@@ -48,11 +46,9 @@ void sensorRead() {
     pin = (sensorDataSize - 1) - i;
     if(pin < 8){
       sensorData[i] = analogRead(pin)/16; //convert to 255
-//      sensorData[i] = pin;
     }
     else {
-      sensorData[i] = analogRead(pin + 10)/16;
-//      sensorData[i] = pin + 10;  
+      sensorData[i] = analogRead(pin + 10)/16; 
     }
   }
   gpio_write_bit(GPIOB, 12, LOW);
@@ -79,14 +75,7 @@ void printSensorData() {
 
 //Simply a while loop that gets the sensor poll data and prints it on update
 void loop() {
-  // put your main code here, to run repeatedly:
-
-  Serial.println("Let's begin!");
   while(true){
-//    digitalWrite(led, HIGH);
-//    delay(200);
-//    digitalWrite(led, LOW);
-//    delay(200);
     
     if (interruptFlag){
       if (digitalRead(led) == HIGH) {
