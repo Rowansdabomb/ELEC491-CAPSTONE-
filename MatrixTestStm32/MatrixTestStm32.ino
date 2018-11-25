@@ -158,7 +158,6 @@ void testGPIO() {
 
 void loop() {
   Serial.println(F_CPU);
-  Serial.println(clock_div_1);
   // put your main code here, to run repeatedly:
  char text[] = "6 5 4 3 2 1";
 // Serial.println(sizeof(text)/sizeof(text[0]));

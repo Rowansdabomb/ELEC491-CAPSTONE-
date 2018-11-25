@@ -47,7 +47,7 @@ void sensorRead() {
   for(uint8_t i = (sensorDataSize - 1); i > 5; --i) {
     pin = (sensorDataSize - 1) - i;
     if(pin < 8){
-      sensorData[i] = analogRead(pin)/16;
+      sensorData[i] = analogRead(pin)/16; //convert to 255
 //      sensorData[i] = pin;
     }
     else {
