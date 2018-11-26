@@ -1,5 +1,5 @@
 /***************************************************************************************
-*	Title: I2C_DynamicAddress_Slave
+*	Title: I2C_DynamicAddress_Master
 *	Description: Modification of i2c_scanner example for STM32
 *	Author: Jimmy Wong
 *	Date: Nov 18, 2018
