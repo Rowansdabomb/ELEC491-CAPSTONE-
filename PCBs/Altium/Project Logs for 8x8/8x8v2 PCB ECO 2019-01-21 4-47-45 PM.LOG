@@ -1,0 +1,26 @@
+Removed Pin From Net: NetName=GND Pin=319_1-3
+Removed Pin From Net: NetName=Net319_1_2 Pin=319_2-1
+Removed Pin From Net: NetName=ADC_COL5 Pin=319_2-2
+Removed Pin From Net: NetName=Net319_1_2 Pin=319_3-2
+Removed Pin From Net: NetName=GND Pin=319_3-3
+Removed Pin From Net: NetName=Net319_1_2 Pin=319_4-1
+Removed Pin From Net: NetName=ADC_COL5 Pin=319_4-2
+Removed Pin From Net: NetName=Net319_1_2 Pin=H_3_1-3
+Added Pin To Net: NetName=VCC Pin=319_1-1
+Added Pin To Net: NetName=GND Pin=319_1-4
+Added Pin To Net: NetName=GND Pin=319_2-1
+Added Pin To Net: NetName=ADC_COL5 Pin=319_2-4
+Added Pin To Net: NetName=VCC Pin=319_3-1
+Added Pin To Net: NetName=GND Pin=319_3-4
+Added Pin To Net: NetName=GND Pin=319_4-1
+Added Pin To Net: NetName=ADC_COL5 Pin=319_4-4
+Added Pin To Net: NetName=Net319_1_2 Pin=H1-10
+Added Pin To Net: NetName=Net319_1_3 Pin=319_1-3
+Added Pin To Net: NetName=Net319_1_3 Pin=319_2-2
+Added Pin To Net: NetName=Net319_1_3 Pin=319_3-3
+Added Pin To Net: NetName=Net319_1_3 Pin=319_4-2
+Added Pin To Net: NetName=Net319_1_3 Pin=H_3_1-3
+Added Net: Name=Net319_1_3
+Added Pin To Net: NetName=Net319_3_2 Pin=319_3-2
+Added Pin To Net: NetName=Net319_3_2 Pin=H1-11
+Added Net: Name=Net319_3_2

@@ -1,0 +1,23 @@
+Removed Pin From Net: NetName=ROW1 Pin=E_IR1-2
+Removed Pin From Net: NetName=NetD1_VDD Pin=J1-1
+Removed Pin From Net: NetName=NetD1_GND Pin=J1-20
+Removed Member From Class: ClassName=8x8 Member=E_IR1
+Added Component: Designator=E_IR_51C1(E_IR_51C)
+Added Pin To Net: NetName=ROW1 Pin=E_IR_51C1-1
+Added Pin To Net: NetName=NetR2_2 Pin=J1-9
+Added Pin To Net: NetName=NetR4_2 Pin=J1-11
+Added Pin To Net: NetName=SCOL3 Pin=J1-13
+Added Pin To Net: NetName=SCOL4 Pin=J1-15
+Added Pin To Net: NetName=SCOL5 Pin=J1-17
+Added Pin To Net: NetName=SCOL6 Pin=J1-19
+Added Pin To Net: NetName=NetR14_2 Pin=J1-21
+Change Net Name : Old Net Name=NetR2_2 New Net Name=NetJ1_9
+Change Net Name : Old Net Name=NetR4_2 New Net Name=NetJ1_11
+Change Net Name : Old Net Name=NetR14_2 New Net Name=NetJ1_21
+Added Pin To Net: NetName=NetE_IR_51C1_2 Pin=E_IR_51C1-2
+Added Pin To Net: NetName=NetE_IR_51C1_2 Pin=R1-2
+Added Net: Name=NetE_IR_51C1_2
+Added Pin To Net: NetName=NetIC2_2 Pin=IC2-2
+Added Pin To Net: NetName=NetIC2_2 Pin=Q14-2
+Added Net: Name=NetIC2_2
+Added Member To Class: ClassName=8x8 Member=Component E_IR_51C1 IR26-51C

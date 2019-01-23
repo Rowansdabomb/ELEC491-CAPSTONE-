@@ -1,0 +1,107 @@
+Removed Pin From Net: NetName=VCC Pin=H_3_1-1
+Removed Pin From Net: NetName=VCC Pin=MUX1-6
+Removed Pin From Net: NetName=GND Pin=MUX1-8
+Removed Pin From Net: NetName=NetH1_6 Pin=MUX1-10
+Removed Pin From Net: NetName=NetH1_5 Pin=MUX1-11
+Removed Pin From Net: NetName=VCC Pin=MUX1-16
+Removed Pin From Net: NetName=VCC Pin=MUX2-6
+Removed Pin From Net: NetName=GND Pin=MUX2-8
+Removed Pin From Net: NetName=NetH1_3 Pin=MUX2-9
+Removed Pin From Net: NetName=NetH1_2 Pin=MUX2-10
+Removed Pin From Net: NetName=NetH1_1 Pin=MUX2-11
+Removed Pin From Net: NetName=VCC Pin=MUX2-16
+Removed Member From Class: ClassName=8x8v2 Member=MUX1
+Removed Member From Class: ClassName=8x8v2 Member=MUX2
+Added Component: Designator=M_C(SOP65P640X110-16N)
+Added Component: Designator=M_R(SOP65P640X110-16N)
+Added Component: Designator=ROUT0(J1-0603)
+Added Component: Designator=ROUT1(J1-0603)
+Added Component: Designator=VR1(TO-252_5PIN)
+Added Pin To Net: NetName=VCC Pin=M_C-6
+Added Pin To Net: NetName=GND Pin=M_C-7
+Added Pin To Net: NetName=GND Pin=M_C-8
+Added Pin To Net: NetName=NetH1_6 Pin=M_C-9
+Added Pin To Net: NetName=NetH1_5 Pin=M_C-10
+Added Pin To Net: NetName=VCC Pin=M_C-16
+Added Pin To Net: NetName=VCC Pin=M_R-6
+Added Pin To Net: NetName=GND Pin=M_R-7
+Added Pin To Net: NetName=GND Pin=M_R-8
+Added Pin To Net: NetName=NetH1_3 Pin=M_R-9
+Added Pin To Net: NetName=NetH1_2 Pin=M_R-10
+Added Pin To Net: NetName=NetH1_1 Pin=M_R-11
+Added Pin To Net: NetName=VCC Pin=M_R-16
+Added Pin To Net: NetName=GND Pin=ROUT0-1
+Added Pin To Net: NetName=GND Pin=ROUT1-1
+Added Pin To Net: NetName=GND Pin=VR1-3
+Added Pin To Net: NetName=VCC Pin=VR1-4
+Added Pin To Net: NetName=NetH1_4 Pin=H1-4
+Added Pin To Net: NetName=NetH1_4 Pin=M_C-11
+Added Net: Name=NetH1_4
+Added Pin To Net: NetName=NetH2_5 Pin=H2-5
+Added Pin To Net: NetName=NetH2_5 Pin=LED1-SDI
+Added Net: Name=NetH2_5
+Added Pin To Net: NetName=NetH2_6 Pin=H2-6
+Added Pin To Net: NetName=NetH2_6 Pin=LED1-CKI
+Added Net: Name=NetH2_6
+Added Pin To Net: NetName=NetH_3_1_1 Pin=H_3_1-1
+Added Pin To Net: NetName=NetH_3_1_1 Pin=VR1-2
+Added Net: Name=NetH_3_1_1
+Added Pin To Net: NetName=NetLED64_CKO Pin=LED64-CKO
+Added Pin To Net: NetName=NetLED64_CKO Pin=ROUT0-2
+Added Net: Name=NetLED64_CKO
+Added Pin To Net: NetName=NetLED64_SDO Pin=LED64-SDO
+Added Pin To Net: NetName=NetLED64_SDO Pin=ROUT1-2
+Added Net: Name=NetLED64_SDO
+Added Pin To Net: NetName=NetM_C_1 Pin=M_C-1
+Added Pin To Net: NetName=NetM_C_1 Pin=Rci4-1
+Added Net: Name=NetM_C_1
+Added Pin To Net: NetName=NetM_C_2 Pin=M_C-2
+Added Pin To Net: NetName=NetM_C_2 Pin=Rci6-1
+Added Net: Name=NetM_C_2
+Added Pin To Net: NetName=NetM_C_4 Pin=M_C-4
+Added Pin To Net: NetName=NetM_C_4 Pin=Rci7-1
+Added Net: Name=NetM_C_4
+Added Pin To Net: NetName=NetM_C_5 Pin=M_C-5
+Added Pin To Net: NetName=NetM_C_5 Pin=Rci5-1
+Added Net: Name=NetM_C_5
+Added Pin To Net: NetName=NetM_C_12 Pin=M_C-12
+Added Pin To Net: NetName=NetM_C_12 Pin=Rci3-1
+Added Net: Name=NetM_C_12
+Added Pin To Net: NetName=NetM_C_13 Pin=M_C-13
+Added Pin To Net: NetName=NetM_C_13 Pin=Rci0-1
+Added Net: Name=NetM_C_13
+Added Pin To Net: NetName=NetM_C_14 Pin=M_C-14
+Added Pin To Net: NetName=NetM_C_14 Pin=Rci1-1
+Added Net: Name=NetM_C_14
+Added Pin To Net: NetName=NetM_C_15 Pin=M_C-15
+Added Pin To Net: NetName=NetM_C_15 Pin=Rci2-1
+Added Net: Name=NetM_C_15
+Added Pin To Net: NetName=NetM_R_1 Pin=M_R-1
+Added Pin To Net: NetName=NetM_R_1 Pin=Rin6-2
+Added Net: Name=NetM_R_1
+Added Pin To Net: NetName=NetM_R_2 Pin=M_R-2
+Added Pin To Net: NetName=NetM_R_2 Pin=Rin7-2
+Added Net: Name=NetM_R_2
+Added Pin To Net: NetName=NetM_R_4 Pin=M_R-4
+Added Pin To Net: NetName=NetM_R_4 Pin=Rin8-2
+Added Net: Name=NetM_R_4
+Added Pin To Net: NetName=NetM_R_5 Pin=M_R-5
+Added Pin To Net: NetName=NetM_R_5 Pin=Rin5-2
+Added Net: Name=NetM_R_5
+Added Pin To Net: NetName=NetM_R_12 Pin=M_R-12
+Added Pin To Net: NetName=NetM_R_12 Pin=Rin4-2
+Added Net: Name=NetM_R_12
+Added Pin To Net: NetName=NetM_R_13 Pin=M_R-13
+Added Pin To Net: NetName=NetM_R_13 Pin=Rin1-2
+Added Net: Name=NetM_R_13
+Added Pin To Net: NetName=NetM_R_14 Pin=M_R-14
+Added Pin To Net: NetName=NetM_R_14 Pin=Rin2-2
+Added Net: Name=NetM_R_14
+Added Pin To Net: NetName=NetM_R_15 Pin=M_R-15
+Added Pin To Net: NetName=NetM_R_15 Pin=Rin3-2
+Added Net: Name=NetM_R_15
+Added Member To Class: ClassName=8x8v2 Member=Component M_C 8-channel analog multiplexer/demultiplexer   Source:  Datasheet
+Added Member To Class: ClassName=8x8v2 Member=Component M_R 8-channel analog multiplexer/demultiplexer   Source:  Datasheet
+Added Member To Class: ClassName=8x8v2 Member=Component ROUT0 Res3
+Added Member To Class: ClassName=8x8v2 Member=Component ROUT1 Res3
+Added Member To Class: ClassName=8x8v2 Member=Component VR1 MIC35302WD

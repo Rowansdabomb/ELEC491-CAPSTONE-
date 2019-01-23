@@ -1,0 +1,27 @@
+Removed Pin From Net: NetName=ADC_COL5 Pin=319_1-3
+Removed Pin From Net: NetName=ADC_COL5 Pin=319_1-4
+Removed Pin From Net: NetName=ADC_COL5 Pin=319_3-3
+Removed Pin From Net: NetName=ADC_COL5 Pin=319_3-4
+Removed Pin From Net: NetName=ADC_COL5 Pin=810_1-3
+Removed Pin From Net: NetName=ADC_COL5 Pin=810_1-4
+Removed Pin From Net: NetName=ADC_COL5 Pin=810_3-3
+Removed Pin From Net: NetName=ADC_COL5 Pin=810_3-4
+Removed Pin From Net: NetName=ADC_COL5 Pin=H1-14
+Removed Pin From Net: NetName=ADC_COL5 Pin=H1-15
+Added Pin To Net: NetName=Net319_1_3 Pin=319_1-3
+Added Pin To Net: NetName=Net319_1_3 Pin=319_1-4
+Added Pin To Net: NetName=Net319_1_3 Pin=319_3-3
+Added Pin To Net: NetName=Net319_1_3 Pin=319_3-4
+Added Pin To Net: NetName=Net319_1_3 Pin=810_1-3
+Added Pin To Net: NetName=Net319_1_3 Pin=810_1-4
+Added Pin To Net: NetName=Net319_1_3 Pin=810_3-3
+Added Pin To Net: NetName=Net319_1_3 Pin=810_3-4
+Added Pin To Net: NetName=Net319_1_3 Pin=H1-14
+Added Pin To Net: NetName=Net319_1_3 Pin=H1-15
+Added Net: Name=Net319_1_3
+Added Member To Class: ClassName=8x8v2 Member=Component 319_3 319_4
+Added Member To Class: ClassName=8x8v2 Member=Component PT11 PT26-51B
+Added Member To Class: ClassName=8x8v2 Member=Component Rin1 Res3
+Added Member To Class: ClassName=8x8v2 Member=Component Rin6 Res3
+Added Member To Class: ClassName=8x8v2 Member=Component Rvs1 Res3
+Added Member To Class: ClassName=8x8v2 Member=Component Rvs6 Res3
