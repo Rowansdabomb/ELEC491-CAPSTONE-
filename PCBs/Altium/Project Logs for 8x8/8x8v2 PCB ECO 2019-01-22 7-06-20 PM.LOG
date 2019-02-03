@@ -1,0 +1,11 @@
+Change Component Designator: OldDesignator=319_1 NewDesignator=319_0
+Change Component Designator: OldDesignator=319_2 NewDesignator=319_1
+Change Component Designator: OldDesignator=319_3 NewDesignator=319_2
+Change Component Designator: OldDesignator=319_4 NewDesignator=319_3
+Change Net Name : Old Net Name=Net319_1_2 New Net Name=Net319_0_2
+Change Net Name : Old Net Name=Net319_1_3 New Net Name=Net319_0_3
+Change Net Name : Old Net Name=Net319_3_2 New Net Name=Net319_2_2
+Added Pin To Net: NetName=Net810_0_2 Pin=H1-8
+Added Net: Name=Net810_0_2
+Added Pin To Net: NetName=Net810_2_2 Pin=H1-9
+Added Net: Name=Net810_2_2

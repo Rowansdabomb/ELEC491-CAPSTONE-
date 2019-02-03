@@ -1,0 +1,56 @@
+Added Component: Designator=R15(J1-0603)
+Added Component: Designator=R16(J1-0603)
+Added Component: Designator=R17(J1-0603)
+Added Component: Designator=R18(J1-0603)
+Added Component: Designator=R19(J1-0603)
+Added Component: Designator=R20(J1-0603)
+Added Component: Designator=R21(J1-0603)
+Added Component: Designator=R22(J1-0603)
+Added Component: Designator=R23(J1-0603)
+Added Component: Designator=R24(J1-0603)
+Added Component: Designator=R25(J1-0603)
+Added Component: Designator=R26(J1-0603)
+Added Component: Designator=R27(J1-0603)
+Added Component: Designator=R28(J1-0603)
+Added Pin To Net: NetName=NetQ10_3 Pin=R15-1
+Added Pin To Net: NetName=NetE_IR8_1 Pin=R15-2
+Added Pin To Net: NetName=GND Pin=R16-1
+Added Pin To Net: NetName=SCOL1 Pin=R16-2
+Added Pin To Net: NetName=NetQ8_3 Pin=R17-1
+Added Pin To Net: NetName=NetE_IR9_1 Pin=R17-2
+Added Pin To Net: NetName=GND Pin=R18-1
+Added Pin To Net: NetName=SCOL2 Pin=R18-2
+Added Pin To Net: NetName=NetQ9_3 Pin=R19-1
+Added Pin To Net: NetName=NetE_IR10_1 Pin=R19-2
+Added Pin To Net: NetName=GND Pin=R20-1
+Added Pin To Net: NetName=NetR6_2 Pin=R20-2
+Added Pin To Net: NetName=NetQ11_3 Pin=R21-1
+Added Pin To Net: NetName=NetE_IR11_1 Pin=R21-2
+Added Pin To Net: NetName=GND Pin=R22-1
+Added Pin To Net: NetName=NetR8_2 Pin=R22-2
+Added Pin To Net: NetName=NetQ12_3 Pin=R23-1
+Added Pin To Net: NetName=NetE_IR12_1 Pin=R23-2
+Added Pin To Net: NetName=GND Pin=R24-1
+Added Pin To Net: NetName=NetR10_2 Pin=R24-2
+Added Pin To Net: NetName=NetQ13_3 Pin=R25-1
+Added Pin To Net: NetName=NetE_IR13_1 Pin=R25-2
+Added Pin To Net: NetName=GND Pin=R26-1
+Added Pin To Net: NetName=NetR12_2 Pin=R26-2
+Added Pin To Net: NetName=NetQ14_3 Pin=R27-1
+Added Pin To Net: NetName=NetE_IR14_1 Pin=R27-2
+Added Pin To Net: NetName=GND Pin=R28-1
+Added Pin To Net: NetName=SCOL7 Pin=R28-2
+Added Member To Class: ClassName=8x8 Member=Component R15 Res3
+Added Member To Class: ClassName=8x8 Member=Component R16 Res3
+Added Member To Class: ClassName=8x8 Member=Component R17 Res3
+Added Member To Class: ClassName=8x8 Member=Component R18 Res3
+Added Member To Class: ClassName=8x8 Member=Component R19 Res3
+Added Member To Class: ClassName=8x8 Member=Component R20 Res3
+Added Member To Class: ClassName=8x8 Member=Component R21 Res3
+Added Member To Class: ClassName=8x8 Member=Component R22 Res3
+Added Member To Class: ClassName=8x8 Member=Component R23 Res3
+Added Member To Class: ClassName=8x8 Member=Component R24 Res3
+Added Member To Class: ClassName=8x8 Member=Component R25 Res3
+Added Member To Class: ClassName=8x8 Member=Component R26 Res3
+Added Member To Class: ClassName=8x8 Member=Component R27 Res3
+Added Member To Class: ClassName=8x8 Member=Component R28 Res3

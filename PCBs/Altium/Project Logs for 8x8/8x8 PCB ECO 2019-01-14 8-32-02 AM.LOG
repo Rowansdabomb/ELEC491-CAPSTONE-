@@ -1,0 +1,59 @@
+Added Component: Designator=R1(J1-0603)
+Added Component: Designator=R2(J1-0603)
+Added Component: Designator=R3(J1-0603)
+Added Component: Designator=R4(J1-0603)
+Added Component: Designator=R5(J1-0603)
+Added Component: Designator=R6(J1-0603)
+Added Component: Designator=R7(J1-0603)
+Added Component: Designator=R8(J1-0603)
+Added Component: Designator=R9(J1-0603)
+Added Component: Designator=R10(J1-0603)
+Added Component: Designator=R11(J1-0603)
+Added Component: Designator=R12(J1-0603)
+Added Component: Designator=R13(J1-0603)
+Added Component: Designator=R14(J1-0603)
+Added Pin To Net: NetName=NetQ10_3 Pin=R1-1
+Added Pin To Net: NetName=NetE_IR1_1 Pin=R1-2
+Added Pin To Net: NetName=GND Pin=R2-1
+Added Pin To Net: NetName=SCOL1 Pin=R2-2
+Added Pin To Net: NetName=NetQ8_3 Pin=R3-1
+Added Pin To Net: NetName=NetE_IR2_1 Pin=R3-2
+Added Pin To Net: NetName=GND Pin=R4-1
+Added Pin To Net: NetName=SCOL2 Pin=R4-2
+Added Pin To Net: NetName=NetQ9_3 Pin=R5-1
+Added Pin To Net: NetName=NetE_IR3_1 Pin=R5-2
+Added Pin To Net: NetName=GND Pin=R6-1
+Added Pin To Net: NetName=NetR6_2 Pin=R6-2
+Added Pin To Net: NetName=NetQ11_3 Pin=R7-1
+Added Pin To Net: NetName=NetE_IR4_1 Pin=R7-2
+Added Pin To Net: NetName=GND Pin=R8-1
+Added Pin To Net: NetName=NetR8_2 Pin=R8-2
+Added Pin To Net: NetName=NetQ12_3 Pin=R9-1
+Added Pin To Net: NetName=NetE_IR5_1 Pin=R9-2
+Added Pin To Net: NetName=GND Pin=R10-1
+Added Pin To Net: NetName=NetR10_2 Pin=R10-2
+Added Pin To Net: NetName=NetQ13_3 Pin=R11-1
+Added Pin To Net: NetName=NetE_IR6_1 Pin=R11-2
+Added Pin To Net: NetName=GND Pin=R12-1
+Added Pin To Net: NetName=NetR12_2 Pin=R12-2
+Added Pin To Net: NetName=NetQ14_3 Pin=R13-1
+Added Pin To Net: NetName=NetE_IR7_1 Pin=R13-2
+Added Pin To Net: NetName=GND Pin=R14-1
+Added Pin To Net: NetName=SCOL7 Pin=R14-2
+Change Class Name : Old Net Name=PCB2 New Net Name=8x8
+Added Member To Class: ClassName=8x8 Member=Component R1 Res3
+Added Member To Class: ClassName=8x8 Member=Component R2 Res3
+Added Member To Class: ClassName=8x8 Member=Component R3 Res3
+Added Member To Class: ClassName=8x8 Member=Component R4 Res3
+Added Member To Class: ClassName=8x8 Member=Component R5 Res3
+Added Member To Class: ClassName=8x8 Member=Component R6 Res3
+Added Member To Class: ClassName=8x8 Member=Component R7 Res3
+Added Member To Class: ClassName=8x8 Member=Component R8 Res3
+Added Member To Class: ClassName=8x8 Member=Component R9 Res3
+Added Member To Class: ClassName=8x8 Member=Component R10 Res3
+Added Member To Class: ClassName=8x8 Member=Component R11 Res3
+Added Member To Class: ClassName=8x8 Member=Component R12 Res3
+Added Member To Class: ClassName=8x8 Member=Component R13 Res3
+Added Member To Class: ClassName=8x8 Member=Component R14 Res3
+Change Room Name: Old Name=PCB2 New Name=8x8
+Change Room Scope: Old Scope=InComponentClass('PCB2') New Scope=InComponentClass('8x8')

@@ -1,0 +1,12 @@
+Added Component: Designator=810_0(810_4)
+Added Component: Designator=810_1(810_4)
+Added Pin To Net: NetName=VCC Pin=810_0-1
+Added Pin To Net: NetName=Net810_0_2 Pin=810_0-2
+Added Pin To Net: NetName=Net319_0_3 Pin=810_0-3
+Added Pin To Net: NetName=GND Pin=810_0-4
+Added Pin To Net: NetName=GND Pin=810_1-1
+Added Pin To Net: NetName=Net319_0_3 Pin=810_1-2
+Added Pin To Net: NetName=ADC_COL5 Pin=810_1-3
+Added Pin To Net: NetName=ADC_COL5 Pin=810_1-4
+Added Member To Class: ClassName=8x8v2 Member=Component 810_0 810_4
+Added Member To Class: ClassName=8x8v2 Member=Component 810_1 810_4

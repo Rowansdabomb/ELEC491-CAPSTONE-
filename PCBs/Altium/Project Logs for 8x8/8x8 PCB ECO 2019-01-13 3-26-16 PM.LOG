@@ -1,0 +1,11 @@
+Added Component: Designator=R?(J1-0603)
+Added Component: Designator=R?(J1-0603)
+Added Pin To Net: NetName=GND Pin=R?-1
+Added Pin To Net: NetName=NetQ10_3 Pin=R?-1
+Added Pin To Net: NetName=NetE_IR1_1 Pin=R?-2
+Added Pin To Net: NetName=SCOL1 Pin=R?-2
+Change Class Name : Old Net Name=PCB2 New Net Name=8x8
+Added Member To Class: ClassName=8x8 Member=Component R? Res3
+Added Member To Class: ClassName=8x8 Member=Component R? Res3
+Change Room Name: Old Name=PCB2 New Name=8x8
+Change Room Scope: Old Scope=InComponentClass('PCB2') New Scope=InComponentClass('8x8')
