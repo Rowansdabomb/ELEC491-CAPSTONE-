@@ -168,35 +168,45 @@ void loop() {
     Serial.print(",y: ");
     Serial.print(tile[0].pos.y);
     Serial.print(",active: ");
-    Serial.println(tile[0].active);
+    Serial.print(tile[0].active);
+    Serial.print(", ports: ");
+    Serial.println(tile[0].ports);
     
     Serial.print("Tile 1 x: ");
     Serial.print(tile[1].pos.x);
     Serial.print(",y: ");
     Serial.print(tile[1].pos.y);
     Serial.print(",active: ");
-    Serial.println(tile[1].active);
+    Serial.print(tile[1].active);
+    Serial.print(", ports: ");
+    Serial.println(tile[1].ports);    
     
     Serial.print("Tile 2 x: ");
     Serial.print(tile[2].pos.x);
     Serial.print(",y: ");
     Serial.print(tile[2].pos.y);
     Serial.print(",active: ");
-    Serial.println(tile[2].active);
- 
+    Serial.print(tile[2].active);
+    Serial.print(", ports: ");
+    Serial.println(tile[2].ports);
+     
     Serial.print("Tile 3 x: ");
     Serial.print(tile[3].pos.x);
     Serial.print(",y: ");
     Serial.print(tile[3].pos.y);
     Serial.print(",active: ");
-    Serial.println(tile[3].active);
+    Serial.print(tile[3].active);
+    Serial.print(", ports: ");
+    Serial.println(tile[3].ports);
 
     Serial.print("Tile 4 x: ");
     Serial.print(tile[4].pos.x);
     Serial.print(",y: ");
     Serial.print(tile[4].pos.y);
     Serial.print(",active: ");
-    Serial.println(tile[4].active);
+    Serial.print(tile[4].active);
+    Serial.print(", ports: ");
+    Serial.println(tile[4].ports);    
     
     Serial.println(); 
     print_flag = 0;
@@ -308,7 +318,9 @@ void loop() {
     if (error == 0){
       tile[tileID].active = 1;
       tile[tileID].pos.x = x_free;
+      x_free = 0;
       tile[tileID].pos.y = y_free;
+      y_free = 0;
       layout[x_free][y_free] = tile[tileID].addr;
       dirChange_f = 0;// reset the direction changed flag
     }
@@ -317,6 +329,39 @@ void loop() {
   
 
   //TODO: Sending data dynamically
+  if(tile[4].active == 1){
+    Wire.beginTransmission(tile[4].addr);
+    switch(tile[0].ports){
+      case CNCT_U:
+        Wire.write('E');
+        Wire.write('1');
+        Wire.write('0');
+        Wire.write('6');
+        break;
+      case CNCT_D:
+        Wire.write('E');
+        Wire.write('0');
+        Wire.write('1');
+        Wire.write('7');
+        break;  
+      case CNCT_L:
+        Wire.write('E');
+        Wire.write('1');
+        Wire.write('1');
+        Wire.write('8');
+        break;  
+      case CNCT_R:
+        Wire.write('E');
+        Wire.write('0');
+        Wire.write('0');
+        Wire.write('9');
+        break; 
+      default:
+        Wire.write('D');
+        break;
+    }//End Switch
+    Wire.endTransmission();    
+  }
   
   delay(100);
   
