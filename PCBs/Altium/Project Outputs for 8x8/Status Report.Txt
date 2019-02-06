@@ -1,22 +1,13 @@
-Output: Gerber Files
-Type  : Gerber
-From  : Variant [[No Variations]] of Project [8x8.PrjPcb]
-   Generated File[8x8v2.GTL]
-   Generated File[8x8v2.GP1]
-   Generated File[8x8v2.GP2]
-   Generated File[8x8v2.GBL]
-   Generated File[8x8v2.GTO]
-   Generated File[8x8v2.GTP]
-   Generated File[8x8v2.GTS]
-   Generated File[8x8v2.GBS]
-   Generated File[8x8v2.GBP]
-   Generated File[8x8v2.GBO]
-   Generated File[8x8v2.RUL]
-   Generated File[8x8v2.EXTREP]
-   Generated File[8x8v2.REP]
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [8x8.PrjPcb]
+   Generated File[8x8v2.TXT]
+   Generated File[8x8v2.DRL]
+   Generated File[8x8v2.LDP]
+   Generated File[8x8v2.DRR]
 
 
-Files Generated   : 13
+Files Generated   : 4
 Documents Printed : 0
 
-Finished Output Generation At 1:16:27 PM On 2019-02-01
+Finished Output Generation At 8:08:21 AM On 2019-02-05
