@@ -1,13 +1,12 @@
 Output: NC Drill Files
 Type  : NC Drill
 From  : Project [8x8.PrjPcb]
-   Generated File[8x8v2.TXT]
-   Generated File[8x8v2.DRL]
+   Generated File[8x8v2-BoardEdgeRout.TXT]
    Generated File[8x8v2.LDP]
    Generated File[8x8v2.DRR]
 
 
-Files Generated   : 4
+Files Generated   : 3
 Documents Printed : 0
 
-Finished Output Generation At 8:08:21 AM On 2019-02-05
+Finished Output Generation At 9:21:49 PM On 2019-02-05
