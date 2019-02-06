@@ -1,0 +1,67 @@
+Removed Pin From Net: NetName=Net810_0_2 Pin=H1-8
+Removed Pin From Net: NetName=Net810_2_2 Pin=H1-9
+Removed Pin From Net: NetName=Net319_0_2 Pin=H1-10
+Removed Pin From Net: NetName=Net319_2_2 Pin=H1-11
+Removed Pin From Net: NetName=I2C_1 Pin=H1-14
+Removed Pin From Net: NetName=I2C_2 Pin=H1-15
+Removed Pin From Net: NetName=GND Pin=H1-19
+Removed Pin From Net: NetName=VCC Pin=H1-20
+Removed Pin From Net: NetName=GND Pin=H2-1
+Removed Pin From Net: NetName=GND Pin=H2-2
+Removed Pin From Net: NetName=VCC Pin=H2-3
+Removed Pin From Net: NetName=ADC_COL7 Pin=H2-9
+Removed Pin From Net: NetName=ADC_COL6 Pin=H2-10
+Removed Pin From Net: NetName=ADC_COL5 Pin=H2-11
+Removed Pin From Net: NetName=ADC_COL4 Pin=H2-12
+Removed Pin From Net: NetName=ADC_COL3 Pin=H2-13
+Removed Pin From Net: NetName=ADC_COL2 Pin=H2-14
+Removed Pin From Net: NetName=ADC_COL1 Pin=H2-15
+Removed Pin From Net: NetName=ADC_COL0 Pin=H2-16
+Change Component Footprint: Designator=H1 Old Footprint=NPPN201BFLC-RC New Footprint=NPTC202KFMS-RC
+Change Component Footprint: Designator=H2 Old Footprint=NPPN201BFLC-RC New Footprint=NPTC202KFMS-RC
+Change Component Comment : Designator=H1 Old Comment=NPPN201BFLC-RC New Comment=NPTC202KFMS-RC
+Change Component Comment : Designator=H2 Old Comment=NPPN201BFLC-RC New Comment=NPTC202KFMS-RC
+Added Pin To Net: NetName=VCC Pin=H1-1
+Added Pin To Net: NetName=GND Pin=H1-2
+Added Pin To Net: NetName=I2C_2 Pin=H1-6
+Added Pin To Net: NetName=I2C_1 Pin=H1-7
+Added Pin To Net: NetName=Net319_2_2 Pin=H1-10
+Added Pin To Net: NetName=Net319_0_2 Pin=H1-11
+Added Pin To Net: NetName=Net810_2_2 Pin=H1-12
+Added Pin To Net: NetName=Net810_0_2 Pin=H1-13
+Added Pin To Net: NetName=ADC_COL0 Pin=H2-25
+Added Pin To Net: NetName=ADC_COL1 Pin=H2-26
+Added Pin To Net: NetName=ADC_COL2 Pin=H2-27
+Added Pin To Net: NetName=ADC_COL3 Pin=H2-28
+Added Pin To Net: NetName=ADC_COL4 Pin=H2-29
+Added Pin To Net: NetName=ADC_COL5 Pin=H2-30
+Added Pin To Net: NetName=ADC_COL6 Pin=H2-31
+Added Pin To Net: NetName=ADC_COL7 Pin=H2-32
+Added Pin To Net: NetName=VCC Pin=H2-38
+Added Pin To Net: NetName=GND Pin=H2-39
+Added Pin To Net: NetName=GND Pin=H2-40
+Added Pin To Net: NetName=M_CS0 Pin=H1-17
+Added Pin To Net: NetName=M_CS0 Pin=M_C-11
+Added Net: Name=M_CS0
+Added Pin To Net: NetName=M_CS1 Pin=H1-16
+Added Pin To Net: NetName=M_CS1 Pin=M_C-10
+Added Net: Name=M_CS1
+Added Pin To Net: NetName=M_CS2 Pin=H1-15
+Added Pin To Net: NetName=M_CS2 Pin=M_C-9
+Added Net: Name=M_CS2
+Added Pin To Net: NetName=M_RS0 Pin=H1-20
+Added Pin To Net: NetName=M_RS0 Pin=M_R-11
+Added Net: Name=M_RS0
+Added Pin To Net: NetName=M_RS1 Pin=H1-19
+Added Pin To Net: NetName=M_RS1 Pin=M_R-10
+Added Net: Name=M_RS1
+Added Pin To Net: NetName=M_RS2 Pin=H1-18
+Added Pin To Net: NetName=M_RS2 Pin=M_R-9
+Added Net: Name=M_RS2
+Added Pin To Net: NetName=NetH2_35 Pin=H2-35
+Added Pin To Net: NetName=NetH2_35 Pin=LED1-CKI
+Added Net: Name=NetH2_35
+Added Pin To Net: NetName=NetH2_36 Pin=H2-36
+Added Pin To Net: NetName=NetH2_36 Pin=LED1-SDI
+Added Net: Name=NetH2_36
+Added Room: Name=8x8v2
