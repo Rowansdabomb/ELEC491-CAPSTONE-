@@ -77,46 +77,6 @@ Used DCodes :
 *************************************************************
 
 *************************************************************
-Generating : Bottom Pad Master
-      File : 8x8v2.GPB
-
-    Adding Layer      : Bottom Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D19
-    D20
-    D21
-    D22
-    D23
-    D24
-    D25
-    D26
-    D27
-    D28
-    D29
-    D30
-    D31
-*************************************************************
-
-*************************************************************
-Generating : Top Pad Master
-      File : 8x8v2.GPT
-
-    Adding Layer      : Top Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D10
-    D11
-    D12
-*************************************************************
-
-*************************************************************
 Generating : Top Overlay
       File : 8x8v2.GTO
 
@@ -234,76 +194,5 @@ Used DCodes :
     D52
     D53
     D54
-*************************************************************
-
-*************************************************************
-Generating : BoardCutout
-      File : 8x8v2.GM1
-
-    Adding Layer      : BoardCutout
-
-
-Used DCodes :
-    D55
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 13
-      File : 8x8v2.GM13
-
-    Adding Layer      : Mechanical 13
-
-
-Used DCodes :
-    D56
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 15
-      File : 8x8v2.GM15
-
-    Adding Layer      : Mechanical 15
-
-
-Used DCodes :
-    D56
-*************************************************************
-
-*************************************************************
-Generating : Mechanical 16
-      File : 8x8v2.GM16
-
-    Adding Layer      : Mechanical 16
-
-
-Used DCodes :
-    D57
-    D58
-*************************************************************
-
-*************************************************************
-Generating : Drill Drawing
-      File : 8x8v2.GD1
-
-    Adding Drill Pair : Bottom Layer-Top Layer
-
-    Adding Layer      : Drill Drawing
-
-
-Used DCodes :
-    D59
-*************************************************************
-
-*************************************************************
-Generating : Drill Guide
-      File : 8x8v2.GG1
-
-    Adding Drill Pair : Bottom Layer-Top Layer
-
-    Adding Layer      : Drill Guide
-
-
-Used DCodes :
-    D59
 *************************************************************
 

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------
-Gerber File Extension Report For: 8x8v2.GBR   2019-02-05  9:21:01 PM
+Gerber File Extension Report For: 8x8v2.GBR   2019-02-06  12:27:04 PM
 ------------------------------------------------------------------------------------------
 
 
@@ -10,18 +10,10 @@ Layer Extension     Layer Description
 .GP1                VCC Plane                               
 .GP2                GND Plane                               
 .GBL                Bottom Layer                            
-.GPB                Bottom Pad Master                       
-.GPT                Top Pad Master                          
 .GTO                Top Overlay                             
 .GTP                Top Paste                               
 .GTS                Top Solder                              
 .GBS                Bottom Solder                           
 .GBP                Bottom Paste                            
 .GBO                Bottom Overlay                          
-.GM1                BoardCutout                             
-.GM13               Mechanical 13                           
-.GM15               Mechanical 15                           
-.GM16               Mechanical 16                           
-.GD1                Drill Drawing                           
-.GG1                Drill Guide                             
 ------------------------------------------------------------------------------------------
