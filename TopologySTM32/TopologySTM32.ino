@@ -59,7 +59,7 @@ TILE tile[TILE_MAX];
 //last set as default 
 int addr_lst[TILE_MAX] = {0x08, 0x10, 0x18, 0x20, 0x28};
 
-int error;
+//int error;
 int i;
 int tileID;
 int x_free;
@@ -170,7 +170,7 @@ void loop() {
     Serial.print(",active: ");
     Serial.print(tile[0].active);
     Serial.print(", ports: ");
-    Serial.println(tile[0].ports);
+    Serial.println(tile[0].ports, BIN);
     
     Serial.print("Tile 1 x: ");
     Serial.print(tile[1].pos.x);
@@ -179,7 +179,7 @@ void loop() {
     Serial.print(",active: ");
     Serial.print(tile[1].active);
     Serial.print(", ports: ");
-    Serial.println(tile[1].ports);    
+    Serial.println(tile[1].ports, BIN);    
     
     Serial.print("Tile 2 x: ");
     Serial.print(tile[2].pos.x);
@@ -188,7 +188,7 @@ void loop() {
     Serial.print(",active: ");
     Serial.print(tile[2].active);
     Serial.print(", ports: ");
-    Serial.println(tile[2].ports);
+    Serial.println(tile[2].ports, BIN);
      
     Serial.print("Tile 3 x: ");
     Serial.print(tile[3].pos.x);
@@ -197,7 +197,7 @@ void loop() {
     Serial.print(",active: ");
     Serial.print(tile[3].active);
     Serial.print(", ports: ");
-    Serial.println(tile[3].ports);
+    Serial.println(tile[3].ports, BIN);
 
     Serial.print("Tile 4 x: ");
     Serial.print(tile[4].pos.x);
@@ -206,9 +206,7 @@ void loop() {
     Serial.print(",active: ");
     Serial.print(tile[4].active);
     Serial.print(", ports: ");
-    Serial.println(tile[4].ports);    
-    
-    Serial.println(); 
+    Serial.println(tile[4].ports, BIN);
     print_flag = 0;
   }
   
@@ -232,10 +230,16 @@ void loop() {
   // Loop to check if the currently existing tiles
   // still exist, if not clear and erase from layout
   // tile[0] will be reserved for the master
-  
-  tileCount = 1;
-  for(i = 0; i < TILE_MAX; i++){
 
+  tileCount = 1;
+
+  Wire.beginTransmission(I2C_DEFAULT);
+  int chk_error = Wire.endTransmission();
+  if (chk_error == 0){
+    Serial.println("Default Address still detected");
+  }
+  for(i = 0; i < TILE_MAX; i++){
+    int error;
     if( i != 0 ){//Check if dealing with master tile
       if( tile[i].active == 1 ){
         Wire.beginTransmission(tile[i].addr);
@@ -298,9 +302,9 @@ void loop() {
     
     // Check if the default address exist
     Wire.beginTransmission(I2C_DEFAULT);
-    error = Wire.endTransmission();
-    Serial.println(error);
-    if (error == SUCCESS){
+    int def_error = Wire.endTransmission();
+    //Serial.println(def_error);
+    if (def_error == SUCCESS){
       Serial.println("Device found at default address");
       Wire.beginTransmission(I2C_DEFAULT);
       Wire.write('A');
@@ -314,8 +318,8 @@ void loop() {
     delay(500); //Half second delay before checking that the tile is now in place
     //Determine the location of the tile
     Wire.beginTransmission(tile[tileID].addr);
-    error = Wire.endTransmission();
-    if (error == 0){
+    int addr_error = Wire.endTransmission();
+    if (addr_error == 0){
       tile[tileID].active = 1;
       tile[tileID].pos.x = x_free;
       x_free = 0;
