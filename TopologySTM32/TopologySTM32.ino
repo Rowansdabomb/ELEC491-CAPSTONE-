@@ -20,16 +20,21 @@
 #define DEBUG 0
 
 int print_flag = 0;
+#define PRINT_EN 1
+
+#define ARRAY_SIZE 7
 
 //Use layout to store the addresses of the devices 7 by 7
 int layout[7][7]= {{  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0},
-                  {  0,  0,  0,  1,  0,  0,  0},
+                  {  0,  0,  0,  9,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0},
 };
+
+int tile_order[4] = {0, 0, 0, 0};
 
 struct POS {
   int x;
@@ -42,7 +47,7 @@ struct POS {
  * posX   = position of tile in the X direction
  * posY   = position of tile in the Y direction
  * ports  = state of the directional pins
- * ports_pre = state of the directional pins in the previous instance
+ * ports_pre = state of the directional pins in the previous instance 
 */
 struct TILE {
   byte  active;
@@ -66,7 +71,13 @@ int x_free;
 int y_free;
 int dirChange;
 int dirChange_f;
-int tileCount;
+int tile_count;
+int tile_order_f = 0;
+//int tile_count_pre;
+int show_tile;
+int show_x;
+int show_y;
+
 int pinDir = B0000;
 
 //DotStar Setup
@@ -101,17 +112,17 @@ const uint16_t colors[] = {
 
 void handler_tim(void);
 
-void setup() {
-  Serial.begin(9600); // for the serial monitor
+void show_tile_info(int tileID);
 
-  //Input pins for direction
+void setup() {
+  // Directional Pin Setup
   
   pinMode(PIN_DIR_U, INPUT_PULLDOWN);
   pinMode(PIN_DIR_D, INPUT_PULLDOWN);
   pinMode(PIN_DIR_L, INPUT_PULLDOWN);
   pinMode(PIN_DIR_R, INPUT_PULLDOWN);
   
-  
+  // Internal Device Map - Initial Population
   for(i = 0; i < TILE_MAX; i++){
     tile[i].active  = 0;
     tile[i].addr    = addr_lst[i];
@@ -132,17 +143,20 @@ void setup() {
   Timer2.setCompare(TIMER_CH1, 1);
   Timer2.attachInterrupt(TIMER_CH1, handler_tim);
   
-
+  // I2C Master Setup
   Wire.begin();
-  /*
-  matrix.begin(); // Initialize pins for output
 
-  matrix.setBrightness(64); // Set max brightness (out of 255)
-  
+  // DotStar Setup
+  matrix.begin(); // Initialize pins for output
+  matrix.setBrightness(64); // Set max brightness (out of 255) 
   matrix.setTextWrap(false);
   matrix.setTextColor(colors[0]);
   matrix.show();  // Turn all LEDs off ASAP
-  */
+
+  // Serial Setup - for output
+  Serial.begin(9600); 
+
+  tile_order_f = 1;
 }
 
 int x    = matrix.width();
@@ -151,65 +165,38 @@ uint8_t colorIndex = 0;
 
 void loop() {
 
-  //Serial.println(print_flag);
-  
-  if(print_flag == 1){
-  
+  if(print_flag == PRINT_EN){
+    /*
     Serial.print("x free: ");
     Serial.print(x_free);
     Serial.print(",y_free: ");
     Serial.println(y_free);
-    //Serial.print("DIR: ");
-    //Serial.println(tile[0].ports, BIN);
-    Serial.print("Tile ID: ");
-    Serial.println(tileID);
-    Serial.print("Tile 0 x: ");
-    Serial.print(tile[0].pos.x);
-    Serial.print(",y: ");
-    Serial.print(tile[0].pos.y);
-    Serial.print(",active: ");
-    Serial.print(tile[0].active);
-    Serial.print(", ports: ");
-    Serial.println(tile[0].ports, BIN);
     
-    Serial.print("Tile 1 x: ");
-    Serial.print(tile[1].pos.x);
-    Serial.print(",y: ");
-    Serial.print(tile[1].pos.y);
-    Serial.print(",active: ");
-    Serial.print(tile[1].active);
-    Serial.print(", ports: ");
-    Serial.println(tile[1].ports, BIN);    
-    
-    Serial.print("Tile 2 x: ");
-    Serial.print(tile[2].pos.x);
-    Serial.print(",y: ");
-    Serial.print(tile[2].pos.y);
-    Serial.print(",active: ");
-    Serial.print(tile[2].active);
-    Serial.print(", ports: ");
-    Serial.println(tile[2].ports, BIN);
-     
-    Serial.print("Tile 3 x: ");
-    Serial.print(tile[3].pos.x);
-    Serial.print(",y: ");
-    Serial.print(tile[3].pos.y);
-    Serial.print(",active: ");
-    Serial.print(tile[3].active);
-    Serial.print(", ports: ");
-    Serial.println(tile[3].ports, BIN);
+    show_tile_info(0);
+    show_tile_info(1);
+    show_tile_info(2);
+    show_tile_info(3);
+    show_tile_info(4); 
+*/
+    Serial.print("# Tiles: ");
+    Serial.print(tile_count);
+    Serial.print(" Order : ");
+    for(int j = 0; j < 4; j++){
+      Serial.print(tile_order[j]);
+      Serial.print(" "); 
+    }
+    Serial.println();
 
-    Serial.print("Tile 4 x: ");
-    Serial.print(tile[4].pos.x);
-    Serial.print(",y: ");
-    Serial.print(tile[4].pos.y);
-    Serial.print(",active: ");
-    Serial.print(tile[4].active);
-    Serial.print(", ports: ");
-    Serial.println(tile[4].ports, BIN);
-    print_flag = 0;
+    //Disable the flag
+    //print_flag = 0;
   }
   
+  int array_x_max = 3;
+  int array_y_max = 3;
+  int array_x_min = 3;
+  int array_y_min = 3;
+  
+  //Serial.println("Determining Directions");
   
   //Determine occupied directions
   tile[0].ports_pre = tile[0].ports;
@@ -230,16 +217,21 @@ void loop() {
   // Loop to check if the currently existing tiles
   // still exist, if not clear and erase from layout
   // tile[0] will be reserved for the master
+  //tile_count_pre = tile_count;
+  tile_count = 1;
 
-  tileCount = 1;
-
+  //Serial.println("First I2C Check");
   Wire.beginTransmission(I2C_DEFAULT);
   int chk_error = Wire.endTransmission();
   if (chk_error == 0){
     Serial.println("Default Address still detected");
   }
+
+  
   for(i = 0; i < TILE_MAX; i++){
     int error;
+    //Serial.print("Currently Checking Tile ");
+    //Serial.println(i);
     if( i != 0 ){//Check if dealing with master tile
       if( tile[i].active == 1 ){
         Wire.beginTransmission(tile[i].addr);
@@ -247,7 +239,7 @@ void loop() {
       }else{
         tileID = i;
       }
-
+      
       if (error == SUCCESS) {
         if(DEBUG){
           Serial.print("I2C device found at address 0x");
@@ -257,18 +249,34 @@ void loop() {
         //If available request current port status from slave devices
         Wire.requestFrom(tile[i].addr, 1);
         tile[i].ports = Wire.read();
-        tileCount++;
+        tile_count++;
+        if( tile[i].pos.x < array_x_min ){
+          array_x_min = tile[i].pos.x;
+        }
+        if( tile[i].pos.x > array_x_max ){
+          array_x_max = tile[i].pos.x;
+        }
+        if( tile[i].pos.y > array_y_max  ){
+          array_y_max = tile[i].pos.y;
+        }
+        if( tile[i].pos.y < array_y_min ){
+          array_y_min = tile[i].pos.y;
+        }
       }else{
         if(DEBUG){
           Serial.print("No I2C device found at address 0x");
           Serial.println(tile[i].addr, HEX);
         }// END DEBUG PRINT
+        layout[tile[i].pos.y][tile[i].pos.x] = 0;
         tile[i].pos.x = 0;
         tile[i].pos.y = 0;
         tile[i].active = 0;
+        //Tile Removed 
+        tile_order_f = 1;
       }// END Address Successfully found
  
     }
+
     //Check if the directional ports has changed
     if(tile[i].ports != tile[i].ports_pre){
       dirChange_f = 1;
@@ -321,18 +329,87 @@ void loop() {
     int addr_error = Wire.endTransmission();
     if (addr_error == 0){
       tile[tileID].active = 1;
-      tile[tileID].pos.x = x_free;
+      tile[tileID].pos.x = x_free;   
+      tile[tileID].pos.y = y_free;  
+      layout[y_free][x_free] = tileID;
       x_free = 0;
-      tile[tileID].pos.y = y_free;
       y_free = 0;
-      layout[x_free][y_free] = tile[tileID].addr;
       dirChange_f = 0;// reset the direction changed flag
+      tile_order_f = 1;// raise the flag for to redo the tile order
     }
 
+  }
+  if(print_flag == PRINT_EN){
+    Serial.println("Current Internal Array");
+    for(int j = 0; j < ARRAY_SIZE; j++){
+      for(int k = 0; k < ARRAY_SIZE; k++){
+        Serial.print(layout[j][k]);
+        Serial.print(" ");
+      }
+      Serial.println();
+    }
+    print_flag = 0;
+  }
+  if(print_flag == 5){
+    Serial.print("Array X Values: ");
+    Serial.print(array_x_min);
+    Serial.print(" ");
+    Serial.println(array_x_max);
+    Serial.print("Array Y Values: ");
+    Serial.print(array_y_min);
+    Serial.print(" ");
+    Serial.println(array_y_max);
+    print_flag = 0;
   }
   
 
   //TODO: Sending data dynamically
+  if(tile_order_f == 1){ // only needs to be done if number of tiles changes
+    int cnt_x;
+    int cnt_y;
+    int cnt_order = 0;
+    for(cnt_order = 0; cnt_order < 4; cnt_order++){
+          tile_order[cnt_order] = 0;  //reset the order
+    }
+    cnt_order = 0;
+    for(cnt_y = array_y_min; cnt_y <= array_y_max; cnt_y++){
+      for(cnt_x = array_x_min; cnt_x <= array_x_max; cnt_x++){
+        /*Serial.print("At position ");
+        Serial.print(cnt_x);
+        Serial.print(" ");
+        Serial.println(cnt_y);
+        */
+        int temp_id = layout[cnt_y][cnt_x];
+        if (temp_id == 9){
+          tile_order[cnt_order] = temp_id;
+          cnt_order++;
+        }else if (temp_id != 0){
+          if( tile[temp_id].active == 1){
+            tile_order[cnt_order] = temp_id;
+            cnt_order++;
+          }       
+        }
+      }
+      tile_order_f = 0;
+    }// End looping through array
+  }// END if 
+  
+  //tile_order[x] is the index of the tile
+  for(show_tile = 0; show_tile < tile_count; show_tile++){
+    
+    if(tile_order[show_tile] == 9){
+      matrix.fillScreen(0);
+      matrix.fillRect(1,1, 2, 2, colors[show_tile]);
+      matrix.show();
+    }else{
+      Wire.beginTransmission(tile[tile_order[show_tile]].addr);
+      Wire.write('B');
+      Wire.write(show_tile);
+      Wire.endTransmission();
+    }
+  }
+  
+  /*
   if(tile[4].active == 1){
     Wire.beginTransmission(tile[4].addr);
     switch(tile[0].ports){
@@ -365,7 +442,9 @@ void loop() {
         break;
     }//End Switch
     Wire.endTransmission();    
-  }
+  }*/
+
+  //Serial.println("Reached the end");
   
   delay(100);
   
@@ -373,4 +452,17 @@ void loop() {
 
 void handler_tim(void) {
   print_flag = 1;
+}
+
+void show_tile_info(int tileID){
+  Serial.print("Tile ID: ");
+  Serial.print(tileID);
+  Serial.print(" x: ");
+  Serial.print(tile[tileID].pos.x);
+  Serial.print(",y: ");
+  Serial.print(tile[tileID].pos.y);
+  Serial.print(",active: ");
+  Serial.print(tile[tileID].active);
+  Serial.print(", ports: ");
+  Serial.println(tile[tileID].ports, BIN);
 }
