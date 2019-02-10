@@ -1,0 +1,38 @@
+Added Component: Designator=C?(0402)
+Added Component: Designator=C?(0402)
+Added Component: Designator=C?(0402)
+Added Component: Designator=C?(0402)
+Added Component: Designator=R200(J1-0603)
+Added Component: Designator=R201(J1-0603)
+Added Pin To Net: NetName=GND Pin=C?-1
+Added Pin To Net: NetName=GND Pin=C?-1
+Added Pin To Net: NetName=GND Pin=C?-1
+Added Pin To Net: NetName=GND Pin=C?-1
+Added Pin To Net: NetName=VCC Pin=R200-1
+Added Pin To Net: NetName=I2C_1 Pin=R200-2
+Added Pin To Net: NetName=VCC Pin=R201-1
+Added Pin To Net: NetName=I2C_2 Pin=R201-2
+Change Net Name : Old Net Name=NetIR_R1_1 New Net Name=COL0
+Change Net Name : Old Net Name=NetIR_R2_1 New Net Name=COL1
+Change Net Name : Old Net Name=NetIR_R3_1 New Net Name=COL2
+Change Net Name : Old Net Name=NetIR_R4_1 New Net Name=COL3
+Change Net Name : Old Net Name=NetIR_R5_1 New Net Name=COL4
+Change Net Name : Old Net Name=NetIR_R6_1 New Net Name=COL5
+Change Net Name : Old Net Name=NetIR_R7_1 New Net Name=COL6
+Change Net Name : Old Net Name=NetIR_R8_1 New Net Name=COL7
+Added Pin To Net: NetName=NetC?_2 Pin=C?-2
+Added Pin To Net: NetName=NetC?_2 Pin=C?-2
+Added Pin To Net: NetName=NetC?_2 Pin=C?-2
+Added Pin To Net: NetName=NetC?_2 Pin=C?-2
+Added Net: Name=NetC?_2
+Added Member To Class: ClassName=8x8v2 Member=Component C? Cap Semi
+Added Member To Class: ClassName=8x8v2 Member=Component C? Cap Semi
+Added Member To Class: ClassName=8x8v2 Member=Component C? Cap Semi
+Added Member To Class: ClassName=8x8v2 Member=Component C? Cap Semi
+Added Member To Class: ClassName=8x8v2 Member=Component H2 NPPN201BFLC-RC
+Added Member To Class: ClassName=8x8v2 Member=Component IR26 IR26-51C
+Added Member To Class: ClassName=8x8v2 Member=Component IR_R58 Res3
+Added Member To Class: ClassName=8x8v2 Member=Component M_C 8-channel analog multiplexer/demultiplexer   Source:  Datasheet
+Added Member To Class: ClassName=8x8v2 Member=Component R200 Res3
+Added Member To Class: ClassName=8x8v2 Member=Component R201 4.7K
+Added Room: Name=8x8v2

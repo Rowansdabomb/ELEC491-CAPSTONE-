@@ -1,0 +1,4 @@
+Change Net Name : Old Net Name=NetH2_35 New Net Name=CKI
+Change Net Name : Old Net Name=NetH2_36 New Net Name=SDI
+Added Member To Class: ClassName=8x8v2 Member=Component M_R 8-channel analog multiplexer/demultiplexer   Source:  Datasheet
+Added Room: Name=8x8v2

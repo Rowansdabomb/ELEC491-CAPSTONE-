@@ -1,0 +1,37 @@
+Change Component Designator: OldDesignator=Q? NewDesignator=Q1
+Added Component: Designator=Q2(SOT223_N)
+Added Component: Designator=Q3(SOT223_N)
+Added Component: Designator=Q4(SOT223_N)
+Added Component: Designator=Q5(SOT223_N)
+Added Component: Designator=Q6(SOT223_N)
+Added Component: Designator=Q7(SOT223_N)
+Added Pin To Net: NetName=NetIC1_14 Pin=Q2-1
+Added Pin To Net: NetName=VDD Pin=Q2-2
+Added Pin To Net: NetName=VDD Pin=Q2-3
+Added Pin To Net: NetName=ROW2 Pin=Q2-4
+Added Pin To Net: NetName=NetIC1_15 Pin=Q3-1
+Added Pin To Net: NetName=VDD Pin=Q3-2
+Added Pin To Net: NetName=VDD Pin=Q3-3
+Added Pin To Net: NetName=ROW3 Pin=Q3-4
+Added Pin To Net: NetName=NetIC1_12 Pin=Q4-1
+Added Pin To Net: NetName=VDD Pin=Q4-2
+Added Pin To Net: NetName=VDD Pin=Q4-3
+Added Pin To Net: NetName=ROW4 Pin=Q4-4
+Added Pin To Net: NetName=NetIC1_1 Pin=Q5-1
+Added Pin To Net: NetName=NetD33_VDD Pin=Q5-2
+Added Pin To Net: NetName=NetD33_VDD Pin=Q5-3
+Added Pin To Net: NetName=ROW5 Pin=Q5-4
+Added Pin To Net: NetName=NetIC1_5 Pin=Q6-1
+Added Pin To Net: NetName=VDD Pin=Q6-2
+Added Pin To Net: NetName=VDD Pin=Q6-3
+Added Pin To Net: NetName=ROW6 Pin=Q6-4
+Added Pin To Net: NetName=NetIC1_2 Pin=Q7-1
+Added Pin To Net: NetName=VDD Pin=Q7-2
+Added Pin To Net: NetName=VDD Pin=Q7-3
+Added Pin To Net: NetName=ROW7 Pin=Q7-4
+Added Member To Class: ClassName=8x8 Member=Component Q2 MOSFET-P4
+Added Member To Class: ClassName=8x8 Member=Component Q3 MOSFET-P4
+Added Member To Class: ClassName=8x8 Member=Component Q4 MOSFET-P4
+Added Member To Class: ClassName=8x8 Member=Component Q5 MOSFET-P4
+Added Member To Class: ClassName=8x8 Member=Component Q6 MOSFET-P4
+Added Member To Class: ClassName=8x8 Member=Component Q7 MOSFET-P4

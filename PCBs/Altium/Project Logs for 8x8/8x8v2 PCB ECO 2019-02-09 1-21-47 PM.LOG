@@ -1,0 +1,11 @@
+Removed Pin From Net: NetName=VCC Pin=319_0-1
+Removed Pin From Net: NetName=VCC Pin=319_2-1
+Added Pin To Net: NetName=VCC Pin=319_0-2
+Added Pin To Net: NetName=VCC Pin=319_2-2
+Added Pin To Net: NetName=Net319_0_1 Pin=319_0-1
+Added Pin To Net: NetName=Net319_0_1 Pin=H1-11
+Added Net: Name=Net319_0_1
+Added Pin To Net: NetName=Net319_2_1 Pin=319_2-1
+Added Pin To Net: NetName=Net319_2_1 Pin=H1-10
+Added Net: Name=Net319_2_1
+Added Room: Name=8x8v2

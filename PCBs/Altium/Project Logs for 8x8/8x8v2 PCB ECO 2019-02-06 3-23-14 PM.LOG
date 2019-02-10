@@ -1,0 +1,16 @@
+Removed Pin From Net: NetName=VCC Pin=VR1-1
+Removed Pin From Net: NetName=GND Pin=VR1-3
+Removed Pin From Net: NetName=VCC Pin=VR1-4
+Added Pin To Net: NetName=VCC Pin=H_3_1-1
+Added Member To Class: ClassName=8x8v2 Member=Component H1 NPTC202KFMS-RC
+Added Member To Class: ClassName=8x8v2 Member=Component H2 NPTC202KFMS-RC
+Added Member To Class: ClassName=8x8v2 Member=Component IR31 IR26-51C
+Added Member To Class: ClassName=8x8v2 Member=Component IR53 IR26-51C
+Added Member To Class: ClassName=8x8v2 Member=Component IR_R27 Res3
+Added Member To Class: ClassName=8x8v2 Member=Component LED30 APA102-2020
+Added Member To Class: ClassName=8x8v2 Member=Component LED31 APA102-2020
+Added Member To Class: ClassName=8x8v2 Member=Component LED44 APA102-2020
+Added Member To Class: ClassName=8x8v2 Member=Component M_C 8-channel analog multiplexer/demultiplexer   Source:  Datasheet
+Added Member To Class: ClassName=8x8v2 Member=Component PT37 PT26-51B
+Added Member To Class: ClassName=8x8v2 Member=Component PT48 PT26-51B
+Added Room: Name=8x8v2

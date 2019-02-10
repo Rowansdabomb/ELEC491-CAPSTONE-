@@ -1,0 +1,5 @@
+Added Component: Designator=Q?(SOT223_N)
+Added Pin To Net: NetName=NetIC1_13 Pin=Q?-1
+Added Pin To Net: NetName=VDD Pin=Q?-2
+Added Pin To Net: NetName=ROW1 Pin=Q?-4
+Added Member To Class: ClassName=8x8 Member=Component Q? MOSFET-P4
