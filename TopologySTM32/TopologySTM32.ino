@@ -381,11 +381,6 @@ void loop() {
     cnt_order = 0;
     for(cnt_y = array_y_min; cnt_y <= array_y_max; cnt_y++){
       for(cnt_x = array_x_min; cnt_x <= array_x_max; cnt_x++){
-        /*Serial.print("At position ");
-        Serial.print(cnt_x);
-        Serial.print(" ");
-        Serial.println(cnt_y);
-        */
         int temp_id = layout[cnt_y][cnt_x];
         if (temp_id == 9){
           tile_order[cnt_order] = temp_id;
@@ -427,41 +422,6 @@ void loop() {
       Wire.endTransmission();
     }
   }
-  
-  /*
-  if(tile[4].active == 1){
-    Wire.beginTransmission(tile[4].addr);
-    switch(tile[0].ports){
-      case CNCT_U:
-        Wire.write('E');
-        Wire.write('1');
-        Wire.write('0');
-        Wire.write('6');
-        break;
-      case CNCT_D:
-        Wire.write('E');
-        Wire.write('0');
-        Wire.write('1');
-        Wire.write('7');
-        break;  
-      case CNCT_L:
-        Wire.write('E');
-        Wire.write('1');
-        Wire.write('1');
-        Wire.write('8');
-        break;  
-      case CNCT_R:
-        Wire.write('E');
-        Wire.write('0');
-        Wire.write('0');
-        Wire.write('9');
-        break; 
-      default:
-        Wire.write('D');
-        break;
-    }//End Switch
-    Wire.endTransmission();    
-  }*/
 
   Serial.println("Reached the end");
   
