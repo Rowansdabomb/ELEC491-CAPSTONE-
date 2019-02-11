@@ -114,7 +114,7 @@ Adafruit_DotStarMatrix matrix = Adafruit_DotStarMatrix(
 );
 
 const uint16_t colors[] = {
-  matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(0, 0, 255), matrix.Color(255, 255, 255) 
+  matrix.Color(0, 0, 255), matrix.Color(0, 255, 0), matrix.Color(255, 0, 0), matrix.Color(255, 255, 255) 
 };
 
 void handler_tim(void);
@@ -407,18 +407,18 @@ void loop() {
     if(tile_order[show_tile] == 9){
       matrix.fillScreen(0);
       if((tile[0].ports & CNCT_U) == CNCT_U){
-        matrix.fillRect(1, 3, 2, 1, colors[show_tile]);
+        matrix.fillRect(1, 3, 2, 1, colors[3]);
       }
       if((tile[0].ports & CNCT_D) == CNCT_D){
-        matrix.fillRect(1, 0, 2, 1, colors[show_tile]);
+        matrix.fillRect(1, 0, 2, 1, colors[3]);
       }
       if((tile[0].ports & CNCT_L) == CNCT_L){
-        matrix.fillRect(0, 1, 1, 2, colors[show_tile]);
+        matrix.fillRect(0, 1, 1, 2, colors[3]);
       }
       if((tile[0].ports & CNCT_R) == CNCT_R){
-        matrix.fillRect(3, 1, 1, 2, colors[show_tile]);
+        matrix.fillRect(3, 1, 1, 2, colors[3]);
       }
-      matrix.fillRect(1,1, 2, 2, colors[3]);
+      matrix.fillRect(1,1, 2, 2, colors[show_tile]);
       matrix.show();
     }else{
       Wire.beginTransmission(tile[tile_order[show_tile]].addr);
