@@ -118,7 +118,7 @@ Adafruit_DotStarMatrix matrix = Adafruit_DotStarMatrix(
 );
 
 const uint16_t colors[] = {
-  matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(0, 0, 255), matrix.Color(255, 255, 255) 
+  matrix.Color(0, 0, 255), matrix.Color(0, 255, 0), matrix.Color(255, 0, 0), matrix.Color(255, 255, 255) 
 };
 
 void handler_tim(void);
@@ -408,6 +408,7 @@ void loop() {
           */
           int temp_id = layout[cnt_y][cnt_x];
           if (temp_id == 9){
+
             tile_order[cnt_order] = temp_id;
             cnt_order++;
           }else if (temp_id != 0){

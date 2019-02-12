@@ -53,7 +53,7 @@ Adafruit_DotStarMatrix matrix = Adafruit_DotStarMatrix(
 );
 
 const uint16_t colors[] = {
-  matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(0, 0, 255), matrix.Color(255, 255, 255) 
+  matrix.Color(0, 0, 255), matrix.Color(0, 255, 0), matrix.Color(255, 0, 0), matrix.Color(255, 255, 255) 
 };
 
 int buttonState = 0;
@@ -158,18 +158,18 @@ void loop()
     Serial.println(msg_buf[0]);
     matrix.fillScreen(0);
     if((ports & CNCT_U) == CNCT_U){
-      matrix.fillRect(1, 3, 2, 1, colors[msg_buf[0]]);
+      matrix.fillRect(1, 3, 2, 1, colors[3]);
     }
     if((ports & CNCT_D) == CNCT_D){
-      matrix.fillRect(1, 0, 2, 1, colors[msg_buf[0]]);
+      matrix.fillRect(1, 0, 2, 1, colors[3]);
     }
     if((ports & CNCT_L) == CNCT_L){
-      matrix.fillRect(0, 1, 1, 2, colors[msg_buf[0]]);
+      matrix.fillRect(0, 1, 1, 2, colors[3]);
     }
     if((ports & CNCT_R) == CNCT_R){
-      matrix.fillRect(3, 1, 1, 2, colors[msg_buf[0]]);
+      matrix.fillRect(3, 1, 1, 2, colors[3]);
     }    
-    matrix.fillRect( 1, 1, 2, 2, colors[2]);
+    matrix.fillRect( 1, 1, 2, 2, colors[msg_buf[0]]);
     matrix.show();
   }
 
