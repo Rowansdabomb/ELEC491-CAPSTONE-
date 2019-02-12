@@ -1,3 +1,10 @@
+/***************************************************************************************
+*  Title: Topology Test Master
+* Author: Jimmy Wong
+* Date: February 10, 2019
+* Code version: 0.0.3
+***************************************************************************************/
+
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_DotStarMatrix.h>
@@ -10,10 +17,10 @@
 #define CNCT_L B0100
 #define CNCT_R B1000
 
-#define PIN_DIR_U PB12
-#define PIN_DIR_D PB13
-#define PIN_DIR_L PB14
-#define PIN_DIR_R PB15
+#define PIN_DIR_U PA4
+#define PIN_DIR_D PA6
+#define PIN_DIR_L PA3
+#define PIN_DIR_R PA5
 
 #define TILE_MAX 5
 
@@ -81,8 +88,8 @@ int show_y;
 int pinDir = B0000;
 
 //DotStar Setup
-const uint8_t MATRIX_DATA_PIN = PB10; 
-const uint8_t MATRIX_CLK_PIN = PB11;
+const uint8_t MATRIX_DATA_PIN = PB11; 
+const uint8_t MATRIX_CLK_PIN = PB10;
 const uint8_t CHAR_WIDTH = 5;
 const uint8_t CHAR_HEIGHT = 8;
 
@@ -399,7 +406,19 @@ void loop() {
     
     if(tile_order[show_tile] == 9){
       matrix.fillScreen(0);
-      matrix.fillRect(1,1, 2, 2, colors[show_tile]);
+      if((tile[0].ports & CNCT_U) == CNCT_U){
+        matrix.fillRect(1, 3, 2, 1, colors[show_tile]);
+      }
+      if((tile[0].ports & CNCT_D) == CNCT_D){
+        matrix.fillRect(1, 0, 2, 1, colors[show_tile]);
+      }
+      if((tile[0].ports & CNCT_L) == CNCT_L){
+        matrix.fillRect(0, 1, 1, 2, colors[show_tile]);
+      }
+      if((tile[0].ports & CNCT_R) == CNCT_R){
+        matrix.fillRect(3, 1, 1, 2, colors[show_tile]);
+      }
+      matrix.fillRect(1,1, 2, 2, colors[3]);
       matrix.show();
     }else{
       Wire.beginTransmission(tile[tile_order[show_tile]].addr);
@@ -444,7 +463,7 @@ void loop() {
     Wire.endTransmission();    
   }*/
 
-  //Serial.println("Reached the end");
+  Serial.println("Reached the end");
   
   delay(100);
   
