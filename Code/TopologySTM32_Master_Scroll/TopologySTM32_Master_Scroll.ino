@@ -10,6 +10,8 @@
 #include <Adafruit_DotStarMatrix.h>
 #include <Adafruit_DotStar.h>
 
+
+#define MATRIX_FRAME_RATE 2
 #define I2C_DEFAULT 0x42
 
 #define CNCT_U B0001
@@ -31,10 +33,6 @@ int print_flag = 0;
 
 #define ARRAY_SIZE 7
 
-#define MATRIX_FRAME_RATE 10
-volatile bool i2cUpdateFlag = false;
-HardwareTimer fpsTimer(2); // timer for updating the screen (send i2c data)
-
 //Use layout to store the addresses of the devices 7 by 7
 int layout[7][7]= {{  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0},
@@ -48,8 +46,8 @@ int layout[7][7]= {{  0,  0,  0,  0,  0,  0,  0},
 int tile_order[4] = {0, 0, 0, 0};
 
 struct POS {
-  int x;
-  int y;
+  uint8_t x;
+  uint8_t y;
 };
 
 /* Tile structure
@@ -125,6 +123,9 @@ void handler_tim(void);
 
 void show_tile_info(int tileID);
 
+volatile bool i2cUpdateFlag = false;
+HardwareTimer fpsTimer(2); // timer for updating the screen (send i2c data)
+
 void setup() {
   // Directional Pin Setup
   
@@ -132,20 +133,7 @@ void setup() {
   pinMode(PIN_DIR_D, INPUT_PULLDOWN);
   pinMode(PIN_DIR_L, INPUT_PULLDOWN);
   pinMode(PIN_DIR_R, INPUT_PULLDOWN);
-
-  ////////////////// Timer setup ////////////////////
-  fpsTimer.pause();
-
-  fpsTimer.setPeriod(1000*1000/MATRIX_FRAME_RATE); // in microseconds
-
-  fpsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-  fpsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  fpsTimer.attachCompare1Interrupt(i2cUpdate);
-
-  fpsTimer.refresh();
-
-  fpsTimer.resume();
-  ///////////////////////////////////////////////////
+  pinMode(PA2, OUTPUT);
   
   // Internal Device Map - Initial Population
   for(i = 1; i < TILE_MAX; ++i){
@@ -162,11 +150,11 @@ void setup() {
   tile[0].pos.y = 3;
   
 
-  //Timer for testing purposes
-  Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
-  Timer2.setPeriod(1000000);
-  Timer2.setCompare(TIMER_CH1, 1);
-  Timer2.attachInterrupt(TIMER_CH1, handler_tim);
+//  //Timer for testing purposes
+//  Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
+//  Timer2.setPeriod(1000000);
+//  Timer2.setCompare(TIMER_CH1, 1);
+//  Timer2.attachInterrupt(TIMER_CH1, handler_tim);
   
   // I2C Master Setup
   Wire.begin();
@@ -182,6 +170,20 @@ void setup() {
   Serial.begin(9600); 
 
   tile_order_f = 1;
+
+    ////////////////// Timer setup ////////////////////
+  fpsTimer.pause();
+
+  fpsTimer.setPeriod(1000*1000/MATRIX_FRAME_RATE); // in microseconds
+
+  fpsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  fpsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  fpsTimer.attachCompare1Interrupt(i2cUpdate);
+
+  fpsTimer.refresh();
+
+  fpsTimer.resume();
+  ///////////////////////////////////////////////////
 }
 
 
@@ -190,33 +192,11 @@ int x = matrix.width();
 int pass = 0;
 uint8_t colorIndex = 0;
 
+int col = 0;
+
 void loop() {
   if(i2cUpdateFlag) {
-    if(print_flag == PRINT_EN){
-      /*
-      Serial.print("x free: ");
-      Serial.print(x_free);
-      Serial.print(",y_free: ");
-      Serial.println(y_free);
-      
-      show_tile_info(0);
-      show_tile_info(1);
-      show_tile_info(2);
-      show_tile_info(3);
-      show_tile_info(4); 
-  */
-      Serial.print("# Tiles: ");
-      Serial.print(tile_count);
-      Serial.print(" Order : ");
-      for(int j = 0; j < 4; j++){
-        Serial.print(tile_order[j]);
-        Serial.print(" "); 
-      }
-      Serial.println();
-  
-      //Disable the flag
-      //print_flag = 0;
-    }
+    Serial.println();
     
     int array_x_max = 3;
     int array_y_max = 3;
@@ -229,16 +209,23 @@ void loop() {
     tile[0].ports_pre = tile[0].ports;
     tile[0].ports = B0000;
     if(digitalRead(PIN_DIR_U)){
+      Serial.println("U");
       tile[0].ports = tile[0].ports | CNCT_U;
     }
     if(digitalRead(PIN_DIR_D)){
+      Serial.println("D");
       tile[0].ports = tile[0].ports | CNCT_D;
     }
     if(digitalRead(PIN_DIR_L)){
+      Serial.println("L");
       tile[0].ports = tile[0].ports | CNCT_L;
     }
     if(digitalRead(PIN_DIR_R)){
+      Serial.println("R");
+      Serial.println(tile[0].ports, BIN);
       tile[0].ports = tile[0].ports | CNCT_R;
+      Serial.println(tile[0].ports, BIN);
+      Serial.println(tile[0].ports_pre, BIN);
     }
   
     // Loop to check if the currently existing tiles
@@ -248,15 +235,13 @@ void loop() {
     tile_count = 1;
   
     //Serial.println("First I2C Check");
-    Wire.beginTransmission(I2C_DEFAULT);
-    int chk_error = Wire.endTransmission();
-    if (chk_error == 0){
+    Wire.beginTransmission(I2C_DEFAULT); 
+    if (!Wire.endTransmission()){
       Serial.println("Default Address still detected");
     }
-  
     
-    for(i = 1; i < TILE_MAX; i++){
-      int error;
+    for(i = 0; i < TILE_MAX; i++){
+      int error = -1;
       //Serial.print("Currently Checking Tile ");
       //Serial.println(i);
       if( i != 0 ){//Check if dealing with master tile
@@ -305,6 +290,8 @@ void loop() {
       }
   
       //Check if the directional ports has changed
+//      Serial.println(tile[i].ports);
+//      Serial.println(tile[i].ports_pre);
       if(tile[i].ports != tile[i].ports_pre){
         dirChange_f = 1;
         dirChange = tile[i].ports ^ tile[i].ports_pre;
@@ -332,13 +319,14 @@ void loop() {
         }// END SWITCH
       }//End of Directional ports changing
     }// End FOR loop
-    
+
+    Serial.println(dirChange_f);
     if(dirChange_f == 1 ){
       
       // Check if the default address exist
       Wire.beginTransmission(I2C_DEFAULT);
       int def_error = Wire.endTransmission();
-      //Serial.println(def_error);
+      Serial.println(def_error);
       if (def_error == SUCCESS){
         Serial.println("Device found at default address");
         Wire.beginTransmission(I2C_DEFAULT);
@@ -423,7 +411,7 @@ void loop() {
     
     //tile_order[x] is the index of the tile
   
-    for(i = 0; i < tile_count; ++i){
+    for(uint8_t i = 0; i < tile_count; ++i){
       
       if(tile_order[i] == 9){
         matrix.fillScreen(0);
@@ -442,16 +430,18 @@ void loop() {
         matrix.fillRect(1, 1, 2, 2, colors[3]);
         matrix.show();
       }else{
-        transmitI2cData(tile[tile_order[i]].addr, i);
+        struct POS temp;
+        temp.x = col;
+        temp.y = 0;
+        transmitI2cData(tile[tile_order[i]].addr, temp, colors[i], i);
       }
     }
   
-    Serial.println("Reached the end");
-  
 //  delay(100);
+    ++col;
+    if (col > (array_x_max - array_x_min)*matrixWidth) col = 0;
     i2cUpdateFlag = false;
   }
-  
   
 }
 
@@ -459,9 +449,12 @@ void i2cUpdate() {
   i2cUpdateFlag = true;
 }
 
-void transmitI2cData(int &addr, int &index) {
+void transmitI2cData(const int &addr, const struct POS &pos, const uint16_t &color, uint8_t index) {
     Wire.beginTransmission(addr);
     Wire.write('B');
+    Wire.write(pos.x);
+    Wire.write(pos.y);
+    Wire.write(color);
     Wire.write(index);
     Wire.endTransmission();
 }
