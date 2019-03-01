@@ -169,7 +169,7 @@ void loop()
       matrix.fillRect(3, 1, 1, 2, colors[msg_buf[4]]);
     }    
     matrix.fillRect( 1, 1, 2, 2, colors[2]); // mid white square
-    matrix.fillRect( pos_x, pos_y, pos_x, pos_y + matrixHeight, color);
+    matrix.fillRect( pos_y, pos_x, matrixHeight, 1, color);
     matrix.show();
   }
 
@@ -199,8 +199,10 @@ void receiveEvent(int howMany)
     mtrx_en = 1;
     int i = 0;
     while(Wire.available()){
-      msg_buf[i] = Wire.read();
-      Serial.print(msg_buf[i]);
+      msg_buf[i] = (uint8_t) Wire.read();
+      Serial.print(i);
+      Serial.print(" ");
+      Serial.println(msg_buf[i], BIN);
       i++;     
     }
   }

@@ -92,11 +92,11 @@ void setup()
   pinMode(LED_L, OUTPUT);
   pinMode(LED_R, OUTPUT);*/
 
-  // Timer Setup
-  Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
-  Timer2.setPeriod(1000000);
-  Timer2.setCompare(TIMER_CH1, 1);
-  Timer2.attachInterrupt(TIMER_CH1, handler_tim);
+//  // Timer Setup
+//  Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
+//  Timer2.setPeriod(1000000);
+//  Timer2.setCompare(TIMER_CH1, 1);
+//  Timer2.attachInterrupt(TIMER_CH1, handler_tim);
 
   // DotStar Setup - BEGIN 
   matrix.begin();
