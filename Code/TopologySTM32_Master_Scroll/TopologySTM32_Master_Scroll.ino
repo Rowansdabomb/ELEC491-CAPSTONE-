@@ -47,7 +47,6 @@ uint8_t y_free;
 uint8_t tileCount;
 bool directionChangedFlag;
 bool tileReorderFlag;
-//int tileCount_pre;
 
 Adafruit_DotStarMatrix matrix = Adafruit_DotStarMatrix(
   matrixWidth, 
@@ -65,12 +64,17 @@ const uint16_t colors[] = {
   matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(0, 0, 255), matrix.Color(255, 255, 255) 
 };
 
-volatile bool i2cUpdateFlag = false;
+volatile bool i2cUpdateFlag;
 HardwareTimer fpsTimer(2); // timer for updating the screen (send i2c data)
 
 void setup() {
-  // Directional Pin Setup
+  // Flag initialization
+  directionChangedFlag = false;
+  tileReorderFlag = false;
+  i2cUpdateFlag = false;
+  tileReorderFlag = false;
   
+  // Directional Pin Setup
   pinMode(PIN_DIR_U, INPUT_PULLDOWN);
   pinMode(PIN_DIR_D, INPUT_PULLDOWN);
   pinMode(PIN_DIR_L, INPUT_PULLDOWN);
@@ -85,6 +89,7 @@ void setup() {
     tile[i].pos.y    = 0;
     tile[i].ports   = B00000000;
   }
+  
   // Master Tile Setup
   tile[0].active = true;
   tile[0].addr = 0xFF;
@@ -103,8 +108,6 @@ void setup() {
 
   // Serial Setup - for output
   Serial.begin(9600); 
-
-  tileReorderFlag = false;
 
   /////////////////// Timer setup ////////////////////
   fpsTimer.pause();
@@ -138,42 +141,48 @@ void loop() {
     // Loop to check if the currently existing tiles
     // still exist, if not clear and erase from layout
     // tile[0] will be reserved for the master
-    //tileCount_pre = tileCount;
     tileCount = 1;
-  
-    Wire.beginTransmission(I2C_DEFAULT); 
-    if (!Wire.endTransmission()){
-      Serial.println("Default Address still detected");
-    }
 
-    // 
     for(uint8_t i = 0; i < TILE_MAX; i++){
-      uint8_t error = -1;
-      
       //Check if dealing with master tile
       if( i != 0 ){
+        uint8_t response = -1;
         if( tile[i].active ){
           Wire.beginTransmission(tile[i].addr);
-          error = Wire.endTransmission();
+          response = Wire.endTransmission();
         } else {
           tileID = i;
         }
 
         // Address successfully found
-        if (error == SUCCESS) {
-          adjustMapBounds(tile[i], array_x_min, array_x_max, array_y_min, array_y_max);
-        } 
-        // Address not found
-        else {
-          
-          layout[tile[i].pos.y][tile[i].pos.x] = 0;
-          tile[i].pos.x = 0;
-          tile[i].pos.y = 0;
-          tile[i].active = false;
-          //Tile Removed 
-          tileReorderFlag = true;
-        }// END Address Successfully found
-      }
+        switch(response) {
+          -1: 
+            Serial.println("TILE NOT ACTIVE");
+            break;
+          0: 
+            adjustMapBounds(tile[i], array_x_min, array_x_max, array_y_min, array_y_max);
+            break;
+          1:
+            Serial.println("I2C ERROR: DATA TOO LONG");
+            addressNotFound(tile[i], tileReorderFlag);
+            break;
+          2:
+            Serial.println("I2C ERROR: NACK ON TRANSMIT OF ADDRESS");
+            addressNotFound(tile[i], tileReorderFlag);
+            break;
+          3: 
+            Serial.println("I2C ERROR: NACK ON TRANSMIT OF DATA");
+            addressNotFound(tile[i], tileReorderFlag);
+            break;
+          4:
+            Serial.println("I2C ERROR: OTHER ERROR RESPONSE FROM I2C");
+            addressNotFound(tile[i], tileReorderFlag);
+            break;
+          default:
+            Serial.println("I2C ERROR: UNKNOWN ERROR RESPONSE FROM I2C");
+            addressNotFound(tile[i], tileReorderFlag);
+        } // END SWITCH
+      } // END NOT MASTER IF
 
       // New tile added
       if(tile[i].ports != tile[i].ports_pre){
@@ -268,6 +277,15 @@ void adjustMapBound(TILE &tile, uint8_t &array_x_min, uint8_t &array_x_max, uint
   if( tile.pos.y < array_y_min ){
     array_y_min = tile.pos.y;
   }
+}
+
+void addressNotFound(TILE &tile, bool &tileReorderFlag) {
+    layout[tile.pos.y][tile.pos.x] = 0;
+    tile.pos.x = 0;
+    tile.pos.y = 0;
+    tile.active = false;
+    //Tile Removed 
+    tileReorderFlag = true;
 }
 
 void getOccupiedDirections(TILE *tile) {  
