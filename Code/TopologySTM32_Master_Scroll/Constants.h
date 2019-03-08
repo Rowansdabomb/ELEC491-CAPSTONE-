@@ -8,3 +8,5 @@ const uint8_t I2C_DEFAULT = 0x42;
 const uint8_t TILE_MAX = 5;
 const uint8_t DEBUG = 0;
 const uint8_t ARRAY_SIZE  = 7;
+
+const uint8_t MAX_DISPLAY_CHARS = 2;
