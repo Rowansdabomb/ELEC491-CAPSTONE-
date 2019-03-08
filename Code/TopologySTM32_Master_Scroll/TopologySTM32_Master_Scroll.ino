@@ -9,43 +9,34 @@
 #include "Tile.h"
 #include "PinConfig.h"
 #include "MatrixSetup.h"
+#include "Constants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_DotStarMatrix.h>
 #include <Adafruit_DotStar.h>
 
-const uint8_t SUCCESS = 0;
+uint8_t tileOrder[4] = {0, 0, 0, 0};
 
-const uint8_t MATRIX_FRAME_RATE = 4;
-const uint8_t I2C_DEFAULT = 0x42;
+TILE tile[TILE_MAX];
 
-const uint8_t TILE_MAX = 5;
-const uint8_t DEBUG = 0;
-const uint8_t ARRAY_SIZE  = 7;
-
-//Use layout to store the addresses of the devices 7 by 7
-int layout[ARRAY_SIZE][ARRAY_SIZE]= {
+//Use tileMap to store the addresses of the devices 7 by 7
+int tileMap[ARRAY_SIZE][ARRAY_SIZE]= {
   {  0,  0,  0,  0,  0,  0,  0},
   {  0,  0,  0,  0,  0,  0,  0},
   {  0,  0,  0,  0,  0,  0,  0},
-  {  0,  0,  0,  9,  0,  0,  0},
+  {  0,  0,  0,  MASTER_TILE_ID,  0,  0,  0},
   {  0,  0,  0,  0,  0,  0,  0},
   {  0,  0,  0,  0,  0,  0,  0},
   {  0,  0,  0,  0,  0,  0,  0},
 };
-
-uint8_t tileOrder[4] = {0, 0, 0, 0};
-
-TILE tile[TILE_MAX];
 
 //last set as default 
 int addr_lst[TILE_MAX] = {0x08, 0x10, 0x18, 0x20, 0x28};
 
 //int error;
 int tileID;
-uint8_t x_free;
-uint8_t y_free;
+uint8_t xFree;
+uint8_t yFree;
 uint8_t tileCount;
-bool directionChangedFlag;
 bool tileReorderFlag;
 
 Adafruit_DotStarMatrix matrix = Adafruit_DotStarMatrix(
@@ -69,10 +60,8 @@ HardwareTimer fpsTimer(2); // timer for updating the screen (send i2c data)
 
 void setup() {
   // Flag initialization
-  directionChangedFlag = false;
   tileReorderFlag = false;
   i2cUpdateFlag = false;
-  tileReorderFlag = false;
   
   // Directional Pin Setup
   pinMode(PIN_DIR_U, INPUT_PULLDOWN);
@@ -139,14 +128,14 @@ void loop() {
     getOccupiedDirections(tile);
   
     // Loop to check if the currently existing tiles
-    // still exist, if not clear and erase from layout
+    // still exist, if not clear and erase from tileMap
     // tile[0] will be reserved for the master
     tileCount = 1;
 
     for(uint8_t i = 0; i < TILE_MAX; i++){
       //Check if dealing with master tile
       if( i != 0 ){
-        uint8_t response = -1;
+        uint8_t response = 4;
         if( tile[i].active ){
           Wire.beginTransmission(tile[i].addr);
           response = Wire.endTransmission();
@@ -156,25 +145,23 @@ void loop() {
 
         // Address successfully found
         switch(response) {
-          -1: 
-            Serial.println("TILE NOT ACTIVE");
-            break;
-          0: 
+          case 0: 
+            ++tileCount;
             adjustMapBounds(tile[i], array_x_min, array_x_max, array_y_min, array_y_max);
             break;
-          1:
+          case 1:
             Serial.println("I2C ERROR: DATA TOO LONG");
             addressNotFound(tile[i], tileReorderFlag);
             break;
-          2:
+          case 2:
             Serial.println("I2C ERROR: NACK ON TRANSMIT OF ADDRESS");
             addressNotFound(tile[i], tileReorderFlag);
             break;
-          3: 
+          case 3: 
             Serial.println("I2C ERROR: NACK ON TRANSMIT OF DATA");
             addressNotFound(tile[i], tileReorderFlag);
             break;
-          4:
+          case 4:
             Serial.println("I2C ERROR: OTHER ERROR RESPONSE FROM I2C");
             addressNotFound(tile[i], tileReorderFlag);
             break;
@@ -186,50 +173,47 @@ void loop() {
 
       // New tile added
       if(tile[i].ports != tile[i].ports_pre){
-        directionChangedFlag = true;
         uint8_t newDirection = tile[i].ports ^ tile[i].ports_pre;
         switch(newDirection){
          case CNCT_U:
-            x_free = tile[i].pos.x;
-            y_free = tile[i].pos.y - 1;
+            xFree = tile[i].pos.x;
+            yFree = tile[i].pos.y - 1;
             break;
           case CNCT_D:
-            x_free = tile[i].pos.x;
-            y_free = tile[i].pos.y + 1;
+            xFree = tile[i].pos.x;
+            yFree = tile[i].pos.y + 1;
             break;
           case CNCT_L:
-            x_free = tile[i].pos.x - 1;
-            y_free = tile[i].pos.y;
+            xFree = tile[i].pos.x - 1;
+            yFree = tile[i].pos.y;
             break;
           case CNCT_R:
-            x_free = tile[i].pos.x + 1;
-            y_free = tile[i].pos.y;
+            xFree = tile[i].pos.x + 1;
+            yFree = tile[i].pos.y;
             break;
           default:
             //will not happen
             break;
         }// END SWITCH
+
+//        uint8_t result = 
+        assignNewAddress(tileID, yFree, xFree);
+//        if (result = -1) {
+//          Serial.println("Failed to assign new address to tile with tileID: %d", (int) tileID);
+//        }
+        tileReorderFlag = true;// raise the flag for to redo the tile order
       }//End of Directional ports changing
     }// End FOR loop
 
-    if(directionChangedFlag) {
-      uint8_t result = assignNewAddress(tile, tileID, y_free, x_free));
-      if (result = -1) {
-        Serial.println("Failed to assign new address to tile with tileID: %d", tileID);
-      }
-      directionChangedFlag = false;// reset the direction changed flag
-      tileReorderFlag = true;// raise the flag for to redo the tile order
-    }
-
     // tile configuration has changed
     if(tileReorderFlag){ 
-      configTileOrder(tileOrder, tile, array_y_min, array_y_max, array_x_min, array_x_max);
+      configTileOrder(array_y_min, array_y_max, array_x_min, array_x_max);
       tileReorderFlag = false;
     }
   
     for(uint8_t i = 0; i < tileCount; ++i){
       //tileOrder[i] is the index of the tile
-      if(tileOrder[i] == 9){
+      if (tileOrder[i] == MASTER_TILE_ID) {
         matrix.fillScreen(0);
         if((tile[0].ports & CNCT_U) == CNCT_U){
           matrix.fillRect(1, 3, 2, 1, colors[i]);
@@ -245,11 +229,11 @@ void loop() {
         }
         matrix.fillRect(1, 1, 2, 2, colors[3]);
         matrix.show();
-      }else{
+      } else {
         struct POS temp;
         temp.x = col;
         temp.y = 0;
-        transmitI2cData(tile[tileOrder[i]].addr, temp, colors[i], i);
+        transmitI2cData(tile[tileOrder[i]].addr, temp, colors[i]);
       }
     }
   
@@ -259,28 +243,27 @@ void loop() {
   }
 }
 
-void adjustMapBound(TILE &tile, uint8_t &array_x_min, uint8_t &array_x_max, uint8_t array_y_min, uint8_t array_y_max) {
+void adjustMapBounds(TILE &tile, uint8_t &xMin, uint8_t &xMax, uint8_t &yMin, uint8_t &yMax) {
   tile.ports_pre = tile.ports;
   //If available request current port status from slave devices
   Wire.requestFrom(tile.addr, 1);
   tile.ports = Wire.read();
-  tileCount++;
-  if( tile.pos.x < array_x_min ){
-    array_x_min = tile.pos.x;
+  if( tile.pos.x < xMin ){
+    xMin = tile.pos.x;
   }
-  if( tile.pos.x > array_x_max ){
-    array_x_max = tile.pos.x;
+  if( tile.pos.x > xMax ){
+    xMax = tile.pos.x;
   }
-  if( tile.pos.y > array_y_max  ){
-    array_y_max = tile.pos.y;
+  if( tile.pos.y > yMax  ){
+    yMax = tile.pos.y;
   }
-  if( tile.pos.y < array_y_min ){
-    array_y_min = tile.pos.y;
+  if( tile.pos.y < yMin ){
+    yMin = tile.pos.y;
   }
 }
 
 void addressNotFound(TILE &tile, bool &tileReorderFlag) {
-    layout[tile.pos.y][tile.pos.x] = 0;
+    tileMap[tile.pos.y][tile.pos.x] = 0;
     tile.pos.x = 0;
     tile.pos.y = 0;
     tile.active = false;
@@ -308,7 +291,7 @@ void getOccupiedDirections(TILE *tile) {
   }
 }
 
-uint8_t assignNewAddress(TILE *tile, const uint8_t &tileID, uint8_t &y_free, uint8_t &x_free) {
+uint8_t assignNewAddress(const uint8_t &tileID, uint8_t &yFree, uint8_t &xFree) {
   // Check if the default address exist
   Wire.beginTransmission(I2C_DEFAULT);
   if (Wire.endTransmission() == SUCCESS){
@@ -323,27 +306,28 @@ uint8_t assignNewAddress(TILE *tile, const uint8_t &tileID, uint8_t &y_free, uin
   Wire.beginTransmission(tile[tileID].addr);
   if (Wire.endTransmission() == SUCCESS){
     tile[tileID].active = true;
-    tile[tileID].pos.x = x_free;   
-    tile[tileID].pos.y = y_free;  
-    layout[y_free][x_free] = tileID;
-    x_free = 0;
-    y_free = 0;
+    tile[tileID].pos.x = xFree;   
+    tile[tileID].pos.y = yFree;  
+    tileMap[yFree][xFree] = tileID;
+    xFree = 0;
+    yFree = 0;
     return 0;
   }
-    return -1;
+  return -1;
 }
 
-void configTileOrder(uint8_t *tileOrder, TILE *tile, uint8_t &y_min, uint8_t &y_max, uint8_t &x_min, uint8_t &x_max) {
+void configTileOrder(const uint8_t &yMin, const uint8_t &yMax, const uint8_t &xMin, const uint8_t &xMax) {
   // reset the order
   for(uint8_t i = 0; i < sizeof(tileOrder)/sizeof(uint8_t); ++i){
     tileOrder[i] = 0;
   }
+
   uint8_t cnt_order = 0;
-  for(uint8_t y = y_min; y <= y_max; ++y){
-    for(uint8_t x = x_min; x <= x_max; ++x){
-      uint8_t currentTileID = layout[y][x];
+  for(uint8_t y = yMin; y <= yMax; ++y){
+    for(uint8_t x = xMin; x <= xMax; ++x){
+      uint8_t currentTileID = tileMap[y][x];
       
-      if (currentTileID == 9){
+      if (currentTileID == MASTER_TILE_ID){
         tileOrder[cnt_order] = currentTileID;
         ++cnt_order;
       }
@@ -359,12 +343,11 @@ void i2cUpdate() {
   i2cUpdateFlag = true;
 }
 
-void transmitI2cData(const int &addr, const struct POS &pos, const uint16_t &color, uint8_t index) {
+void transmitI2cData(const int &addr, const struct POS &pos, const uint16_t &color) {
     Wire.beginTransmission(addr);
     Wire.write('B');
     Wire.write(pos.x);
     Wire.write(pos.y);
     Wire.write(color);
-    Wire.write(index);
     Wire.endTransmission();
 }
