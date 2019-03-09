@@ -107,14 +107,14 @@ void loop() {
   }
 }
 
-void transmitToSlaves(int i) {
+void transmitToSlaves(const int i) {
     struct POS temp;
     temp.x = 0;
     temp.y = 0;
     transmitI2cData(tile[tileOrder[i]].addr, temp, colors[i]);
 }
 
-void updateTileDisplay(int i) {
+void updateTileDisplay(const int i) {
     matrix.fillScreen(0);
     if((tile[0].ports & CNCT_U) == CNCT_U){
       matrix.fillRect(1, 3, 2, 1, colors[i]);
