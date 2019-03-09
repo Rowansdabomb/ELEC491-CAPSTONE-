@@ -1,3 +1,5 @@
+#pragma once
+
 const uint8_t MASTER_TILE_ID = 9;
 
 const uint8_t MATRIX_FRAME_RATE = 4;

@@ -10,9 +10,7 @@
 #include "PinConfig.h"
 #include "MatrixSetup.h"
 #include "Constants.h"
-#include <Adafruit_GFX.h>
-#include <Adafruit_DotStarMatrix.h>
-#include <Adafruit_DotStar.h>
+#include "Colors.h"
 
 uint8_t tileOrder[4] = {0, 0, 0, 0};
 
@@ -20,40 +18,20 @@ TILE tile[TILE_MAX];
 
 //Use tileMap to store the addresses of the devices 7 by 7
 int tileMap[ARRAY_SIZE][ARRAY_SIZE]= {
-  {  0,  0,  0,  0,  0,  0,  0},
-  {  0,  0,  0,  0,  0,  0,  0},
-  {  0,  0,  0,  0,  0,  0,  0},
+  {  0,  0,  0,         0,        0,  0,  0},
+  {  0,  0,  0,         0,        0,  0,  0},
+  {  0,  0,  0,         0,        0,  0,  0},
   {  0,  0,  0,  MASTER_TILE_ID,  0,  0,  0},
-  {  0,  0,  0,  0,  0,  0,  0},
-  {  0,  0,  0,  0,  0,  0,  0},
-  {  0,  0,  0,  0,  0,  0,  0},
+  {  0,  0,  0,         0,        0,  0,  0},
+  {  0,  0,  0,         0,        0,  0,  0},
+  {  0,  0,  0,         0,        0,  0,  0},
 };
 
 //last set as default 
-int addr_lst[TILE_MAX] = {0x08, 0x10, 0x18, 0x20, 0x28};
+const uint8_t addr_lst[TILE_MAX] = {0x08, 0x10, 0x18, 0x20, 0x28};
 
-//int error;
 int tileID;
-uint8_t xFree;
-uint8_t yFree;
-uint8_t tileCount;
 bool tileReorderFlag;
-
-Adafruit_DotStarMatrix matrix = Adafruit_DotStarMatrix(
-  matrixWidth, 
-  matrixHeight, 
-  tilesX, 
-  tilesY,
-  MATRIX_DATA_PIN, 
-  MATRIX_CLK_PIN, 
-  DS_MATRIX_TOP     + DS_MATRIX_LEFT +
-  DS_MATRIX_COLUMNS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
-  DOTSTAR_RGB
-);
-
-const uint16_t colors[] = {
-  matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(0, 0, 255), matrix.Color(255, 255, 255) 
-};
 
 volatile bool i2cUpdateFlag;
 HardwareTimer fpsTimer(2); // timer for updating the screen (send i2c data)
@@ -113,12 +91,48 @@ void setup() {
   ///////////////////////////////////////////////////
 }
 
-uint8_t x = matrix.width();
-uint8_t colorIndex = 0;
-int col = 0;
-
 void loop() {
   if(i2cUpdateFlag) {
+    uint8_t tileCount = 0;
+    tileCount = handleDisplayShape();  
+    for(uint8_t i = 0; i < tileCount; ++i){
+      //tileOrder[i] is the index of the tile
+      if (tileOrder[i] == MASTER_TILE_ID) {
+        updateTileDisplay(i);
+      } else {
+        transmitToSlaves(i);
+      }
+    }
+    i2cUpdateFlag = false;
+  }
+}
+
+void transmitToSlaves(int i) {
+    struct POS temp;
+    temp.x = 0;
+    temp.y = 0;
+    transmitI2cData(tile[tileOrder[i]].addr, temp, colors[i]);
+}
+
+void updateTileDisplay(int i) {
+    matrix.fillScreen(0);
+    if((tile[0].ports & CNCT_U) == CNCT_U){
+      matrix.fillRect(1, 3, 2, 1, colors[i]);
+    }
+    if((tile[0].ports & CNCT_D) == CNCT_D){
+      matrix.fillRect(1, 0, 2, 1, colors[i]);
+    }
+    if((tile[0].ports & CNCT_L) == CNCT_L){
+      matrix.fillRect(0, 1, 1, 2, colors[i]);
+    }
+    if((tile[0].ports & CNCT_R) == CNCT_R){
+      matrix.fillRect(3, 1, 1, 2, colors[i]);
+    }
+    matrix.fillRect(1, 1, 2, 2, colors[3]);
+    matrix.show();
+}
+
+uint8_t handleDisplayShape() {
     uint8_t array_x_max = 3;
     uint8_t array_y_max = 3;
     uint8_t array_x_min = 3;
@@ -130,7 +144,7 @@ void loop() {
     // Loop to check if the currently existing tiles
     // still exist, if not clear and erase from tileMap
     // tile[0] will be reserved for the master
-    tileCount = 1;
+    uint8_t tileCount = 1;
 
     for(uint8_t i = 0; i < TILE_MAX; i++){
       //Check if dealing with master tile
@@ -145,7 +159,7 @@ void loop() {
 
         // Address successfully found
         switch(response) {
-          case 0: 
+          case 0:
             ++tileCount;
             adjustMapBounds(tile[i], array_x_min, array_x_max, array_y_min, array_y_max);
             break;
@@ -174,6 +188,8 @@ void loop() {
       // New tile added
       if(tile[i].ports != tile[i].ports_pre){
         uint8_t newDirection = tile[i].ports ^ tile[i].ports_pre;
+        uint8_t xFree;
+        uint8_t yFree;
         switch(newDirection){
          case CNCT_U:
             xFree = tile[i].pos.x;
@@ -196,11 +212,7 @@ void loop() {
             break;
         }// END SWITCH
 
-//        uint8_t result = 
         assignNewAddress(tileID, yFree, xFree);
-//        if (result = -1) {
-//          Serial.println("Failed to assign new address to tile with tileID: %d", (int) tileID);
-//        }
         tileReorderFlag = true;// raise the flag for to redo the tile order
       }//End of Directional ports changing
     }// End FOR loop
@@ -210,37 +222,13 @@ void loop() {
       configTileOrder(array_y_min, array_y_max, array_x_min, array_x_max);
       tileReorderFlag = false;
     }
-  
-    for(uint8_t i = 0; i < tileCount; ++i){
-      //tileOrder[i] is the index of the tile
-      if (tileOrder[i] == MASTER_TILE_ID) {
-        matrix.fillScreen(0);
-        if((tile[0].ports & CNCT_U) == CNCT_U){
-          matrix.fillRect(1, 3, 2, 1, colors[i]);
-        }
-        if((tile[0].ports & CNCT_D) == CNCT_D){
-          matrix.fillRect(1, 0, 2, 1, colors[i]);
-        }
-        if((tile[0].ports & CNCT_L) == CNCT_L){
-          matrix.fillRect(0, 1, 1, 2, colors[i]);
-        }
-        if((tile[0].ports & CNCT_R) == CNCT_R){
-          matrix.fillRect(3, 1, 1, 2, colors[i]);
-        }
-        matrix.fillRect(1, 1, 2, 2, colors[3]);
-        matrix.show();
-      } else {
-        struct POS temp;
-        temp.x = col;
-        temp.y = 0;
-        transmitI2cData(tile[tileOrder[i]].addr, temp, colors[i]);
-      }
-    }
-  
-    ++col;
-    if (col > (array_x_max - array_x_min + 1)*matrixWidth) col = 0;
-    i2cUpdateFlag = false;
-  }
+
+    return tileCount;
+}
+
+void debugWithMatrix(int , int color) {
+  matrix.fillScreen(0);
+  matrix.fillRect(0, 0, 0, 0, colors[color]);
 }
 
 void adjustMapBounds(TILE &tile, uint8_t &xMin, uint8_t &xMax, uint8_t &yMin, uint8_t &yMax) {
@@ -309,8 +297,6 @@ uint8_t assignNewAddress(const uint8_t &tileID, uint8_t &yFree, uint8_t &xFree) 
     tile[tileID].pos.x = xFree;   
     tile[tileID].pos.y = yFree;  
     tileMap[yFree][xFree] = tileID;
-    xFree = 0;
-    yFree = 0;
     return 0;
   }
   return -1;
