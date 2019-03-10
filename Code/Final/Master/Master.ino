@@ -97,6 +97,7 @@ void setup() {
 
   fpsTimer.resume();
   ///////////////////////////////////////////////////
+  Serial.println("Let's Begin");
 }
 
 void loop() {
@@ -112,8 +113,8 @@ void loop() {
       getOutputData(dataOut, textData, textLength);
       //tileOrder[i] is the index of the tile
       if (tileOrder[i] == MASTER_TILE_ID) {
-        // updateTileDisplay(i);
-        displayChar(outPos, dataOut);
+        updateTileDisplay(i);
+        // displayChar(outPos, dataOut);
       } else {
         transmitToSlaves(tileOrder, i);
       }
@@ -130,23 +131,23 @@ void transmitToSlaves(const uint8_t tileOrder[], const uint8_t i) {
     transmitI2cData(tile[tileOrder[i]].addr, temp, colors[i]);
 }
 
-// void updateTileDisplay(const int i) {
-//     matrix.fillScreen(0);
-//     if((tile[0].ports & CNCT_U) == CNCT_U){
-//       matrix.fillRect(1, 3, 2, 1, colors[i]);
-//     }
-//     if((tile[0].ports & CNCT_D) == CNCT_D){
-//       matrix.fillRect(1, 0, 2, 1, colors[i]);
-//     }
-//     if((tile[0].ports & CNCT_L) == CNCT_L){
-//       matrix.fillRect(0, 1, 1, 2, colors[i]);
-//     }
-//     if((tile[0].ports & CNCT_R) == CNCT_R){
-//       matrix.fillRect(3, 1, 1, 2, colors[i]);
-//     }
-//     matrix.fillRect(1, 1, 2, 2, colors[VIOLET]);
-//     matrix.show();
-// }
+void updateTileDisplay(const int i) {
+    matrix.fillScreen(0);
+    if((tile[0].ports & CNCT_U) == CNCT_U){
+      matrix.fillRect(1, 3, 2, 1, colors[i]);
+    }
+    if((tile[0].ports & CNCT_D) == CNCT_D){
+      matrix.fillRect(1, 0, 2, 1, colors[i]);
+    }
+    if((tile[0].ports & CNCT_L) == CNCT_L){
+      matrix.fillRect(0, 1, 1, 2, colors[i]);
+    }
+    if((tile[0].ports & CNCT_R) == CNCT_R){
+      matrix.fillRect(3, 1, 1, 2, colors[i]);
+    }
+    matrix.fillRect(1, 1, 2, 2, colors[VIOLET]);
+    matrix.show();
+}
 
 uint8_t handleDisplayShape(uint8_t tileOrder[]) {
     uint8_t array_x_max = 3;
@@ -201,7 +202,7 @@ uint8_t handleDisplayShape(uint8_t tileOrder[]) {
             break;
           // TILE NOT ACTIVE
           default:
-            debugWithMatrix(3, RED);
+            // debugWithMatrix(3, RED);
             addressNotFound(tile[i], tileReorderFlag);
         } // END SWITCH
       } // END NOT MASTER IF
@@ -233,10 +234,10 @@ uint8_t handleDisplayShape(uint8_t tileOrder[]) {
             break;
         }// END SWITCH
 
-        uint8_t response = response = assignNewAddress(tileID, yFree, xFree);
-        // if(response != SUCCESS) {
-
-        // }
+        uint8_t response = assignNewAddress(tileID, yFree, xFree);
+        if(response != SUCCESS) {
+          debugWithMatrix(response, RED);
+        }
 
         tileReorderFlag = true;// raise the flag for to redo the tile order
       }//End of Directional ports changing
@@ -255,6 +256,7 @@ void debugWithMatrix(const int mode, const int color) {
   matrix.fillScreen(0);
   matrix.fillRect(mode, 2, mode, 2, colors[color]);
   matrix.show();
+  delay(250);
 }
 
 void adjustMapBounds(TILE &tile, uint8_t &xMin, uint8_t &xMax, uint8_t &yMin, uint8_t &yMax) {
@@ -310,13 +312,17 @@ uint8_t assignNewAddress(const uint8_t tileID, const uint8_t yFree, const uint8_
   uint8_t response = -1;
   Wire.beginTransmission(I2C_DEFAULT);
   response = Wire.endTransmission();
+  Serial.print("assignNewAddress FIRST ");
+  Serial.println(response);
   if (response != SUCCESS) return response;
+
   
   Wire.beginTransmission(I2C_DEFAULT);
   Wire.write('A');
   Wire.write(tile[tileID].addr); //Assign the next available address from 
   response = Wire.endTransmission();
   if (response != SUCCESS) return response;
+  Serial.println("address write success");
   
   uint8_t waits = 0;
   response = -1;
@@ -326,6 +332,8 @@ uint8_t assignNewAddress(const uint8_t tileID, const uint8_t yFree, const uint8_
     response = Wire.endTransmission();
     ++waits;
   }
+  Serial.print("assignNewAddress LAST ");
+  Serial.println( response);
   if (response != SUCCESS) return response;
   
   tile[tileID].active = true;
@@ -442,7 +450,6 @@ void updateScrollPos(uint8_t &scrollPos, const uint8_t scrollLength){
   {
     scrollPos++;
   }
-  
 }
 
 
