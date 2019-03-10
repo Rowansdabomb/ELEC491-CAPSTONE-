@@ -21,7 +21,7 @@ int textLength = 4;
 char textData[4] = {'T','L','2', '5'};
 
 //Use tileMap to store the addresses of the devices 7 by 7
-int tileMap[ARRAY_SIZE][ARRAY_SIZE]= {
+int tileMap[ARRAY_SIZE][ARRAY_SIZE] = {
   {  0,  0,  0,         0,        0,  0,  0},
   {  0,  0,  0,         0,        0,  0,  0},
   {  0,  0,  0,         0,        0,  0,  0},
@@ -30,9 +30,6 @@ int tileMap[ARRAY_SIZE][ARRAY_SIZE]= {
   {  0,  0,  0,         0,        0,  0,  0},
   {  0,  0,  0,         0,        0,  0,  0},
 };
-
-//last set as default 
-const uint8_t addr_lst[TILE_MAX] = {0x08, 0x10, 0x18, 0x20, 0x28};
 
 uint8_t tileID;
 uint8_t scrollPos = 0;
@@ -109,7 +106,7 @@ void loop() {
     tileCount = handleDisplayShape(tileOrder);  
     startIndex = scrollPos/CHAR_WIDTH;
     for(uint8_t i = 0; i < tileCount; ++i){
-      POS outPos = getOffset(scrollPos,i);
+      POS outPos = getOffset(scrollPos, i);
       getOutputData(dataOut, textData, textLength);
       //tileOrder[i] is the index of the tile
       if (tileOrder[i] == MASTER_TILE_ID) {
@@ -375,14 +372,14 @@ void i2cUpdate() {
   i2cUpdateFlag = true;
 }
 
-int transmitI2cData(const int &addr, const struct POS &pos, const uint16_t &color) {
-    Wire.beginTransmission(addr);
-    Wire.write('B');
-    Wire.write(pos.x);
-    Wire.write(pos.y);
-    Wire.write(color);
-    return Wire.endTransmission();
-}
+// int transmitI2cData(const int &addr, const struct POS &pos, const uint16_t &color) {
+//     Wire.beginTransmission(addr);
+//     Wire.write('B');
+//     Wire.write(pos.x);
+//     Wire.write(pos.y);
+//     Wire.write(color);
+//     return Wire.endTransmission();
+// }
 
 /*
 transmitI2cCharData - Transmits the Character Data to a slave tile.
@@ -407,13 +404,13 @@ int transmitI2cCharData(const int &addr, const struct POS &pos, const uint16_t &
 }
 
 //Currently only a prototype for when Sanket implements his code as well
-void updateTextData(uint8_t &scrollLength){
+void updateTextData(uint8_t &scrollLength) {
   //new Text Length from ESP
   //new Text Data from ESP
   scrollLength = textLength * CHAR_WIDTH;
 }
 
-POS getOffset(uint8_t scrollPos, uint8_t tileNumber){
+POS getOffset(uint8_t scrollPos, uint8_t tileNumber) {
   POS tempPos;
   tempPos.x = scrollPos + (tileNumber * matrixWidth) - (startIndex * CHAR_WIDTH);
   tempPos.y = 0;
@@ -443,7 +440,7 @@ void getOutputData(char dataOut[], char textData[], const uint8_t textLength){
   }
 }
 
-void updateScrollPos(uint8_t &scrollPos, const uint8_t scrollLength){
+void updateScrollPos(uint8_t &scrollPos, const uint8_t scrollLength) {
   if(scrollPos >= scrollLength){
     scrollPos = 0;
   }else
@@ -452,8 +449,7 @@ void updateScrollPos(uint8_t &scrollPos, const uint8_t scrollLength){
   }
 }
 
-
-void displayChar(POS &pos, char dataOut[]){
+void displayChar(POS &pos, char dataOut[]) {
   matrix.fillScreen(0);
   matrix.setCursor(pos.x, pos.y);
   for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2

@@ -1,4 +1,7 @@
-#ifndef t25_
+#ifndef t25_pin_config_h
+#define t25_pin_config_h
+#include <stdint.h>
+
 // PIN CONFIGURATIONS
 const uint8_t PIN_DIR_U = PA4;
 const uint8_t PIN_DIR_D = PA6;
@@ -10,3 +13,5 @@ const uint8_t CNCT_U = B0001;
 const uint8_t CNCT_D = B0010;
 const uint8_t CNCT_L = B0100;
 const uint8_t CNCT_R = B1000;
+
+#endif
