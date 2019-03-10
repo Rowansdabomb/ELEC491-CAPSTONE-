@@ -36,10 +36,10 @@ int tileMap[ARRAY_SIZE][ARRAY_SIZE]= {
 //last set as default 
 const uint8_t addr_lst[TILE_MAX] = {0x08, 0x10, 0x18, 0x20, 0x28};
 
-int tileID;
-int scrollPos;
-int startIndex;
-int scrollLength;
+uint8_t tileID;
+uint8_t scrollPos = 0;
+uint8_t startIndex;
+uint8_t scrollLength;
 bool tileReorderFlag;
 char dataOut[MAX_DISPLAY_CHARS];
 
@@ -365,7 +365,7 @@ transmitI2cCharData - Transmits the Character Data to a slave tile.
   Outputs:
     Return value of endTransmission
 */
-int transmitI2cCharData(const int &addr, const struct POS &pos, const uint16_t &color, char *data[], int dataLength ) {
+int transmitI2cCharData(const int &addr, const struct POS &pos, const uint16_t &color, char data[]) {
     Wire.beginTransmission(addr);
     Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily 
     Wire.write(pos.x);
@@ -377,13 +377,13 @@ int transmitI2cCharData(const int &addr, const struct POS &pos, const uint16_t &
     return Wire.endTransmission();
 }
 //Currently only a prototype for when Sanket implements his code as well
-void updateTextData(int &scrollLength){
+void updateTextData(uint8_t &scrollLength){
   //new Text Length from ESP
   //new Text Data from ESP
   scrollLength = textLength * CHAR_WIDTH;
 }
 
-POS getOffset(int scrollPos, int tileNumber){
+POS getOffset(uint8_t scrollPos, uuint8_t tileNumber){
   POS tempPos;
   tempPos.x = scrollPos + (tileNumber * matrixWidth) - (startIndex * CHAR_WIDTH);
   tempPos.y = 0;
@@ -398,8 +398,8 @@ getOutputData - gets the characters that are to be sent to a Tile
   Outputs:
     N/A
 */
-void getOutputData(char dataOut[], char textData[], int &textLength){
-  for( int i = 0; i , MAX_DISPLAY_CHARS; ++i){
+void getOutputData(char dataOut[], char textData[], uint8_t &textLength){
+  for( int i = 0; i < MAX_DISPLAY_CHARS; ++i){
     if ( i == 0 ){
       dataOut[i] = textData[startIndex];
     }else{
@@ -412,7 +412,7 @@ void getOutputData(char dataOut[], char textData[], int &textLength){
   }
 }
 
-void updateScrollPos(int &scrollPos, int &scrollLength){
+void updateScrollPos(uint8_t &scrollPos, uint8_t &scrollLength){
   if(scrollPos >= scrollLength){
     scrollPos = 0;
   }else
