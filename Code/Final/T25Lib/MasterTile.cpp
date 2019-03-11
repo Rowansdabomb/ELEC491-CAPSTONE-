@@ -1,4 +1,6 @@
+#include "Arduino.h"
 #include "MasterTile.h"
+#include <Wire.h>
 
 MasterTile::MasterTile(uint8_t addr):Tile(addr) {
   // Initialize the tileMap
@@ -27,16 +29,24 @@ MasterTile::MasterTile(uint8_t addr):Tile(addr) {
 }
 
 /*
-transmitI2cCharData - Transmits the Character Data to a slave tile.
+  setCursor - Sets the cursor on the matrix
+*/
+void Tile::getCursorOffset(POS scrollPos, uint8_t tileNumber) {
+  POS tempPos;
+  tempPos.x = scrollPos.x + (tileNumber * matrixWidth) - (cursorStart.x * CHAR_WIDTH);
+  tempPos.y = scrollPos.y;
+  return tempPos;
+}
+
+/*
+assignNewAddress - assigns an address to a newly connected Tile
   Inputs:
-    addr    - address of the slave tile
-    pos     - reference position of where character data should start
-    color   - RGB value to display text
-    data    - 2 byte character array
+    yFree   - 
+    xFree   - 
   Outputs:
     Return value of endTransmission
 */
-uint8_t assignNewAddress(const uint8_t yFree, const uint8_t xFree) {
+uint8_t MasterTile::assignNewAddress(const uint8_t yFree, const uint8_t xFree) {
   // Check if the default address exist
   uint8_t response = -1;
   Wire.beginTransmission(I2C_DEFAULT);
@@ -76,7 +86,7 @@ transmitI2cCharData - Transmits the Character Data to a slave tile.
   Outputs:
     Return value of endTransmission
 */
-int transmitI2cCharData(const int &addr, const struct POS &pos, const uint16_t &color, char data[]) {
+uint8_t MasterTile::transmitI2cCharData(const int &addr, const struct POS &pos, const uint16_t &color, char data[]) {
     Wire.beginTransmission(addr);
     Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily 
     Wire.write(pos.x);
@@ -97,7 +107,7 @@ getOutputData - gets the characters that are to be sent to a Tile
   Outputs:
     N/A
 */
-void getOutputData(char dataOut[], char textData[], const uint8_t textLength){
+void MasterTile::getOutputData(char dataOut[], char textData[], const uint8_t textLength){
   for( int i = 0; i < MAX_DISPLAY_CHARS; ++i){
     if ( i == 0 ){
       dataOut[i] = textData[startIndex];
@@ -108,5 +118,19 @@ void getOutputData(char dataOut[], char textData[], const uint8_t textLength){
         dataOut[i] = textData[startIndex + i];
       }
     }
+  }
+}
+
+/*
+updateScrollPos - gets the current position in the scrolling string
+  Inputs:
+    scrollPos - ref to current position in the string
+    scrollLength - size of the string being scrolled
+*/
+void MasterTile::updateScrollPos(uint16_t &scrollPos, const uint8_t scrollLength) {
+  if (scrollPos >= scrollLength) {
+    scrollPos = 0;
+  } else {
+    ++scrollPos;
   }
 }

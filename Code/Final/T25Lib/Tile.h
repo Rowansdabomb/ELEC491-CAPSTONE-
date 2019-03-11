@@ -1,12 +1,13 @@
 #ifndef t25_tile_h
 #define t25_tile_h
+
 #include <stdint.h>
 #include "PinConfig.h"
 #include "Colors.h"
 
 struct POS {
-  uint8_t x;
-  uint8_t y;
+  int8_t x;
+  int8_t y;
 };
 
 /* Tile structure
@@ -29,13 +30,16 @@ struct TILE {
 class Tile {
   public:
     Tile(uint8_t addr);
+    void updateScrollPos(const uint8_t scrollLength);
+    void setCursor(int8_t x, int8_t y);
+
   protected:
     struct TILE data;
+    struct POS cursor;
+    struct POS cursorStart;
 
-    struct POS getOffset(uint8_t scrollPos, uint8_t tileNumber);
     void updateTileDisplay(const int i);
-    void updateScrollPos(uint8_t &scrollPos, const uint8_t scrollLength);
-    void displayChar(const POS &cursor, char dataOut[]);
+    void displayChar(char dataOut[]);
     void findNeighborTiles();
 }
 

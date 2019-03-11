@@ -54,12 +54,12 @@ void setup() {
   pinMode(PA2, OUTPUT);
   
   // Internal Device Map - Initial Population
-  for(uint8_t i = 1; i < TILE_MAX; ++i){
-    tile[i].active  = false;
-    tile[i].addr    = addr_lst[i];
-    tile[i].pos.x    = 0;
-    tile[i].pos.y    = 0;
-    tile[i].ports   = B00000000;
+  for (uint8_t i = 1; i < TILE_MAX; ++i) {
+    tile[i].active    = false;
+    tile[i].addr      = addr_lst[i];
+    tile[i].pos.x     = 0;
+    tile[i].pos.y     = 0;
+    tile[i].ports     = B00000000;
   }
   
   // Master Tile Setup
