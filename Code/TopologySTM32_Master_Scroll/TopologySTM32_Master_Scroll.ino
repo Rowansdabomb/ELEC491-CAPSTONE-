@@ -128,7 +128,7 @@ void updateTileDisplay(const int i) {
     if((tile[0].ports & CNCT_R) == CNCT_R){
       matrix.fillRect(3, 1, 1, 2, colors[i]);
     }
-    matrix.fillRect(1, 1, 2, 2, colors[3]);
+    matrix.fillRect(1, 1, 2, 2, colors[VIOLET]);
     matrix.show();
 }
 
