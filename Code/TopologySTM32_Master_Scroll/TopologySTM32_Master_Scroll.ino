@@ -1,8 +1,8 @@
 /***************************************************************************************
 *  Title: Topology Test Master
-* Author: Jimmy Wong
+* Author: Jimmy Wong, Rowan Baker-French
 * Date: February 10, 2019
-* Code version: 0.0.3
+* Code version: 0.0.7
 ***************************************************************************************/
 
 #include <Wire.h>
@@ -15,6 +15,12 @@
 uint8_t tileOrder[4] = {0, 0, 0, 0};
 
 TILE tile[TILE_MAX];
+
+/* THESE ARE TEMP VARIABLES
+  Ideally this should be a temp variable from Sanket's code, for now assume it's 4 for TL25;
+*/
+int textLength = 4;
+char textData[4] = {'T','L','2', '5'};
 
 //Use tileMap to store the addresses of the devices 7 by 7
 int tileMap[ARRAY_SIZE][ARRAY_SIZE]= {
@@ -30,8 +36,12 @@ int tileMap[ARRAY_SIZE][ARRAY_SIZE]= {
 //last set as default 
 const uint8_t addr_lst[TILE_MAX] = {0x08, 0x10, 0x18, 0x20, 0x28};
 
-int tileID;
+uint8_t tileID;
+uint8_t scrollPos = 0;
+uint8_t startIndex;
+uint8_t scrollLength;
 bool tileReorderFlag;
+char dataOut[MAX_DISPLAY_CHARS];
 
 volatile bool i2cUpdateFlag;
 HardwareTimer fpsTimer(2); // timer for updating the screen (send i2c data)
@@ -92,18 +102,24 @@ void setup() {
 }
 
 void loop() {
+  updateTextData(scrollLength);//This should be done by Sanket's code
   if(i2cUpdateFlag) {
     uint8_t tileCount = 0;
     tileCount = handleDisplayShape();  
+    startIndex = scrollPos/CHAR_WIDTH;
     for(uint8_t i = 0; i < tileCount; ++i){
+      POS outPos = getOffset(scrollPos,i);
+      getOutputData(dataOut, textData, textLength);
       //tileOrder[i] is the index of the tile
       if (tileOrder[i] == MASTER_TILE_ID) {
         updateTileDisplay(i);
+        displayChar(outPos, dataOut);
       } else {
         transmitToSlaves(i);
       }
     }
     i2cUpdateFlag = false;
+    updateScrollPos(scrollPos, scrollLength);
   }
 }
 
@@ -131,6 +147,7 @@ void updateTileDisplay(const int i) {
     matrix.fillRect(1, 1, 2, 2, colors[VIOLET]);
     matrix.show();
 }
+
 
 uint8_t handleDisplayShape() {
     uint8_t array_x_max = 3;
@@ -329,11 +346,88 @@ void i2cUpdate() {
   i2cUpdateFlag = true;
 }
 
-void transmitI2cData(const int &addr, const struct POS &pos, const uint16_t &color) {
+int transmitI2cData(const int &addr, const struct POS &pos, const uint16_t &color) {
     Wire.beginTransmission(addr);
     Wire.write('B');
     Wire.write(pos.x);
     Wire.write(pos.y);
     Wire.write(color);
-    Wire.endTransmission();
+    return Wire.endTransmission();
+}
+
+/*
+transmitI2cCharData - Transmits the Character Data to a slave tile.
+  Inputs:
+    addr    - address of the slave tile
+    pos     - reference position of where character data should start
+    color   - RGB value to display text
+    data    - 2 byte character array
+  Outputs:
+    Return value of endTransmission
+*/
+int transmitI2cCharData(const int &addr, const struct POS &pos, const uint16_t &color, char data[]) {
+    Wire.beginTransmission(addr);
+    Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily 
+    Wire.write(pos.x);
+    Wire.write(pos.y);
+    Wire.write(color);
+    for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
+        Wire.write(data[i]);
+    }
+    return Wire.endTransmission();
+}
+//Currently only a prototype for when Sanket implements his code as well
+void updateTextData(uint8_t &scrollLength){
+  //new Text Length from ESP
+  //new Text Data from ESP
+  scrollLength = textLength * CHAR_WIDTH;
+}
+
+POS getOffset(uint8_t scrollPos, uuint8_t tileNumber){
+  POS tempPos;
+  tempPos.x = scrollPos + (tileNumber * matrixWidth) - (startIndex * CHAR_WIDTH);
+  tempPos.y = 0;
+  return tempPos;
+}
+/*
+getOutputData - gets the characters that are to be sent to a Tile
+  Inputs:
+    dataOut - Character Array with MAX_DISPLAY_CHARS size 
+    textData - Text Array with textLength size
+    textLength - The length of the text to be displayed as obtained from Sanket's code
+  Outputs:
+    N/A
+*/
+void getOutputData(char dataOut[], char textData[], uint8_t &textLength){
+  for( int i = 0; i < MAX_DISPLAY_CHARS; ++i){
+    if ( i == 0 ){
+      dataOut[i] = textData[startIndex];
+    }else{
+      if( startIndex + i + 1 > textLength){
+        dataOut[i] = ' '; //Data out of bounds set to empty character
+      }else{
+        dataOut[i] = textData[startIndex + i];
+      }
+    }
+  }
+}
+
+void updateScrollPos(uint8_t &scrollPos, uint8_t &scrollLength){
+  if(scrollPos >= scrollLength){
+    scrollPos = 0;
+  }else
+  {
+    scrollPos++;
+  }
+  
+}
+
+
+void displayChar(POS &pos, char dataOut[]){
+  matrix.fillScreen(0);
+  matrix.setCursor(pos.x, pos.y);
+  for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
+    matrix.print(dataOut[i]);
+  }
+  matrix.show();
 }
