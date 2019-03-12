@@ -4,6 +4,9 @@
 #include "Arduino.h"
 #include "Tile.h"
 #include "MasterTile.h"
-
+#include "Colors.h"
+#include "Constants.h"
+#include "MatrixSetup.h"
+#include "PinConfig.h"
 
 #endif

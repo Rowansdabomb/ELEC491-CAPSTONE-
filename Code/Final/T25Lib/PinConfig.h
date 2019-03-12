@@ -1,6 +1,7 @@
 #ifndef t25_pin_config_h
 #define t25_pin_config_h
-#include <stdint.h>
+
+#include "Arduino.h"
 
 // PIN CONFIGURATIONS
 const uint8_t PIN_DIR_U = PA4;

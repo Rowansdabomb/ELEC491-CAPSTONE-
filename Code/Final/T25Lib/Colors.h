@@ -1,4 +1,7 @@
-#pragma once
+#ifndef t25_colors_h
+#define t25_colors_h
+
+#include "Arduino.h"
 #include "MatrixSetup.h"
 
 const uint8_t RED = 2;
@@ -15,3 +18,5 @@ const uint16_t colors[6] = {
   matrix.Color(0, 165, 255),  //ORANGE
   matrix.Color(238, 130, 238) // VIOLET
 };
+
+#endif

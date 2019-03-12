@@ -1,4 +1,7 @@
-#pragma once
+#ifndef t25_matrix_setup_h
+#define t25_matrix_setup_h
+
+#include "Arduino.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_DotStarMatrix.h>
 #include <Adafruit_DotStar.h>
@@ -28,4 +31,6 @@ Adafruit_DotStarMatrix matrix = Adafruit_DotStarMatrix(
   DS_MATRIX_COLUMNS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
   DOTSTAR_RGB
 );
+
+#endif
 

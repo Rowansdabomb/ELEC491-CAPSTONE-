@@ -1,9 +1,7 @@
 #ifndef t25_tile_h
 #define t25_tile_h
 
-#include <stdint.h>
-#include "PinConfig.h"
-#include "Colors.h"
+#include "Arduino.h"
 
 struct POS {
   int8_t x;
@@ -30,17 +28,20 @@ struct TILE {
 class Tile {
   public:
     Tile(uint8_t addr);
-    void updateScrollPos(const uint8_t scrollLength);
     void setCursor(int8_t x, int8_t y);
+    struct TILE getData();
+    struct TILE findNeighborTiles();
+    void debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color);
+    void updateOperationMode(const uint8_t mode);
+    void updateTileDisplay(const uint8_t i, char dataOut[]);
 
   protected:
+    uint8_t operationMode;
     struct TILE data;
     struct POS cursor;
     struct POS cursorStart;
 
-    void updateTileDisplay(const int i);
     void displayChar(char dataOut[]);
-    void findNeighborTiles();
-}
+};
 
 #endif

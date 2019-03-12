@@ -1,29 +1,61 @@
 #ifndef t25_master_h
 #define t25_master_h
 
+#include "Arduino.h"
 #include "Constants.h"
 #include "Tile.h"
 
-// library interface description
+struct TILEMAP {
+  uint8_t grid[TILE_MAP_SIZE][TILE_MAP_SIZE];
+  uint8_t xMin;
+  uint8_t xMax;
+  uint8_t yMin;
+  uint8_t yMax;
+};
+
 class MasterTile: public Tile
 {
-  // user-accessible "public" interface
   public:
     MasterTile(uint8_t addr);
-    uint8_t assignNewAddress( const uint8_t yFree, const uint8_t xFree); 
-    uint8_t transmitI2cCharData(const int &addr, const uint16_t &color, char data[]);
+
+    // Setters
+    void setTileCount(const uint8_t count);
+    void setTextData(const char textData[], const uint16_t size);
+
+    // Getters
+    uint8_t getTileCount();
+    uint8_t getOrderedTileID(uint8_t i);
+    struct TILE getTile(uint8_t i);
+    struct POS getOffsetCursor(uint8_t tileNumber, uint8_t charXIndex);
+    struct POS getScrollPos();
+
+    void resetTileOrder();
+    void resetTileMapBounds();
+    void updateScrollPos();
+    uint8_t handleDisplayShape();
+
+    void transmitToSlave(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
+    uint8_t getOutputData(char dataOut[], char textData[], const uint8_t textLength, const uint8_t charIndex);
+
 
   private:
-    uint8_t cursor;
+    char textData[MAX_STRING_SIZE];
+    uint16_t scrollLength;
+    struct POS scrollPos;
+
     uint8_t tileID;
-    uint8_t tileMap[TILE_MAP_SIZE][TILE_MAP_SIZE];
+    uint8_t tileCount;
+    uint8_t tileOrder[TILE_MAX];
+    struct TILEMAP tileMap;
     struct TILE tile[TILE_MAX];
 
-    void updateScrollPos(uint16_t &scrollPos, const uint8_t scrollLength)
-    void getOutputData(char dataOut[], char textData[], const uint8_t textLength);
-    //Currently only a prototype for when Sanket implements his code as well
-    void updateTextData(uint8_t &scrollLength);
-
+    void handleAddedOrRemovedTiles();
+    void addNewTile(const struct TILE &tile);
+    uint8_t assignNewAddress(const uint8_t yFree, const uint8_t xFree); 
+    void addressNotFound(TILE &tile);
+    uint8_t transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
+    void adjustMapBounds(TILE &tile);
+    void configTileOrder();
 };
 
 #endif
