@@ -71,28 +71,30 @@ void loop()
   posY = msgBuffer[1];
   uint16_t color = (msgBuffer[2] << 8 ) | (msgBuffer[3] & 0xff);
   dataLength = dataLength - 4;
+  
 
   if(matrixUpdateFlag){
     updateTileDisplay(msgBuffer[4]);
     matrixUpdateFlag = 0;
   }
   if(matrixScrollFlag){
-    matrixScroll(posX, posY, dataLength);
+    matrixScroll(posX, posY, 4, dataLength);
     matrixScrollFlag =0;
   }
 
   delay(100);
 }
 
-uint8_t receiveI2cData(uint8_t &enableFlag,  char msgBuffer[]){
+uint8_t receiveI2cData(volatile bool &enableFlag,  char msgBuffer[]){
   enableFlag = 1;
-  uint8_t msgCount;
+  uint8_t msgCount = 0;
   while(Wire.available()){
-    msgBuffer[i] = (uint8_t) Wire.read();
-    msg_count++;
-    Serial.print(i);
+    msgBuffer[msgCount] = (uint8_t) Wire.read();
+    Serial.print(msgCount);
     Serial.print(" ");
-    Serial.println(msgBuffer[i], BIN);
+    Serial.println(msgBuffer[msgCount], BIN);
+    msgCount++;
+
   }
   return msgCount;
 }
@@ -136,27 +138,27 @@ void receiveEvent(int howMany)
 
 void updateTileDisplay(const int i) {
     matrix.fillScreen(0);
-    if((tile[0].ports & CNCT_U) == CNCT_U){
+    if((ports & CNCT_U) == CNCT_U){
       matrix.fillRect(1, 3, 2, 1, colors[i]);
     }
-    if((tile[0].ports & CNCT_D) == CNCT_D){
+    if((ports & CNCT_D) == CNCT_D){
       matrix.fillRect(1, 0, 2, 1, colors[i]);
     }
-    if((tile[0].ports & CNCT_L) == CNCT_L){
+    if((ports & CNCT_L) == CNCT_L){
       matrix.fillRect(0, 1, 1, 2, colors[i]);
     }
-    if((tile[0].ports & CNCT_R) == CNCT_R){
+    if((ports & CNCT_R) == CNCT_R){
       matrix.fillRect(3, 1, 1, 2, colors[i]);
     }
     matrix.fillRect(1, 1, 2, 2, colors[3]);
     matrix.show();
 }
 
-void matrixScroll(uint8_t &posX, uint8_t &posY, uint8_t &dataLength){
+void matrixScroll(uint8_t &posX, uint8_t &posY, uint8_t dataStart, uint8_t &dataLength){
   matrix.fillScreen(0);
   matrix.setCursor(posX, posY);
-  for(uint8_t i = 0; i < dataLength, ++i){
-    matrix.print(data[i]);
+  for(uint8_t i = dataStart; i < dataLength; ++i){
+    matrix.print(msgBuffer[i]);
   }
   matrix.show();
 }
