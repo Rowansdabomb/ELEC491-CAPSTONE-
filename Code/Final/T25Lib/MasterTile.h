@@ -2,8 +2,8 @@
 #define t25_master_h
 
 #include "Arduino.h"
-#include "Constants.h"
 #include "Tile.h"
+#include "Constants.h"
 
 struct TILEMAP {
   uint8_t grid[TILE_MAP_SIZE][TILE_MAP_SIZE];

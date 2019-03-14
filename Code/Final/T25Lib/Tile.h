@@ -2,6 +2,9 @@
 #define t25_tile_h
 
 #include "Arduino.h"
+#include <Adafruit_GFX.h>
+#include <Adafruit_DotStarMatrix.h>
+#include <Adafruit_DotStar.h>
 
 struct POS {
   int8_t x;
@@ -28,6 +31,7 @@ struct TILE {
 class Tile {
   public:
     Tile(uint8_t addr);
+
     void setCursor(int8_t x, int8_t y);
     struct TILE getData();
     struct TILE findNeighborTiles();
@@ -37,6 +41,9 @@ class Tile {
 
   protected:
     uint8_t operationMode;
+
+    Adafruit_DotStarMatrix *matrix;
+
     struct TILE data;
     struct POS cursor;
     struct POS cursorStart;

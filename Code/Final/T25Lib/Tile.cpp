@@ -1,7 +1,6 @@
 #include "Arduino.h"
 #include "Constants.h"
 #include "Tile.h"
-#include "MatrixSetup.h"
 #include "PinConfig.h"
 #include "Colors.h"
 #include <Wire.h>
@@ -12,6 +11,26 @@ Tile::Tile(uint8_t addr) {
   cursor.y = 0;
   cursorStart.x = cursor.x/CHAR_WIDTH;
   cursorStart.y = cursor.y/CHAR_HEIGHT;
+
+  //initialize the matrix
+  matrix = new Adafruit_DotStarMatrix(
+    MATRIX_WIDTH, 
+    MATRIX_HEIGHT, 
+    TILES_X, 
+    TILES_Y,
+    MATRIX_DATA_PIN, 
+    MATRIX_CLK_PIN, 
+    DS_MATRIX_TOP     + DS_MATRIX_LEFT +
+    DS_MATRIX_COLUMNS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
+    DOTSTAR_RGB
+  );
+
+  // DotStar Setup
+  matrix->begin(); // Initialize pins for output
+  matrix->setBrightness(64); // Set max brightness (out of 255) 
+  matrix->setTextWrap(false);
+  matrix->setTextColor(colors[0]);
+  matrix->show();  // Turn all LEDs off ASAP
 }
 
 /*
@@ -57,33 +76,33 @@ displayChar - Shows the visible portion of characters on the matrix
     dataOut - char array of characters to be displayed
 */
 void Tile::displayChar(char dataOut[]) {
-  matrix.fillScreen(0);
-  matrix.setCursor(cursor.x, cursor.y);
+  matrix->fillScreen(0);
+  matrix->setCursor(cursor.x, cursor.y);
   for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
-    matrix.print(dataOut[i]);
+    matrix->print(dataOut[i]);
   }
-  matrix.show();
+  matrix->show();
 }
 
 // /*
 // i2cDirectionTest - test to show direction of tiles added
 // */
 // void Tile::i2cDirectionTest(const uint8_t i) {
-//     matrix.fillScreen(0);
+//     matrix->fillScreen(0);
 //     if((data.ports & CNCT_U) == CNCT_U){
-//       matrix.fillRect(1, 3, 2, 1, colors[i]);
+//       matrix->fillRect(1, 3, 2, 1, colors[i]);
 //     }
 //     if((data.ports & CNCT_D) == CNCT_D){
-//       matrix.fillRect(1, 0, 2, 1, colors[i]);
+//       matrix->fillRect(1, 0, 2, 1, colors[i]);
 //     }
 //     if((data.ports & CNCT_L) == CNCT_L){
-//       matrix.fillRect(0, 1, 1, 2, colors[i]);
+//       matrix->fillRect(0, 1, 1, 2, colors[i]);
 //     }
 //     if((data.ports & CNCT_R) == CNCT_R){
-//       matrix.fillRect(3, 1, 1, 2, colors[i]);
+//       matrix->fillRect(3, 1, 1, 2, colors[i]);
 //     }
-//     matrix.fillRect(1, 1, 2, 2, colors[WHITE]);
-//     matrix.show();
+//     matrix->fillRect(1, 1, 2, 2, colors[WHITE]);
+//     matrix->show();
 // }
 
 /*
@@ -122,8 +141,8 @@ debugWithMatrix - Displays single pixel on tile matrix corresponding to some err
     color - predefined color code value
 */
 void Tile::debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color) {
-  matrix.fillScreen(0);
-  matrix.fillRect(x, 1, y, 1, colors[color]);
-  matrix.show();
+  matrix->fillScreen(0);
+  matrix->fillRect(x, 1, y, 1, colors[color]);
+  matrix->show();
   delay(250);
 }

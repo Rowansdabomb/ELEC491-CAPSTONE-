@@ -1,8 +1,8 @@
 #include "Arduino.h"
-#include "Constants.h"
 #include "MasterTile.h"
-#include "MatrixSetup.h"
 #include "PinConfig.h"
+#include "Constants.h"
+#include "MatrixSetup.h"
 #include "Colors.h"
 #include <Wire.h>
 
@@ -25,7 +25,7 @@ MasterTile::MasterTile(uint8_t addr):Tile(addr) {
     for(uint8_t j = 0; j < TILE_MAP_SIZE; j++) {
       tileMap.grid[i][j] = 0;
       // set center of map as MASTER_TILE_ID
-      if(i = TILE_MAP_SIZE/2 && j == TILE_MAP_SIZE/2) tileMap.grid[i][j] = MASTER_TILE_ID;
+      if ((i == TILE_MAP_SIZE/2) && (j == TILE_MAP_SIZE/2)) tileMap.grid[i][j] = MASTER_TILE_ID;
     }
   }
 
@@ -51,17 +51,10 @@ MasterTile::MasterTile(uint8_t addr):Tile(addr) {
   pinMode(PIN_DIR_D, INPUT_PULLDOWN);
   pinMode(PIN_DIR_L, INPUT_PULLDOWN);
   pinMode(PIN_DIR_R, INPUT_PULLDOWN);
-  pinMode(PA2, OUTPUT);
+  // pinMode(PA2, OUTPUT);
 
   // I2C Master Setup
   Wire.begin();
-
-  // DotStar Setup
-  matrix.begin(); // Initialize pins for output
-  matrix.setBrightness(64); // Set max brightness (out of 255) 
-  matrix.setTextWrap(false);
-  matrix.setTextColor(colors[0]);
-  matrix.show();  // Turn all LEDs off ASAP
 }
 
 void MasterTile::setTileCount(const uint8_t count) {
@@ -80,13 +73,13 @@ struct POS MasterTile::getScrollPos() {
   return scrollPos;
 }
 /*
-getTile - returns a tile  
+getTile - returns a tile
   Input:
     id - the id of the tile to be returned
 */
 struct TILE MasterTile::getTile(const uint8_t id) {
   return tile[id];
-} 
+}
 
 void MasterTile::resetTileOrder() {
   for(uint8_t i = 0; i < TILE_MAX; ++i) {
@@ -103,22 +96,22 @@ void MasterTile::resetTileMapBounds() {
 
 /*
 getCursor - gets the cursor position for a tile at tileOrder[tileNumber]
-  Inputs: the 
+  Inputs: the
 */
 struct POS MasterTile::getOffsetCursor(uint8_t tileNumber, uint8_t charXIndex) {
   POS offset;
-  offset.x = scrollPos.x + (tileNumber * matrixWidth) - (charXIndex * CHAR_WIDTH);
+  offset.x = scrollPos.x + (tileNumber * MATRIX_WIDTH) - (charXIndex * CHAR_WIDTH);
   offset.y = scrollPos.y;
   return offset;
 }
 
 /*
 handleDisplayShape - checks for the addition or removal of Tiles from the display and
-  updates the 
+  updates the
 */
 uint8_t MasterTile::handleDisplayShape() {
     resetTileMapBounds();
-    
+
     //Determine occupied directions
     findNeighborTiles();
     tile[0] = getData();
@@ -149,36 +142,36 @@ void MasterTile::handleAddedOrRemovedTiles () {
         }
 
         switch(response) {
-          case 0: 
+          case 0:
           // SUCCESS
             ++tileCount;
             adjustMapBounds(tile[i]);
             break;
-          case 1: 
+          case 1:
           // DATA TOO LONG
             debugWithMatrix(0, 0, RED);
             addressNotFound(tile[i]);
             tilesUpdated = true; // Tile removed
             break;
-          case 2: 
+          case 2:
           // NACK ON TRANSMIT OF ADDRESS
             debugWithMatrix(1, 0, RED);
             addressNotFound(tile[i]);
             tilesUpdated = true; // Tile removed
             break;
-          case 3: 
+          case 3:
           // NACK ON TRANSMIT OF DATA
             debugWithMatrix(1, 0, RED);
             addressNotFound(tile[i]);
             tilesUpdated = true; // Tile removed
             break;
-          case 4: 
+          case 4:
           // OTHER ERROR
             debugWithMatrix(2, 0, RED);
             addressNotFound(tile[i]);
             tilesUpdated = true; // Tile removed
             break;
-          default: 
+          default:
           // TILE NOT ACTIVE
             addressNotFound(tile[i]);
             tilesUpdated = true; // Tile removed
@@ -192,7 +185,7 @@ void MasterTile::handleAddedOrRemovedTiles () {
       }
     }// End FOR loop
 
-    if(tilesUpdated){ 
+    if(tilesUpdated){
       configTileOrder();
     }
 }
@@ -222,6 +215,9 @@ void MasterTile::addNewTile(const struct TILE &tile) {
         x = tile.pos.x + 1;
         y = tile.pos.y;
         break;
+      default:
+        x = 0;
+        y = 0;
     }// END SWITCH
 
     uint8_t response = assignNewAddress(y, x);
@@ -244,13 +240,13 @@ uint8_t MasterTile::assignNewAddress(const uint8_t x, const uint8_t y) {
   Wire.beginTransmission(I2C_DEFAULT);
   response = Wire.endTransmission();
   if (response != SUCCESS) return response;
-  
+
   Wire.beginTransmission(I2C_DEFAULT);
   Wire.write('A');
-  Wire.write(tile[tileID].addr); //Assign the next available address from 
+  Wire.write(tile[tileID].addr); //Assign the next available address from
   response = Wire.endTransmission();
   if (response != SUCCESS) return response;
-  
+
   uint8_t waits = 0;
   response = -1;
   while(response != SUCCESS && waits < 20) {
@@ -261,10 +257,10 @@ uint8_t MasterTile::assignNewAddress(const uint8_t x, const uint8_t y) {
   }
 
   if (response != SUCCESS) return response;
-  
+
   tile[tileID].active = true;
-  tile[tileID].pos.x = x;   
-  tile[tileID].pos.y = y;  
+  tile[tileID].pos.x = x;
+  tile[tileID].pos.y = y;
   tileMap.grid[y][x] = tileID;
   return SUCCESS;
 }
@@ -281,7 +277,7 @@ transmitI2cCharData - Transmits the Character Data to a slave tile.
 */
 uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
     Wire.beginTransmission(addr);
-    Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily 
+    Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily
     Wire.write(pos.x);
     Wire.write(pos.y);
     Wire.write(color);
@@ -294,7 +290,7 @@ uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &po
 /*
 getOutputData - gets the characters that are to be sent to a Tile
   Inputs:
-    dataOut     - Character Array with MAX_DISPLAY_CHARS size 
+    dataOut     - Character Array with MAX_DISPLAY_CHARS size
     textData    - Text Array with textLength size
     textLength  - The length of the text to be displayed as obtained from Sanket's code
     charIndex   - The index of the character the scroll position is currently at
@@ -343,7 +339,7 @@ void MasterTile::updateScrollPos() {
 /*
 adjustMapBounds - sets the outer bounds of the tileMap
   Inputs:
-    &tile - ref to a tile 
+    &tile - ref to a tile
 */
 void MasterTile::adjustMapBounds(TILE &tile) {
   tile.previousPorts = tile.ports;
@@ -381,21 +377,21 @@ void MasterTile::configTileOrder() {
   for(uint8_t y = tileMap.yMin; y <= tileMap.yMax; ++y){
     for(uint8_t x = tileMap.xMin; x <= tileMap.xMax; ++x){
       uint8_t currentTileID = tileMap.grid[y][x];
-      
+
       if (currentTileID == MASTER_TILE_ID){
         tileOrder[cnt_order] = currentTileID;
         ++cnt_order;
       }
       else if (currentTileID != 0 && tile[currentTileID].active){
         tileOrder[cnt_order] = currentTileID;
-        ++cnt_order;   
+        ++cnt_order;
       }
     }
   }// End looping through array
 }
 
 /*
-addressNotFound - resets the tilemap position and data of the missing tile 
+addressNotFound - resets the tilemap position and data of the missing tile
   Inputs:
     &tile - the tile that is not found
 */
@@ -407,7 +403,7 @@ void MasterTile::addressNotFound(struct TILE &tile) {
 }
 
 /*
-transmitToSlave - transmits data to a slave tile depending on operation mode  
+transmitToSlave - transmits data to a slave tile depending on operation mode
   Inputs:
     addr  - address of the slave tile to update
     pos   - cursor offset for slave tile

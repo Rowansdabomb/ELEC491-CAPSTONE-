@@ -2,11 +2,12 @@
 #define t25_t25_lib_h
 
 #include "Arduino.h"
-#include "Tile.h"
 #include "MasterTile.h"
-#include "Colors.h"
+#include "Tile.h"
+
 #include "Constants.h"
-#include "MatrixSetup.h"
 #include "PinConfig.h"
+#include "Colors.h"
+#include <Wire.h>
 
 #endif
