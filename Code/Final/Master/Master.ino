@@ -48,12 +48,10 @@ void setup() {
 
 
 void loop() {
-  // Master.setTextData(textData, textLength);//This should be done by Sanket's code
+  Master.setTextData(textData, textLength);//This should be done by Sanket's code
   if(i2cUpdateFlag) {
-    // Master.resetTileOrder();
-
   //   Serial.println("Before handleDisplayShape"); 
-  //   Master.handleDisplayShape();
+    Master.handleDisplayShape();
   //   for(uint8_t i = 0; i < Master.getTileCount(); ++i) {
   //     Serial.println("Before getScrollPos");
   //     struct POS scrollPos = Master.getScrollPos();
@@ -68,7 +66,9 @@ void loop() {
   //     uint8_t tileID = Master.getOrderedTileID(i);
   //     if (tileID == MASTER_TILE_ID) {
   //       Serial.println("Before updateTileDisplay");
-  //       Master.updateTileDisplay(i, dataOut);
+        switch(Master.getOperationMode()) {
+            
+        }
   //     } else {
   //       struct TILE slave = Master.getTile(tileID);
   //       Serial.println("Before transmitToSlave");
@@ -83,6 +83,8 @@ void loop() {
     digitalWrite(LED_BUILTIN, HIGH);
   }
 }
+
+void handleOutputType
 
 /*
 Interrupt Subroutine on a timer.

@@ -46,13 +46,6 @@ MasterTile::MasterTile(uint8_t addr):Tile(addr) {
 
   data = tile[0];
 
-  // Directional Pin Setup
-  pinMode(PIN_DIR_U, INPUT_PULLDOWN);
-  pinMode(PIN_DIR_D, INPUT_PULLDOWN);
-  pinMode(PIN_DIR_L, INPUT_PULLDOWN);
-  pinMode(PIN_DIR_R, INPUT_PULLDOWN);
-  // pinMode(PA2, OUTPUT);
-
   // I2C Master Setup
   Wire.begin();
 }
@@ -74,13 +67,18 @@ struct POS MasterTile::getScrollPos() {
 }
 /*
 getTile - returns a tile
-  Input:
+  Inputs:
     id - the id of the tile to be returned
+  Outputs:
+    tile - 
 */
 struct TILE MasterTile::getTile(const uint8_t id) {
   return tile[id];
 }
 
+/*
+resetTileOrder - sets the tileOrder array to all 0s
+*/
 void MasterTile::resetTileOrder() {
   for(uint8_t i = 0; i < TILE_MAX; ++i) {
     tileOrder[i] = 0;
@@ -110,6 +108,7 @@ handleDisplayShape - checks for the addition or removal of Tiles from the displa
   updates the
 */
 uint8_t MasterTile::handleDisplayShape() {
+    resetTileOrder();
     resetTileMapBounds();
 
     //Determine occupied directions
@@ -339,9 +338,9 @@ void MasterTile::updateScrollPos() {
 /*
 adjustMapBounds - sets the outer bounds of the tileMap
   Inputs:
-    &tile - ref to a tile
+    &tile - tile struct
 */
-void MasterTile::adjustMapBounds(TILE &tile) {
+void MasterTile::adjustMapBounds(struct TILE &tile) {
   tile.previousPorts = tile.ports;
   //If available request current port status from slave devices
   Wire.requestFrom(tile.addr, 1);
@@ -427,15 +426,13 @@ void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, cons
     }
 }
 
-//Currently only a prototype for when Sanket implements his code as well
-void MasterTile::setTextData(const char text[], uint16_t size) {
-  if (size > MAX_STRING_SIZE) {
-    size = MAX_STRING_SIZE - 1;
-  }
-  for (uint8_t i = 0; i < size; ++i) {
-    textData[0] = text[0];
-  }
-  textData[size] = '\0';
+/*
+
+Currently only a prototype for when Sanket implements his code as well
+*/
+
+void MasterTile::setTextData(const char text[], uint8_t size) {
+  strncpy (textData, text, size);
   scrollLength = size * CHAR_WIDTH;
 }
 

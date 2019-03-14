@@ -52,9 +52,9 @@ class MasterTile: public Tile
     void handleAddedOrRemovedTiles();
     void addNewTile(const struct TILE &tile);
     uint8_t assignNewAddress(const uint8_t yFree, const uint8_t xFree); 
-    void addressNotFound(TILE &tile);
+    void addressNotFound(struct TILE &tile);
     uint8_t transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
-    void adjustMapBounds(TILE &tile);
+    void adjustMapBounds(struct TILE &tile);
     void configTileOrder();
 };
 

@@ -31,12 +31,18 @@ struct TILE {
 class Tile {
   public:
     Tile(uint8_t addr);
+    ~Tile();
+
+    char msgBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     void setCursor(int8_t x, int8_t y);
+    void setOperationMode(const uint8_t mode);
+    uint8_t getOperationMode();
     struct TILE getData();
+
     struct TILE findNeighborTiles();
     void debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color);
-    void updateOperationMode(const uint8_t mode);
+   
     void updateTileDisplay(const uint8_t i, char dataOut[]);
 
   protected:
@@ -46,9 +52,9 @@ class Tile {
 
     struct TILE data;
     struct POS cursor;
-    struct POS cursorStart;
 
     void displayChar(char dataOut[]);
+    void i2cDirectionTest(const uint16_t color)
 };
 
 #endif
