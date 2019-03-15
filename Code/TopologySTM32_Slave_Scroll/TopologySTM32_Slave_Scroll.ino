@@ -17,8 +17,8 @@ volatile bool matrixScrollFlag;
 uint8_t I2C_ADDR = 0x42; //Initalize I2C_ADDR
 #define I2C_DEFAULT 0x42
 
-uint8_t posX = 0;
-uint8_t posY = 0;
+int8_t posX = 0;
+int8_t posY = 0;
 uint8_t ports = B0000;
 uint8_t dataLength = 0;
 
@@ -60,41 +60,50 @@ void loop()
     Wire.begin(I2C_ADDR); //join the i2c bus with a different address
     Wire.onRequest(requestEvent);
     Wire.onReceive(receiveEvent);
-    Serial.print("Attempted Address Change");
-    Serial.println(I2C_ADDR, HEX); 
+    // Serial.print("Attempted Address Change");
+    // Serial.println(I2C_ADDR, HEX); 
     addressUpdateFlag = 0;   
+    matrix.fillScreen(0);
+    matrix.fillRect(1, 1, 1, 1, colors[3]);
+    matrix.show();
+    delay(500);
   }
   ports = getOccupiedDirections();
 
   //make color from 2 bytes
   posX = msgBuffer[0];
   posY = msgBuffer[1];
-  uint16_t color = (msgBuffer[2] << 8 ) | (msgBuffer[3] & 0xff);
-  dataLength = dataLength - 4;
-  
+  // uint16_t color = (msgBuffer[2] << 8 ) | (msgBuffer[3] & 0xff);
+  uint16_t color = (msgBuffer[2] & 0xff);
 
   if(matrixUpdateFlag){
     updateTileDisplay(msgBuffer[4]);
     matrixUpdateFlag = 0;
   }
   if(matrixScrollFlag){
-    matrixScroll(posX, posY, 4, dataLength);
-    matrixScrollFlag =0;
+    // Serial.print("dataLength: ");
+    // Serial.println(dataLength);
+    matrix.setTextColor(colors[1]);
+    matrixScroll(posX, posY, 3, dataLength);
+    matrixScrollFlag = 0;
   }
-
-  delay(100);
+  delay(10);
 }
 
 uint8_t receiveI2cData(volatile bool &enableFlag,  char msgBuffer[]){
   enableFlag = 1;
   uint8_t msgCount = 0;
   while(Wire.available()){
-    msgBuffer[msgCount] = (uint8_t) Wire.read();
-    Serial.print(msgCount);
-    Serial.print(" ");
-    Serial.println(msgBuffer[msgCount], BIN);
-    msgCount++;
+    msgBuffer[msgCount] = (int8_t) Wire.read();
+    // Serial.print(msgCount);
+    // Serial.print(" ");
+    // if(msgCount < 3){
+    //   Serial.println(msgBuffer[msgCount], DEC);
+    // }else{
+    //   Serial.println(msgBuffer[msgCount]);
+    // }
 
+    msgCount++;
   }
   return msgCount;
 }
@@ -121,18 +130,16 @@ uint8_t getOccupiedDirections(){
 void receiveEvent(int howMany)
 {
   char c;
-  Serial.println("Event Received");
+  // Serial.println("Event Received");
   if(Wire.available()){
     c = Wire.read();      // receive first byte as a character
-    Serial.println(c);         // print the character
+    // Serial.println(c);         // print the character
   }
   if(c == 'B'){
     dataLength = receiveI2cData(matrixUpdateFlag, msgBuffer);
-
   }
   if(c == 'Q'){
     dataLength = receiveI2cData(matrixScrollFlag, msgBuffer);
-    
   }
 }
 
@@ -154,13 +161,22 @@ void updateTileDisplay(const int i) {
     matrix.show();
 }
 
-void matrixScroll(uint8_t &posX, uint8_t &posY, uint8_t dataStart, uint8_t &dataLength){
+void matrixScroll(int8_t &posX, int8_t &posY, uint8_t dataStart, uint8_t &dataLength){
   matrix.fillScreen(0);
   matrix.setCursor(posX, posY);
+  // Serial.print("posX value : ");
+  // Serial.print( posX );
+  // Serial.print(" ");
+  // Serial.print("posY value : ");
+  // Serial.print( posY);
+  // Serial.print(" ");
+  // matrix.fillRect(1, 1, 2, 2, colors[posX]);
   for(uint8_t i = dataStart; i < dataLength; ++i){
+    Serial.print(msgBuffer[i]);
     matrix.print(msgBuffer[i]);
   }
   matrix.show();
+  // Serial.println("");
 }
 
 // function that executes whenever data is requested by master
