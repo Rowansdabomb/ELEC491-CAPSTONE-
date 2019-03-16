@@ -2,8 +2,8 @@
 #define t25_master_h
 
 #include "Arduino.h"
-#include "Tile.h"
-#include "Constants.h"
+#include "../Tile/Tile.h"
+#include "../Constants.h"
 
 struct TILEMAP {
   uint8_t grid[TILE_MAP_SIZE][TILE_MAP_SIZE];
@@ -17,6 +17,8 @@ class MasterTile: public Tile
 {
   public:
     MasterTile(uint8_t addr);
+
+    void beginMasterTile();
 
     // Setters
     void setTileCount(const uint8_t count);

@@ -35,6 +35,10 @@ class Tile {
 
     char msgBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
+    uint8_t frameRate;
+
+    void beginTile();
+
     void setCursor(int8_t x, int8_t y);
     void setOperationMode(const uint8_t mode);
     uint8_t getOperationMode();
@@ -54,7 +58,7 @@ class Tile {
     struct POS cursor;
 
     void displayChar(char dataOut[]);
-    void i2cDirectionTest(const uint16_t color)
+    void i2cDirectionTest(const uint16_t color);
 };
 
 #endif

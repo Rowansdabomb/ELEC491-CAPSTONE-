@@ -1,7 +1,7 @@
 #ifndef t25_slave_h
 #define t25_slave_h
 
-#include "Tile.h"
+#include "../Tile/Tile.h"
 
 class SlaveTile: public Tile {
 public:

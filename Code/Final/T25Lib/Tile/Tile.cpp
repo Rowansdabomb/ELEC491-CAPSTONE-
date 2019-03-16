@@ -1,8 +1,8 @@
 #include "Arduino.h"
-#include "Constants.h"
 #include "Tile.h"
-#include "PinConfig.h"
-#include "Colors.h"
+#include "../Constants.h"
+#include "../PinConfig.h"
+#include "../Colors.h"
 #include <Wire.h>
 
 Tile::Tile(uint8_t addr) {
@@ -10,6 +10,11 @@ Tile::Tile(uint8_t addr) {
   operationMode = DIRECTION_TEST;
 
   data.addr = addr;
+  frameRate = 24;
+}
+
+void Tile::beginTile() {
+  Serial.println("begin Tile");
   cursor.x = 0;
   cursor.y = 0;
 
@@ -43,6 +48,10 @@ Tile::Tile(uint8_t addr) {
 
 Tile::~Tile() {
   delete matrix;
+}
+
+uint8_t Tile::getOperationMode() {
+  return operationMode;
 }
 
 /*

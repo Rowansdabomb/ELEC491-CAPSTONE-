@@ -2,8 +2,10 @@
 #define t25_t25_lib_h
 
 #include "Arduino.h"
-#include "MasterTile.h"
-#include "Tile.h"
+#include "MasterTile/MasterTile.h"
+// #include "SlaveTile/SlaveTile.h"
+#include "Tile/Tile.h"
+
 
 #include "Constants.h"
 #include "PinConfig.h"

@@ -1,12 +1,18 @@
 #include "Arduino.h"
 #include "MasterTile.h"
-#include "PinConfig.h"
-#include "Constants.h"
-#include "MatrixSetup.h"
-#include "Colors.h"
+#include "../PinConfig.h"
+#include "../Constants.h"
+#include "../MatrixSetup.h"
+#include "../Colors.h"
 #include <Wire.h>
 
-MasterTile::MasterTile(uint8_t addr):Tile(addr) {
+MasterTile::MasterTile(uint8_t addr):Tile(addr) {}
+
+void MasterTile::beginMasterTile() {
+  Serial.println("MasterTile begin");
+  // first initialize the base class Tile 
+  beginTile();
+
   tileID = 0;
   tileCount = 0;
 
@@ -39,12 +45,11 @@ MasterTile::MasterTile(uint8_t addr):Tile(addr) {
   }
 
   // Master Tile Setup
-  tile[0].active = true;
-  tile[0].addr = addr;
-  tile[0].pos.x = 3;
-  tile[0].pos.y = 3;
+  data.active = true;
+  data.pos.x = 3;
+  data.pos.y = 3;
 
-  data = tile[0];
+  tile[0] = data;
 
   // I2C Master Setup
   Wire.begin();
