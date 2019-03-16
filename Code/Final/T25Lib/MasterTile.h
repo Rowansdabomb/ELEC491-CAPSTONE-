@@ -2,8 +2,8 @@
 #define t25_master_h
 
 #include "Arduino.h"
-#include "../Tile/Tile.h"
-#include "../Constants.h"
+#include "Tile.h"
+#include "Constants.h"
 
 struct TILEMAP {
   uint8_t grid[TILE_MAP_SIZE][TILE_MAP_SIZE];
@@ -22,13 +22,12 @@ class MasterTile: public Tile
 
     // Setters
     void setTileCount(const uint8_t count);
-    void setTextData(const char textData[], const uint16_t size);
+    void setTextData(const char text[], const uint8_t size);
 
     // Getters
     uint8_t getTileCount();
     uint8_t getOrderedTileID(uint8_t i);
     struct TILE getTile(uint8_t i);
-    struct POS getOffsetCursor(uint8_t tileNumber, uint8_t charXIndex);
     struct POS getScrollPos();
 
     void resetTileOrder();
@@ -37,7 +36,7 @@ class MasterTile: public Tile
     uint8_t handleDisplayShape();
 
     void transmitToSlave(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
-    uint8_t getOutputData(char dataOut[], char textData[], const uint8_t textLength, const uint8_t charIndex);
+    struct POS getOutputData(char dataOut[], char textData[], const uint8_t textLength, const uint8_t tileIndex);
 
 
   private:

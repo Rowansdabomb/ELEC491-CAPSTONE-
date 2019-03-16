@@ -14,8 +14,7 @@
 uint16_t textLength = 4;
 char textData[4] = {'T','L','2', '5'};
 
-char dataOut[MAX_DISPLAY_CHARS];
-
+// char dataOut[MAX_DISPLAY_CHARS];
 volatile bool i2cUpdateFlag;
 void i2cUpdate();
 
@@ -28,7 +27,6 @@ void setup() {
   i2cUpdateFlag = false;
   // Serial Setup - for output
   Serial.begin(9600); 
-  pinMode(LED_BUILTIN, OUTPUT);
   ///////////////// Timer setup ////////////////////
   fpsTimer.pause();
 
@@ -50,34 +48,22 @@ void setup() {
 void loop() {
   master.setTextData(textData, textLength);//This should be done by Sanket's code
   if(i2cUpdateFlag) {
-    // Serial.println(master.getOperationMode()); 
     master.handleDisplayShape();
     for(uint8_t i = 0; i < master.getTileCount(); ++i) {
-      // Serial.println("Before getScrollPos");
-      struct POS scrollPos = master.getScrollPos();
-      uint16_t charXIndex = scrollPos.x/CHAR_WIDTH;
-      // Serial.println("Before getOffsetCursor");
-      struct POS outPos = master.getOffsetCursor(i, charXIndex);
+      char dataOut[MAX_DISPLAY_CHARS];
 
-      // Serial.println("Before getOutputData");
-      master.getOutputData(dataOut, textData, textLength, charXIndex);
-      //tileOrder[i] is the index of the tile
-      // Serial.println("Before getOrderedTileID");
+      struct POS outPos = master.getOutputData(dataOut, textData, textLength, i);
       uint8_t tileID = master.getOrderedTileID(i);
       if (tileID == MASTER_TILE_ID) {
-        // Serial.println("Before updateTileDisplay");
-        master.updateTileDisplay(i, dataOut);
+        master.updateTileDisplay(outPos, dataOut);
       } else {
         struct TILE slave = master.getTile(tileID);
-        // Serial.println("Before transmitToSlave");
         master.transmitToSlave(slave.addr, outPos, colors[RED], dataOut);
       }
     }
-    // Serial.println("Before handleDisplayShape");
     master.updateScrollPos();
 
     i2cUpdateFlag = false;
-    // digitalWrite(LED_BUILTIN, HIGH);
   }
 }
 

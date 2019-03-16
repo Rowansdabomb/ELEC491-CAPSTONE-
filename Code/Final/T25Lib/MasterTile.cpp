@@ -1,15 +1,14 @@
 #include "Arduino.h"
 #include "MasterTile.h"
-#include "../PinConfig.h"
-#include "../Constants.h"
-#include "../MatrixSetup.h"
-#include "../Colors.h"
+#include "PinConfig.h"
+#include "Constants.h"
+#include "MatrixSetup.h"
+#include "Colors.h"
 #include <Wire.h>
 
 MasterTile::MasterTile(uint8_t addr):Tile(addr) {}
 
 void MasterTile::beginMasterTile() {
-  Serial.println("MasterTile begin");
   // first initialize the base class Tile 
   beginTile();
 
@@ -98,19 +97,12 @@ void MasterTile::resetTileMapBounds() {
 }
 
 /*
-getCursor - gets the cursor position for a tile at tileOrder[tileNumber]
-  Inputs: the
-*/
-struct POS MasterTile::getOffsetCursor(uint8_t tileNumber, uint8_t charXIndex) {
-  POS offset;
-  offset.x = scrollPos.x + (tileNumber * MATRIX_WIDTH) - (charXIndex * CHAR_WIDTH);
-  offset.y = scrollPos.y;
-  return offset;
-}
-
-/*
 handleDisplayShape - checks for the addition or removal of Tiles from the display and
   updates the
+  Inputs:
+    void
+  Outputs:
+    tileCount - the current number of tiles in the display
 */
 uint8_t MasterTile::handleDisplayShape() {
     resetTileOrder();
@@ -313,20 +305,19 @@ getOutputData - gets the characters that are to be sent to a Tile
   Outputs:
     N/A
 */
-uint8_t MasterTile::getOutputData(char dataOut[], char textData[], const uint8_t textLength, const uint8_t charIndex){
-  for( int i = 0; i < MAX_DISPLAY_CHARS; ++i){
-    if ( i == 0 ){
-      dataOut[i] = textData[charIndex];
-    }else{
-      if( charIndex + i + 1 > textLength){
-        dataOut[i] = ' '; //Data out of bounds set to empty character
-      }else{
-        dataOut[i] = textData[charIndex + i];
-      }
+struct POS MasterTile::getOutputData(char dataOut[], char textData[], const uint8_t textLength, uint8_t tileIndex){
+  uint8_t charIndex = ( scrollPos.x + MATRIX_WIDTH * tileIndex ) / CHAR_WIDTH;
+  struct POS offset;
+  offset.x = charIndex*CHAR_WIDTH - (scrollPos.x + MATRIX_WIDTH * tileIndex);
+  offset.y = 0;
+  for( int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //TODO: Write function to determine MAX_DISPLAY_CHARS
+    if (charIndex + i >= textLength) {
+      dataOut[i] = 9; // TAB
+    } else {
+      dataOut[i] = textData[charIndex + i];
     }
   }
-
-  return MAX_DISPLAY_CHARS;
+  return offset;
 }
 
 /*

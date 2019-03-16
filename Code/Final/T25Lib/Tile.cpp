@@ -1,24 +1,18 @@
 #include "Arduino.h"
 #include "Tile.h"
-#include "../Constants.h"
-#include "../PinConfig.h"
-#include "../Colors.h"
+#include "Constants.h"
+#include "PinConfig.h"
+#include "Colors.h"
 #include <Wire.h>
 
 Tile::Tile(uint8_t addr) {
   // initialize operationMode
-  operationMode = DIRECTION_TEST;
+  operationMode = SCROLL_MODE;
 
   data.addr = addr;
-  frameRate = 24;
-}
+  frameRate = 8;
 
-void Tile::beginTile() {
-  Serial.println("begin Tile");
-  cursor.x = 0;
-  cursor.y = 0;
-
-  //initialize the matrix
+    //initialize the matrix
   matrix = new Adafruit_DotStarMatrix(
     MATRIX_WIDTH, 
     MATRIX_HEIGHT, 
@@ -26,10 +20,15 @@ void Tile::beginTile() {
     TILES_Y,
     MATRIX_DATA_PIN, 
     MATRIX_CLK_PIN, 
-    DS_MATRIX_TOP     + DS_MATRIX_LEFT +
+    DS_MATRIX_BOTTOM     + DS_MATRIX_LEFT +
     DS_MATRIX_COLUMNS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
     DOTSTAR_RGB
   );
+}
+
+void Tile::beginTile() {
+  cursor.x = 0;
+  cursor.y = 0;
 
   // DotStar Setup
   matrix->begin(); // Initialize pins for output
@@ -44,14 +43,6 @@ void Tile::beginTile() {
   pinMode(PIN_DIR_L, INPUT_PULLDOWN);
   pinMode(PIN_DIR_R, INPUT_PULLDOWN);
   // pinMode(PA2, OUTPUT);
-}
-
-Tile::~Tile() {
-  delete matrix;
-}
-
-uint8_t Tile::getOperationMode() {
-  return operationMode;
 }
 
 /*
@@ -88,7 +79,7 @@ uint8_t Tile::getOperationMode() {
 }
 
 /*
-getData - retrieves the Tile's status, address, position, and findNeighborTiles
+getData - retrieves the Tile's status, address, position, and neighborTiles
   Outputs:
     TILE - a struct describing the tile data
 */
@@ -99,16 +90,16 @@ struct TILE Tile::getData() {
 /*
 updateTileDisplay - updates the display based on current operation mode
 */
-void Tile::updateTileDisplay(struct displayData data) {
+void Tile::updateTileDisplay(const POS &outPos, char dataOut[]) {
     switch(operationMode) {
       case (SCROLL_MODE):
-        displayChar(data.dataOut);
+        displayChar(outPos, dataOut);
         break;
       case (GESTURE_MODE):
         // TBD
         break;
       case (DIRECTION_TEST):
-        i2cDirectionTest(colors[data.color]);
+        // i2cDirectionTest(colors[data.color]);
         break;
     }
 }
@@ -118,9 +109,9 @@ displayChar - Shows the visible portion of characters on the matrix
   Inputs:
     dataOut - char array of characters to be displayed
 */
-void Tile::displayChar(const char dataOut[]) {
+void Tile::displayChar(const POS &pos, char dataOut[]){
   matrix->fillScreen(0);
-  matrix->setCursor(cursor.x, cursor.y);
+  matrix->setCursor(pos.x, pos.y);
   for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
     matrix->print(dataOut[i]);
   }
@@ -153,7 +144,7 @@ void Tile::i2cDirectionTest(const uint16_t color) {
 /*
 findNeighborTiles - checks each port of the tile for a neighbor and updates the Tile's data
   Outputs:
-    struct TILE - data including updated ports of the current tile
+    struct TILE - data including updated ports of the current tile and previous ports of current tile
 */
 // void getOccupiedDirections() {  
 struct TILE Tile::findNeighborTiles() {  

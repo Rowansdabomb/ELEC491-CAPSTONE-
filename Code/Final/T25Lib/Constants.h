@@ -23,5 +23,6 @@ const uint8_t addr_lst[TILE_MAX] = {0x08, 0x10, 0x18, 0x20, 0x28};
 const uint8_t SCROLL_MODE = 0;
 const uint8_t GESTURE_MODE = 1;
 const uint8_t DIRECTION_TEST = 2;
+const uint8_t MIRROR_MODE = 3;
 
 #endif

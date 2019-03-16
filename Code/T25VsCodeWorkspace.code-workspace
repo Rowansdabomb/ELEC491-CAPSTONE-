@@ -5,6 +5,12 @@
 		},
 		{
 			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Lib"
+		},
+		{
+			"path": "TopologySTM32_Master_Scroll"
+		},
+		{
+			"path": "TopologySTM32_Slave_Scroll"
 		}
 	],
 	"settings": {}

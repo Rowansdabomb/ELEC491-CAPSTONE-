@@ -431,7 +431,6 @@ void updateScrollPos(uint8_t &scrollPos, const uint8_t scrollLength){
   {
     scrollPos++;
   }
-  
 }
 
 

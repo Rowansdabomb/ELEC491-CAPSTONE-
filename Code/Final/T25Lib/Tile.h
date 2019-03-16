@@ -2,6 +2,7 @@
 #define t25_tile_h
 
 #include "Arduino.h"
+#include "Constants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_DotStarMatrix.h>
 #include <Adafruit_DotStar.h>
@@ -21,17 +22,22 @@ struct POS {
 */
 
 struct TILE {
-  bool  active;
-  int   addr;
-  POS   pos;
-  int   ports;
-  int   previousPorts;
+  bool      active;
+  uint8_t   addr;
+  POS       pos;
+  uint8_t   ports;
+  uint8_t   previousPorts;
+};
+
+struct MessageData {
+    struct POS pos;
+    uint16_t color;
+    char text[MAX_DISPLAY_CHARS];
 };
 
 class Tile {
   public:
     Tile(uint8_t addr);
-    ~Tile();
 
     char msgBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -47,17 +53,16 @@ class Tile {
     struct TILE findNeighborTiles();
     void debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color);
    
-    void updateTileDisplay(const uint8_t i, char dataOut[]);
-
-  protected:
-    uint8_t operationMode;
+    void updateTileDisplay(const POS &outPos, char dataOut[]);
 
     Adafruit_DotStarMatrix *matrix;
 
+  protected:
+    uint8_t operationMode;
     struct TILE data;
     struct POS cursor;
 
-    void displayChar(char dataOut[]);
+    void displayChar(const POS &pos, char dataOut[]);
     void i2cDirectionTest(const uint16_t color);
 };
 
