@@ -24,7 +24,7 @@ Adafruit_DotStarMatrix matrix = Adafruit_DotStarMatrix(
   tilesY,
   MATRIX_DATA_PIN, 
   MATRIX_CLK_PIN, 
-  DS_MATRIX_TOP     + DS_MATRIX_LEFT +
+  DS_MATRIX_BOTTOM     + DS_MATRIX_LEFT +
   DS_MATRIX_COLUMNS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
   DOTSTAR_RGB
 );

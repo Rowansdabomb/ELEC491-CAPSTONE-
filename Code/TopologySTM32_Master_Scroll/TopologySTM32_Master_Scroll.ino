@@ -17,8 +17,8 @@ TILE tile[TILE_MAX];
 /* THESE ARE TEMP VARIABLES
   Ideally this should be a temp variable from Sanket's code, for now assume it's 4 for TL25;
 */
-int textLength = 4;
-char textData[4] = {'T','L','2', '5'};
+int textLength = 5;
+char textData[5] = {'T','L','2', '5', 'E'};
 
 //Use tileMap to store the addresses of the devices 7 by 7
 int tileMap[ARRAY_SIZE][ARRAY_SIZE]= {
@@ -108,14 +108,17 @@ void loop() {
     tileCount = handleDisplayShape(tileOrder);  
     startIndex = scrollPos/CHAR_WIDTH;
     for(uint8_t i = 0; i < tileCount; ++i){
-      POS outPos = getOffset(scrollPos,i);
-      getOutputData(dataOut, textData, textLength);
+      // POS outPos = getOffset(scrollPos,i);
+      POS outPos = getOutputData(dataOut, textData, textLength, i);
       //tileOrder[i] is the index of the tile
       if (tileOrder[i] == MASTER_TILE_ID) {
         // updateTileDisplay(i);
+        Serial.print("outputPosition :");
+        Serial.println(outPos.x);
         displayChar(outPos, dataOut);
       } else {
-        transmitToSlaves(tileOrder, i);
+        // transmitToSlaves(tileOrder, i);
+        transmitI2cCharData(tile[tileOrder[i]].addr, outPos, colors[5], dataOut);
       }
     }
     i2cUpdateFlag = false;
@@ -129,24 +132,6 @@ void transmitToSlaves(const uint8_t tileOrder[], const uint8_t i) {
     temp.y = 0;
     transmitI2cData(tile[tileOrder[i]].addr, temp, colors[i]);
 }
-
-// void updateTileDisplay(const int i) {
-//     matrix.fillScreen(0);
-//     if((tile[0].ports & CNCT_U) == CNCT_U){
-//       matrix.fillRect(1, 3, 2, 1, colors[i]);
-//     }
-//     if((tile[0].ports & CNCT_D) == CNCT_D){
-//       matrix.fillRect(1, 0, 2, 1, colors[i]);
-//     }
-//     if((tile[0].ports & CNCT_L) == CNCT_L){
-//       matrix.fillRect(0, 1, 1, 2, colors[i]);
-//     }
-//     if((tile[0].ports & CNCT_R) == CNCT_R){
-//       matrix.fillRect(3, 1, 1, 2, colors[i]);
-//     }
-//     matrix.fillRect(1, 1, 2, 2, colors[VIOLET]);
-//     matrix.show();
-// }
 
 uint8_t handleDisplayShape(uint8_t tileOrder[]) {
     uint8_t array_x_max = 3;
@@ -201,8 +186,9 @@ uint8_t handleDisplayShape(uint8_t tileOrder[]) {
             break;
           // TILE NOT ACTIVE
           default:
-            debugWithMatrix(3, RED);
+            // debugWithMatrix(3, RED);
             addressNotFound(tile[i], tileReorderFlag);
+            break;
         } // END SWITCH
       } // END NOT MASTER IF
 
@@ -405,13 +391,6 @@ void updateTextData(uint8_t &scrollLength){
   scrollLength = textLength * CHAR_WIDTH;
 }
 
-POS getOffset(uint8_t scrollPos, uint8_t tileNumber){
-  POS tempPos;
-  tempPos.x = scrollPos + (tileNumber * matrixWidth) - (startIndex * CHAR_WIDTH);
-  tempPos.y = 0;
-  return tempPos;
-}
-
 /*
 getOutputData - gets the characters that are to be sent to a Tile
   Inputs:
@@ -419,20 +398,30 @@ getOutputData - gets the characters that are to be sent to a Tile
     textData - Text Array with textLength size
     textLength - The length of the text to be displayed as obtained from Sanket's code
   Outputs:
-    N/A
+    offset - Position of cursor relative to the left edge of matrix
 */
-void getOutputData(char dataOut[], char textData[], const uint8_t textLength){
-  for( int i = 0; i < MAX_DISPLAY_CHARS; ++i){
-    if ( i == 0 ){
-      dataOut[i] = textData[startIndex];
-    }else{
-      if( startIndex + i + 1 > textLength){
-        dataOut[i] = ' '; //Data out of bounds set to empty character
-      }else{
-        dataOut[i] = textData[startIndex + i];
-      }
+struct POS getOutputData(char dataOut[], char textData[], const uint8_t textLength, uint8_t tileIndex){
+  uint8_t charIndex = ( scrollPos + matrixWidth * tileIndex ) / CHAR_WIDTH;
+  struct POS offset;
+  offset.x = charIndex*CHAR_WIDTH - (scrollPos + matrixWidth * tileIndex);
+  offset.y = 0;
+  for( int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //TODO: Write function to determine MAX_DISPLAY_CHARS
+    if (charIndex + i >= textLength) {
+      dataOut[i] = 9; // TAB
+    } else {
+      dataOut[i] = textData[charIndex + i];
     }
+    // if ( i == 0 ){
+    //   dataOut[i] = textData[charIndex];
+    // }else{
+    //   if( charIndex + i + 1 > textLength){
+    //     dataOut[i] = ' '; //Data out of bounds set to empty character
+    //   }else{
+    //     dataOut[i] = textData[charIndex + i];
+    //   }
+    // }
   }
+  return offset;
 }
 
 void updateScrollPos(uint8_t &scrollPos, const uint8_t scrollLength){
