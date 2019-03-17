@@ -1,0 +1,3 @@
+MasterTile    KEYWORD1
+Tile          KEYWORD2
+SlaveTile     KEYWORD3
