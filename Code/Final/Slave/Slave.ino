@@ -6,7 +6,8 @@
 ***************************************************************************************/
 
 #include <Wire_slave.h>
-#include <T25Lib.h>
+#include <T25Tile.h>
+#include <T25SlaveTile.h>
 
 volatile bool addressUpdateFlag;
 
@@ -22,7 +23,7 @@ void setup()
   Wire.onReceive(receiveAddress); // register event
 
   //  Serial Setup - for output
-  Serial.begin(9600);    
+  Serial.begin(38400);    
   
   slave.beginSlaveTile();       
 }
@@ -93,7 +94,7 @@ void requestEvent()
 }
 
 void receiveAddress(int howMany){
-  Serial.println("Attempte receiveAddress");
+  Serial.println("Attempt receiveAddress");
   char c;
   if(Wire.available()){
     c = Wire.read();

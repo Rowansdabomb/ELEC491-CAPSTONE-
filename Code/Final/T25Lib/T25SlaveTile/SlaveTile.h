@@ -2,7 +2,7 @@
 #define t25_slave_h
 
 #include "Arduino.h"
-#include "Tile.h"
+#include <T25Tile.h>
 
 class SlaveTile: public Tile {
 public:

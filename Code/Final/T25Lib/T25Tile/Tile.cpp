@@ -3,14 +3,14 @@
 #include "Constants.h"
 #include "PinConfig.h"
 #include "Colors.h"
-#include <Wire.h>
+// #include <Wire.h>
 
 Tile::Tile(uint8_t addr) {
   // initialize operationMode
   operationMode = SCROLL_MODE;
 
   data.addr = addr;
-  frameRate = 8;
+  frameRate = 1;
 
     //initialize the matrix
   matrix = new Adafruit_DotStarMatrix(

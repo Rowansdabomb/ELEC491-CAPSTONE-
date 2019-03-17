@@ -6,7 +6,7 @@
 //DotStar Setup
 const uint8_t MATRIX_DATA_PIN = PB11; 
 const uint8_t MATRIX_CLK_PIN = PB10;
-const uint8_t CHAR_WIDTH = 5;
+const uint8_t CHAR_WIDTH = 6;
 const uint8_t CHAR_HEIGHT = 8;
 
 // Size of each tile matrix

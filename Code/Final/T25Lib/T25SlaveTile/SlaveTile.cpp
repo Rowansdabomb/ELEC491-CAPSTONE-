@@ -8,7 +8,6 @@ SlaveTile::SlaveTile(uint8_t addr):Tile(addr) {
   for (uint8_t i = 0; i < 8; ++i) {
     msgBuffer[i] = 0;
   }
-
 }
 
 void SlaveTile::beginSlaveTile() {
@@ -59,7 +58,7 @@ struct MessageData SlaveTile::getMessageData() {
             msgData.pos.y = msgBuffer[1];
             msgData.color = (msgBuffer[2] << 8 ) | (msgBuffer[3] & 0xff);
             for(uint8_t i = 0; i < MAX_DISPLAY_CHARS; i++) {
-                msgData.text[i] = msgBuffer[4 + i];
+                msgData.text[i] = msgBuffer[3 + i];
             }
             break;
         case GESTURE_MODE:

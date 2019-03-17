@@ -6,7 +6,8 @@
 ***************************************************************************************/
 
 #include <Wire.h>
-#include <T25Lib.h>
+#include "T25Tile.h"
+#include "T25MasterTile.h"
 
 /* THESE ARE TEMP VARIABLES
   Ideally this should be a temp variable from Sanket's code, for now assume it's 4 for TL25;
@@ -26,7 +27,7 @@ void setup() {
   // Flag initialization
   i2cUpdateFlag = false;
   // Serial Setup - for output
-  Serial.begin(9600); 
+  Serial.begin(38400); 
   ///////////////// Timer setup ////////////////////
   fpsTimer.pause();
 
