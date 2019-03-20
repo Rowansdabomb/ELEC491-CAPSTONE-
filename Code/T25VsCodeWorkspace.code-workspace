@@ -4,13 +4,16 @@
 			"path": "Final"
 		},
 		{
-			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Lib"
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Tile"
 		},
 		{
-			"path": "TopologySTM32_Master_Scroll"
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25SlaveTile"
 		},
 		{
-			"path": "TopologySTM32_Slave_Scroll"
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25MasterTile"
+		},
+		{
+			"path": "8x8SensorMatrixPoll"
 		}
 	],
 	"settings": {}

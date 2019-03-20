@@ -9,10 +9,20 @@ Tile::Tile(uint8_t addr) {
   // initialize operationMode
   operationMode = SCROLL_MODE;
 
+  //SET ADDRESS
   data.addr = addr;
+
+  // SET FRAME RATE
   frameRate = 1;
 
-    //initialize the matrix
+  // SENSOR SETUP
+  sensorRow = 0;
+  sensorCol = 0;
+  for (uint16_t i = 0; i < MATRIX_WIDTH*MATRIX_HEIGHT; ++i) {
+    sensorData[i] = 0;
+  }
+
+  //initialize the matrix
   matrix = new Adafruit_DotStarMatrix(
     MATRIX_WIDTH, 
     MATRIX_HEIGHT, 
@@ -22,7 +32,7 @@ Tile::Tile(uint8_t addr) {
     MATRIX_CLK_PIN, 
     DS_MATRIX_BOTTOM     + DS_MATRIX_LEFT +
     DS_MATRIX_COLUMNS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
-    DOTSTAR_RGB
+    DOTSTAR_BGR
   );
 }
 
@@ -108,6 +118,8 @@ void Tile::updateTileDisplay(const POS &outPos, char dataOut[]) {
 displayChar - Shows the visible portion of characters on the matrix
   Inputs:
     dataOut - char array of characters to be displayed
+  Outputs:
+    void
 */
 void Tile::displayChar(const POS &pos, char dataOut[]){
   matrix->fillScreen(0);
@@ -175,10 +187,113 @@ debugWithMatrix - Displays single pixel on tile matrix corresponding to some err
     x - horizontal offset from left edge of tile matrix
     y - veritcal offset from top edge of tile matrix
     color - predefined color code value
+  Outputs:
+    void
 */
 void Tile::debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color) {
   matrix->fillScreen(0);
   matrix->fillRect(x, 1, y, 1, colors[color]);
   matrix->show();
   delay(250);
+}
+
+/*
+changeColor - a method to change the color of the matrix
+  Inputs:
+    colors - an array containing the values for red, green, blue from 0-255
+  Outputs:
+    void
+*/
+void Tile::changeColor(uint8_t colors[]) {
+    matrix->setCursor(0, 0);
+    matrix->setTextColor(makeColor(colors[0], colors[1], colors[2]));
+    matrix->show();
+}
+
+/*
+changeColor - a method to change the color of the matrix
+  Inputs:
+    color - a 2byte color
+  Outputs:
+    void
+*/
+void Tile::changeColor(uint16_t color) {
+    matrix->setCursor(0, 0);
+    matrix->setTextColor(color);
+    matrix->show();
+}
+
+/*
+printSensorData - outputs the current sensor data to serial
+  Inputs:
+    void
+  Outputs:
+    void
+*/
+void Tile::printSensorData() {
+    Serial.write(27);       // ESC command
+  Serial.print("[2J");    // clear screen command
+  Serial.write(27);
+  Serial.print("[H");     // cursor to home command
+
+  for (uint8_t i = 0; i < MATRIX_WIDTH; ++i) {
+    for(uint8_t j = 0; j < MATRIX_HEIGHT; ++j) {
+      Serial.print(sensorData[i + j*(MATRIX_HEIGHT)]);
+      if(j < MATRIX_HEIGHT - 1)
+        Serial.print(" | ");
+      else
+        Serial.println();
+    }
+  }
+  Serial.println();
+}
+
+/*
+readSensorData - 
+*/
+void Tile::readSensorData() {
+  if (sensorID != prevSensorID) {
+    // read sensor data, pin map should be 0-7 for A0-A7 so we use sensorCol
+    sensorData[sensorCol + sensorRow*8] = analogRead(sensorCol);
+
+    // turn on next emitter
+    ++sensorRow;
+    if (sensorRow > MATRIX_WIDTH - 1) {
+      sensorRow = 0;
+    }
+
+    ++sensorCol;
+    if (sensorCol > MATRIX_HEIGHT - 1) {
+      sensorCol = 0;
+    }
+
+    for (uint8_t i = 0; i < 3; ++i) {
+      if ((sensorRow >> i) & 1) {
+        gpio_write_bit(GPIOB, MUX_ROW_SELECT[i], LOW);
+      } else {
+        gpio_write_bit(GPIOB, MUX_ROW_SELECT[i], HIGH);
+      }
+      
+      if ((sensorCol >> i) & 1) {
+        gpio_write_bit(GPIOB, MUX_COL_SELECT[i], LOW);
+      } else {
+        gpio_write_bit(GPIOB, MUX_COL_SELECT[i], HIGH);
+      }
+    }
+
+    if (DEBUG) {
+      printSensorData();
+    }
+  }
+}
+
+/*
+
+*/
+void Tile::ISR_sensorRead() {
+  prevSensorID = sensorID;
+  ++sensorID;
+  if (sensorID > MATRIX_WIDTH * MATRIX_HEIGHT) {
+    sensorID = 0;
+  }
 }

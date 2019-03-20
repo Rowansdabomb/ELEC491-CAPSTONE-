@@ -8,12 +8,12 @@ const uint8_t testPin = PB12;
 
 //TODO
 // row mux pin maps
-const char muxRowSelects[3] = {0, 1, 2};
+const char MUX_ROW_SELECT[3] = {0, 1, 2};
 //col muc pin maps
-const char muxColSelects[3] = {0, 1, 2};
+const char MUX_COL_SELECT[3] = {0, 1, 2};
 
-const uint8_t matrixWidth = 8;
-const uint8_t matrixHeight = 8;
+const uint8_t MATRIX_WIDTH = 8;
+const uint8_t MATRIX_HEIGHT = 8;
 
 // Interrupt variables
 volatile char sensorRow = 0; // 0-7
@@ -62,10 +62,10 @@ void sensorRead() {
   ++sensorCol;
   if (sensorCol > 7) sensorCol = 0;
   for (int i = 0; i < 3; ++i) {
-    if ((sensorRow >> i) & 1) gpio_write_bit(GPIOB, muxRowSelects[i], LOW);
-    else gpio_write_bit(GPIOB, muxRowSelects[i], HIGH);
-    if ((sensorCol >> i) & 1) gpio_write_bit(GPIOB, muxColSelects[i], LOW);
-    else gpio_write_bit(GPIOB, muxColSelects[i], HIGH);
+    if ((sensorRow >> i) & 1) gpio_write_bit(GPIOB, MUX_ROW_SELECT[i], LOW);
+    else gpio_write_bit(GPIOB, MUX_ROW_SELECT[i], HIGH);
+    if ((sensorCol >> i) & 1) gpio_write_bit(GPIOB, MUX_COL_SELECT[i], LOW);
+    else gpio_write_bit(GPIOB, MUX_COL_SELECT[i], HIGH);
   }
   if (sensorRow == 7 && sensorCol == 7) SRIF = true;
 
@@ -78,10 +78,10 @@ void printSensorData() {
   Serial.write(27);
   Serial.print("[H");     // cursor to home command
 
-  for (uint8_t i = 0; i < matrixWidth; ++i) {
-    for(uint8_t j = 0; j < matrixHeight; ++j) {
-      Serial.print(sensorData[i + j*(matrixHeight)]);
-      if(j < matrixHeight - 1)
+  for (uint8_t i = 0; i < MATRIX_WIDTH; ++i) {
+    for(uint8_t j = 0; j < MATRIX_HEIGHT; ++j) {
+      Serial.print(sensorData[i + j*(MATRIX_HEIGHT)]);
+      if(j < MATRIX_HEIGHT - 1)
         Serial.print(" | ");
       else
         Serial.println();

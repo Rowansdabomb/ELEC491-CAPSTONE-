@@ -6,7 +6,7 @@
 
 const uint8_t RGB = 0;
 const uint8_t BGR = 1;
-const uint8_t COLOR_ORDER = BGR; 
+const uint8_t COLOR_ORDER = RGB; 
 
 uint16_t makeColor(uint8_t r, uint8_t g, uint8_t b);
 

@@ -13,6 +13,8 @@ volatile bool addressUpdateFlag;
 
 SlaveTile slave(I2C_DEFAULT);
 
+uint16_t prevColor = 0;
+
 void setup()
 {
   addressUpdateFlag = false;
@@ -23,7 +25,7 @@ void setup()
   Wire.onReceive(receiveAddress); // register event
 
   //  Serial Setup - for output
-  Serial.begin(38400);    
+  Serial.begin(57600);    
   
   slave.beginSlaveTile();       
 }
@@ -44,9 +46,17 @@ void loop()
 
   // make color from 2 bytes
   struct MessageData msgData = slave.getMessageData();
+
+  if (msgData.color != prevColor ) {
+    prevColor = msgData.color;
+    Serial.print("Color from master: ");
+    Serial.println(msgData.color);
+    slave.changeColor(msgData.color);
+  }
+
+  Serial.print("pos x: ");
   Serial.print(msgData.pos.x);
-  Serial.print(" ");
-  Serial.println(msgData.pos.y);
+  Serial.println();
 
   slave.updateTileDisplay(msgData.pos, msgData.text);
 
@@ -65,10 +75,8 @@ void receiveEvent(int howMany)
 {
   char mode = '0';
 
-  Serial.println("Event Received");
   if (Wire.available()) {
     mode = Wire.read();      // receive first byte as a character
-    Serial.println(mode);         // print the character
   }
   switch(mode){
     case 'B':
@@ -94,7 +102,6 @@ void requestEvent()
 }
 
 void receiveAddress(int howMany){
-  Serial.println("Attempt receiveAddress");
   char c;
   if(Wire.available()){
     c = Wire.read();

@@ -47,7 +47,6 @@ void loop() {
     if (temp_color != ColourM) {
         ColourChange(ColourM);
         temp_color = ColourM; 
-        
     }
     
 //// To Enter Text ///////////////////////////////////////////////////////
@@ -55,23 +54,22 @@ void loop() {
     if (temp_text != TextM) {
         TextChange(TextM);
         temp_text = TextM; 
-    
     }
 }
 
 
 void HextoRGB (String hexstring, int rgb[]){
 
-long long number = strtoll( &hexstring[1], NULL, 16);
+  long long number = strtoll( &hexstring[1], NULL, 16);
 
-// Split them up into r, g, b values
-long r = number >> 16;
-long g = number >> 8 & 0xFF;
-long b = number & 0xFF;
+  // Split them up into r, g, b values
+  long r = number >> 16;
+  long g = number >> 8 & 0xFF;
+  long b = number & 0xFF;
 
-rgb[0] = r;
-rgb[1] = g;
-rgb[2] = b;
+  rgb[0] = r;
+  rgb[1] = g;
+  rgb[2] = b;
 
 }
 
@@ -83,9 +81,11 @@ void ColourChange(String HexColourCode){
   ESPSerial.write(2);
  
   for(int i  =0; i < 3; i++){
-     Serial.println(rgb[i]); 
+     Serial.print(rgb[i]);
+     Serial.print(", "); 
      ESPSerial.write(rgb[i]);
   } 
+  Serial.println();
 }
 
 void TextChange(String TextFB) {

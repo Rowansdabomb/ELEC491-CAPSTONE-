@@ -2,6 +2,7 @@
 #define t25_tile_h
 
 #include "Arduino.h"
+#include "MatrixSetup.h"
 #include "Constants.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_DotStarMatrix.h>
@@ -54,6 +55,15 @@ class Tile {
     void debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color);
    
     void updateTileDisplay(const POS &outPos, char dataOut[]);
+    void changeColor(uint8_t colors[]);
+    void changeColor(uint16_t color);
+    void printSensorData();
+    void readSensorData();
+
+    //ISR
+    volatile uint8_t sensorID;
+    volatile uint8_t prevSensorID;
+    void ISR_sensorRead();
 
     Adafruit_DotStarMatrix *matrix;
 
@@ -61,6 +71,10 @@ class Tile {
     uint8_t operationMode;
     struct TILE data;
     struct POS cursor;
+
+    uint8_t sensorRow;
+    uint8_t sensorCol;
+    uint16_t sensorData[MATRIX_WIDTH * MATRIX_HEIGHT];
 
     void displayChar(const POS &pos, char dataOut[]);
     void i2cDirectionTest(const uint16_t color);

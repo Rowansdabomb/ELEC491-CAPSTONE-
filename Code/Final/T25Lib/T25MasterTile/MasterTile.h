@@ -35,11 +35,13 @@ class MasterTile: public Tile
     uint8_t handleDisplayShape();
 
     void transmitToSlave(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
-    struct POS getOutputData(char dataOut[], char textData[], const uint8_t textLength, const uint8_t tileIndex);
+    struct POS getOutputData(char dataOut[], const uint8_t tileIndex);
+    char textData[MAX_STRING_SIZE];
 
 
   private:
-    char textData[MAX_STRING_SIZE];
+
+    uint16_t textDataLength;
     uint16_t scrollLength;
     struct POS scrollPos;
 

@@ -6,17 +6,18 @@
 #include "Colors.h"
 #include <Wire.h>
 
-MasterTile::MasterTile(uint8_t addr):Tile(addr) {}
-
-void MasterTile::beginMasterTile() {
-  // first initialize the base class Tile 
-  beginTile();
-
+MasterTile::MasterTile(uint8_t addr):Tile(addr) {
   tileID = 0;
   tileCount = 0;
 
   scrollPos.x = 0;
   scrollPos.y = 0;
+
+}
+
+void MasterTile::beginMasterTile() {
+  // first initialize the base class Tile 
+  beginTile();
 
   //Initialize the tileOrder
   resetTileOrder();
@@ -49,6 +50,8 @@ void MasterTile::beginMasterTile() {
   data.pos.y = 3;
 
   tile[0] = data;
+
+  setTextData("Hello", 5);
 
   // I2C Master Setup
   Wire.begin();
@@ -262,33 +265,9 @@ uint8_t MasterTile::assignNewAddress(const uint8_t x, const uint8_t y) {
 }
 
 /*
-transmitI2cCharData - Transmits the Character Data to a slave tile.
-  Inputs:
-    addr    - address of the slave tile
-    pos     - reference position of where character data should start
-    color   - RGB value to display text
-    data    - 2 byte character array
-  Outputs:
-    Return value of endTransmission
-*/
-uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
-    Wire.beginTransmission(addr);
-    Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily
-    Wire.write(pos.x);
-    Wire.write(pos.y);
-    Wire.write(color);
-    for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
-        Wire.write(data[i]);
-    }
-    return Wire.endTransmission();
-}
-
-/*
 getOutputData - gets the characters that are to be sent to a Tile
   Inputs:
     dataOut     - Character Array with MAX_DISPLAY_CHARS size
-    textData    - Text Array with textLength size
-    textLength  - The length of the text to be displayed as obtained from Sanket's code
     charIndex   - The index of the character the scroll position is currently at
 
         scrollPos = 2 and charIndex = 0
@@ -305,14 +284,14 @@ getOutputData - gets the characters that are to be sent to a Tile
   Outputs:
     N/A
 */
-struct POS MasterTile::getOutputData(char dataOut[], char textData[], const uint8_t textLength, uint8_t tileIndex){
+struct POS MasterTile::getOutputData(char dataOut[], uint8_t tileIndex){
   uint8_t charIndex = ( scrollPos.x + MATRIX_WIDTH * tileIndex ) / CHAR_WIDTH;
   struct POS offset;
   offset.x = charIndex*CHAR_WIDTH - (scrollPos.x + MATRIX_WIDTH * tileIndex);
   offset.y = 0;
   for( int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //TODO: Write function to determine MAX_DISPLAY_CHARS
-    if (charIndex + i >= textLength) {
-      dataOut[i] = 9; // TAB
+    if (charIndex + i >= textDataLength) {
+      dataOut[i] = textData[0]; // TAB
     } else {
       dataOut[i] = textData[charIndex + i];
     }
@@ -423,12 +402,40 @@ void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, cons
 }
 
 /*
-
-Currently only a prototype for when Sanket implements his code as well
+transmitI2cCharData - Transmits the Character Data to a slave tile.
+  Inputs:
+    addr    - address of the slave tile
+    pos     - reference position of where character data should start
+    color   - RGB value to display text
+    data    - 2 byte character array
+  Outputs:
+    Return value of endTransmission
 */
+uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
+    Wire.beginTransmission(addr);
+    Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily
+    Wire.write(pos.x);
+    Wire.write(pos.y);
+    Wire.write((color >> 8) & 0xff);
+    Wire.write(color & 0xff);
+    for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
+        Wire.write(data[i]);
+    }
+    return Wire.endTransmission();
+}
 
+/*
+setTextData - Sets scrollLength, textData, and textDataSize
+  Inputs:
+    text[] - c string containing the data to update textData with
+    size - the length of the text string
+  Outputs:
+    void
+*/
 void MasterTile::setTextData(const char text[], uint8_t size) {
   strncpy (textData, text, size);
+  textData[size] = '\0';
+  textDataLength = size;
   scrollLength = size * CHAR_WIDTH;
 }
 
