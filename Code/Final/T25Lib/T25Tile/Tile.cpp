@@ -254,7 +254,8 @@ readSensorData -
 void Tile::readSensorData() {
   if (sensorID != prevSensorID) {
     // read sensor data, pin map should be 0-7 for A0-A7 so we use sensorCol
-    sensorData[sensorCol + sensorRow*8] = analogRead(sensorCol);
+    
+    sensorData[sensorCol + sensorRow*MATRIX_WIDTH] = analogRead(sensorCol);
 
     // turn on next emitter
     ++sensorRow;
