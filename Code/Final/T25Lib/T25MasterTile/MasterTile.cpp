@@ -334,6 +334,65 @@ void MasterTile::adjustMapBounds(struct TILE &tile) {
   }
 }
 
+// void MasterTile::getESPData() {
+//   Wire.requestFrom(WIFI_SLAVE_ADDR, 2);
+//   byte transmitType = Wire.read();
+//   uint8_t msgSize = Wire.read();
+
+//   Wire.requestFrom(WIFI_SLAVE_ADDR, msgSize, true);
+  
+//   switch(transmitType) {
+//     case CHANGE_COLOR:
+//     {
+//       uint8_t rgb[3];
+
+//       uint8_t i = 0;
+//       while (Wire.available()) {
+//         rgb[i] = Wire.read();
+//         // delay(1);
+//         ++i;
+//       }
+
+//       currentColor = makeColor(rgb[0], rgb[1], rgb[2]);
+//       master.changeColor(currentColor);
+//       break;
+//     }
+//     case CHANGE_TEXT:
+//     {
+//       char textData[MAX_STRING_SIZE];
+//       // uint8_t textDataSize = Wire.read();
+//       uint8_t i = 0;
+//       while(Wire.available()) {
+//         textData[i] = Wire.read();
+//         ++i;
+//       }
+//       // int textDataSize = Serial1.readBytesUntil('\0', textData, MAX_STRING_SIZE);
+//       // textData[textDataSize] = '\0';
+//       textData[i] = '\0';
+        
+//       master.setTextData(textData, textDataSize);//This should be done by Sanket's code
+//       break;
+//     }
+//     case CHANGE_OPERATION_MODE:
+//     {
+//       // master.setOperationMode(Serial1.read());
+//       uint8_t mode = Wire.read();
+//       master.setOperationMode(mode);
+//     }
+
+//     default:
+//       // DO NOTHING
+//       break;
+//   }
+//   byte size = Wire.read();
+//   delay(1);
+//   Wire.requestFrom(WIFI_SLAVE_ADDR, size);
+//   char espBuff[size];
+//   for(uint8_t i = 0; i < size; i++) {
+//     espBuff[i] = Wire.read();
+//   }
+// }
+
 /*
 configTileOrder - sorts tileOrder with tilIDs from left to right then top to bottom
 

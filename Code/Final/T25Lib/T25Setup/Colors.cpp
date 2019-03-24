@@ -1,7 +1,5 @@
 #include "Colors.h"
 
-#define max(r, g, b)
-
 uint16_t makeColor(uint8_t r, uint8_t g, uint8_t b) {
   switch(COLOR_ORDER) {
     case RGB:
@@ -28,8 +26,8 @@ float * rgbToHsl(uint8_t rgb[]) {
   float g = rgb[1]/255;
   float b = rgb[2]/255;
   float _rgb[3] = {r, g, b};
-  float cmax = getMax(_rgb, 3);
-  float cmin = getMin(_rgb, 3);
+  float cmax = nGetMax(_rgb, 3);
+  float cmin = nGetMin(_rgb, 3);
   float delta = cmax - cmin;
 
   float L = (cmax + cmin) / 2;
@@ -43,11 +41,11 @@ float * rgbToHsl(uint8_t rgb[]) {
   if (delta = 0) {
     H = 0;
   } else if (cmax = r) {
-    H = 60 * (((g - b)/delta) % 6);
+    H = 60 * ((int)((g - b)/delta) % 6);
   } else if (cmax = g) {
-    H = 60 * (((b - r)/delta) + 2);
+    H = 60 * ((int)((b - r)/delta) + 2);
   } else {
-    H = 60 * (((r - g)/delta) + 4);
+    H = 60 * ((int)((r - g)/delta) + 4);
   }
   
   float hsl[3];
@@ -62,8 +60,8 @@ float * rgbToHsl(uint8_t rgb[]) {
 converts hsl to rgb colors
 */
 uint8_t * hslToRgb(float hsl[]) {
-  float C = (1 - abs(2 * hsl[2] - 1) * hsl[1];
-  float X = C * (1 - abs((hsl[0] / 60) % 2 - 1));
+  float C = (1 - abs(2 * hsl[2] - 1)) * hsl[1];
+  float X = C * (1 - abs((int) (hsl[0] / 60) % 2 - 1));
   float m = hsl[2] - C/2;
   float _rgb[3];
   if (0 <= hsl[0] && hsl[0] < 60) {
@@ -87,7 +85,7 @@ uint8_t * hslToRgb(float hsl[]) {
   return rgb;
 } 
 
-float getMax(float arr[], const uint8_t size) {
+float nGetMax(float arr[], const uint8_t size) {
   float result = 0;
   for(uint8_t i = 0; i < size; i++) {
     if(result < arr[i]) result = arr[i];
@@ -95,8 +93,8 @@ float getMax(float arr[], const uint8_t size) {
   return result;
 }
 
-float getMin(float arr[], const uint8_t size) {
-  float result = 255;
+float nGetMin(float arr[], const uint8_t size) {
+  float result = 1;
   for(uint8_t i = 0; i < size; i++) {
     if(result > arr[i]) result = arr[i];
   }

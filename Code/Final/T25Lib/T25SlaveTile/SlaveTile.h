@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include <T25Tile.h>
+#include <T25Setup.h>
 
 class SlaveTile: public Tile {
 public:

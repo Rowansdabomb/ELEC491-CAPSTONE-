@@ -8,6 +8,7 @@
 const uint8_t MASTER_TILE_ID = 9;
 
 const uint8_t I2C_DEFAULT = 0x42;
+const uint8_t WIFI_SLAVE_ADDR = 0x0f;
 
 // SENSOR POLLING
 const uint8_t MUX_ROW_SELECT[3] = {MROW_0, MROW_1, MROW_2}; 

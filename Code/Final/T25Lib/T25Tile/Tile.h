@@ -2,8 +2,7 @@
 #define t25_tile_h
 
 #include "Arduino.h"
-#include "MatrixSetup.h"
-#include "Constants.h"
+#include <T25Setup.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_DotStarMatrix.h>
 #include <Adafruit_DotStar.h>

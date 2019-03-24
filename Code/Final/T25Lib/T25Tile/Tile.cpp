@@ -3,7 +3,6 @@
 #include "Constants.h"
 #include "PinConfig.h"
 #include "Colors.h"
-// #include <Wire.h>
 
 Tile::Tile(uint8_t addr) {
   // initialize operationMode
@@ -16,7 +15,7 @@ Tile::Tile(uint8_t addr) {
   frameRate = 30;
 
   // SET SCROLL SPEED
-  scrollSpeed = 1;
+  scrollSpeed = 4;
 
   // SENSOR SETUP
   sensorRow = 0;
@@ -127,7 +126,7 @@ displayChar - Shows the visible portion of characters on the matrix
 void Tile::displayChar(const POS &pos, char dataOut[]){
   matrix->fillScreen(0);
   matrix->setCursor(pos.x, pos.y);
-  for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
+  for (int i = 0; i < MAX_DISPLAY_CHARS; ++i) { //For 4x4 should be 2
     matrix->print(dataOut[i]);
   }
   matrix->show();
@@ -234,7 +233,7 @@ printSensorData - outputs the current sensor data to serial
     void
 */
 void Tile::printSensorData() {
-    Serial.write(27);       // ESC command
+  Serial.write(27);       // ESC command
   Serial.print("[2J");    // clear screen command
   Serial.write(27);
   Serial.print("[H");     // cursor to home command

@@ -6,8 +6,10 @@
 ***************************************************************************************/
 
 #include <Wire.h>
+#include "T25Setup.h"
 #include "T25Tile.h"
 #include "T25MasterTile.h"
+#include "T25Common.h"
 
 volatile bool i2cUpdateFlag;
 void i2cUpdate();
@@ -65,6 +67,11 @@ void loop() {
   if(i2cUpdateFlag) {
     master.handleDisplayShape();
 
+    if (currentFrame % (master.frameRate) == 0) {
+      Serial.println("Try data base update");
+      updateFromDataBase();
+    }
+
     if (currentFrame % (master.frameRate / master.scrollSpeed) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
         char dataOut[MAX_DISPLAY_CHARS];
@@ -100,7 +107,6 @@ void loop() {
         }
       master.updateScrollPos();
     }
-
     
     i2cUpdateFlag = false;
   }
@@ -109,42 +115,42 @@ void loop() {
   master.readSensorData();
   
   // Check for available data from ESP
-  if(Serial1.available() > 1) {
-      int transmitType = Serial1.read();
+  // if(Serial1.available() > 1) {
+  //     int transmitType = Serial1.read();
 
-      switch(transmitType) {
-        case CHANGE_COLOR:
-        {
-          uint8_t rgb[3];
+  //     switch(transmitType) {
+  //       case CHANGE_COLOR:
+  //       {
+  //         uint8_t rgb[3];
 
-          for(uint8_t i = 0; i < 3; i++) {
-            rgb[i] = Serial1.read();
-            delay(10);
-          }
+  //         for(uint8_t i = 0; i < 3; i++) {
+  //           rgb[i] = Serial1.read();
+  //           delay(10);
+  //         }
 
-          currentColor = makeColor(rgb[0], rgb[1], rgb[2]);
-          master.changeColor(currentColor);
-          break;
-        }
-        case CHANGE_TEXT:
-        {
-          char textData[MAX_STRING_SIZE];
-          int textDataSize = Serial1.readBytesUntil('\0', textData, MAX_STRING_SIZE);
-          textData[textDataSize] = '\0';
+  //         currentColor = makeColor(rgb[0], rgb[1], rgb[2]);
+  //         master.changeColor(currentColor);
+  //         break;
+  //       }
+  //       case CHANGE_TEXT:
+  //       {
+  //         char textData[MAX_STRING_SIZE];
+  //         int textDataSize = Serial1.readBytesUntil('\0', textData, MAX_STRING_SIZE);
+  //         textData[textDataSize] = '\0';
             
-          master.setTextData(textData, textDataSize);//This should be done by Sanket's code
-          break;
-        }
-        case CHANGE_OPERATION_MODE:
-        {
-          master.setOperationMode(Serial1.read());
-        }
+  //         master.setTextData(textData, textDataSize);//This should be done by Sanket's code
+  //         break;
+  //       }
+  //       case CHANGE_OPERATION_MODE:
+  //       {
+  //         master.setOperationMode(Serial1.read());
+  //       }
 
-        default:
-          // DO NOTHING
-          break;
-      }
-  }
+  //       default:
+  //         // DO NOTHING
+  //         break;
+  //     }
+  // }
 }
 
 /*
@@ -159,4 +165,55 @@ void i2cUpdate() {
 
 void sensorRead() {
   master.ISR_sensorRead();
+}
+
+void updateFromDataBase() {
+  uint8_t metaData[2] = {255}; // [0] is transmitType, [1] is size of data to be transmitted
+  
+  uint8_t metaCount = 0;
+  uint8_t temp = Wire.requestFrom(WIFI_SLAVE_ADDR, 2);
+  Serial.print("temp: ");
+  Serial.println(temp);
+  
+  while(Wire.available()) {
+    metaData[metaCount] = Wire.read();
+    ++metaCount;
+  }
+
+  // may have issues if metaData[1] (size) is over 32
+  Serial.print("transmit type: ");
+  Serial.println(metaData[0]);
+  Serial.print("Address ");
+  Serial.println(WIFI_SLAVE_ADDR);
+  
+  uint8_t msgCount = 0;
+  char msgBuf[MAX_STRING_SIZE] = {'\0'};
+  Wire.requestFrom(WIFI_SLAVE_ADDR, metaData[1]);
+  while (Wire.available()) {
+    msgBuf[msgCount] = Wire.read();
+    ++msgCount;
+    if (msgCount > metaData[1] || msgCount > 254) break;
+  }
+
+  switch(metaData[0]) {
+    case CHANGE_COLOR:
+    {
+      currentColor = makeColor(msgBuf[0], msgBuf[1], msgBuf[2]);
+      master.changeColor(currentColor);
+      break;
+    }
+    case CHANGE_TEXT:
+    {
+      master.setTextData(msgBuf, metaData[1]); //This should be done by Sanket's code
+      break;
+    }
+    case CHANGE_OPERATION_MODE:
+    {
+      master.setOperationMode(msgBuf[0]);
+    }
+
+    default:
+      // DO NOTHING
+      break;
+  }
 }

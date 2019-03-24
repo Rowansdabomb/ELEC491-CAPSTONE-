@@ -2,7 +2,6 @@
 #include "Constants.h"
 #include "PinConfig.h"
 #include "Colors.h"
-#include <Wire_slave.h>
 
 SlaveTile::SlaveTile(uint8_t addr):Tile(addr) {
   for (uint8_t i = 0; i < 8; ++i) {

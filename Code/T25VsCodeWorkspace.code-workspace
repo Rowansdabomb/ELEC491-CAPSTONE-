@@ -10,13 +10,13 @@
 			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25SlaveTile"
 		},
 		{
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Setup"
+		},
+		{
 			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25MasterTile"
 		},
 		{
-			"path": "IRSensorsSTM32"
-		},
-		{
-			"path": "C:\\Users\\rowan\\Code\\T25ELEC491\\APP_Control\\ESP32WIFI"
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Common"
 		}
 	],
 	"settings": {}
