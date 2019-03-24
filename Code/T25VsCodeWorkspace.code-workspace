@@ -13,7 +13,10 @@
 			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25MasterTile"
 		},
 		{
-			"path": "8x8SensorMatrixPoll"
+			"path": "IRSensorsSTM32"
+		},
+		{
+			"path": "C:\\Users\\rowan\\Code\\T25ELEC491\\APP_Control\\ESP32WIFI"
 		}
 	],
 	"settings": {}

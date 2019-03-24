@@ -43,6 +43,7 @@ class Tile {
     char msgBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     uint8_t frameRate;
+    uint8_t scrollSpeed;
 
     void beginTile();
 

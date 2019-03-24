@@ -20,6 +20,7 @@ HardwareTimer sensorTimer(3); // time for polling the sensors
 MasterTile master(0xFF);
 
 uint16_t currentColor = colors[RED];
+uint8_t currentFrame = 1;
 
 void setup() {
   // Flag initialization
@@ -48,7 +49,7 @@ void setup() {
   ///////////////// SENSOR POLL TIMER SETUP ////////////////////
   sensorTimer.pause();
 
-  sensorTimer.setPeriod(SENSOR_POLL_PERIOD*1000); // in microseconds
+  sensorTimer.setPeriod(SENSOR_POLL_PERIOD); // in microseconds
 
   sensorTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   sensorTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
@@ -60,37 +61,56 @@ void setup() {
   ///////////////////////////////////////////////////
 }
 
-
 void loop() {
-  // master.setTextData(textData, textLength);//This should be done by Sanket's code
   if(i2cUpdateFlag) {
     master.handleDisplayShape();
-    for(uint8_t i = 0; i < master.getTileCount(); ++i) {
-      char dataOut[MAX_DISPLAY_CHARS];
 
-      struct POS outPos = master.getOutputData(dataOut, i);
-      outPos.y = -2;
-      
-      uint8_t tileID = master.getOrderedTileID(i);
-      if (tileID == MASTER_TILE_ID) {
-        master.updateTileDisplay(outPos, dataOut);
-      } else {
-        struct TILE slave = master.getTile(tileID);
-        master.transmitToSlave(slave.addr, outPos, currentColor, dataOut);
-      }
+    if (currentFrame % (master.frameRate / master.scrollSpeed) == 0) {
+      for(uint8_t i = 0; i < master.getTileCount(); ++i) {
+        char dataOut[MAX_DISPLAY_CHARS];
+
+        struct POS outPos = master.getOutputData(dataOut, i);
+        outPos.y = -2;
+        
+        uint8_t tileID = master.getOrderedTileID(i);
+
+
+        //   uint8_t rgb1[3] = {255, 0, 0};
+        //   uint8_t rgb2[3] = {0, 255, 0};
+        //   float * hsl1;
+        //   float * hsl2;
+          
+        //   hsl1 = rgbToHsl(rgb1);
+        //   hsl2 = rgbToHsl(rgb2);
+        //   float h = lerp(hsl1[0], hsl2[0], (float) currentFrame / master.frameRate);
+          
+        //   hsl1[0] = h;
+        //   uint8_t *rgb;
+        //   rgb = hslToRgb(hsl1);
+
+          // master.changeColor(makeColor(rgb[0], rgb[1], rgb[2]));
+
+
+          if (tileID == MASTER_TILE_ID) {
+            master.updateTileDisplay(outPos, dataOut);
+          } else {
+            struct TILE slave = master.getTile(tileID);
+            master.transmitToSlave(slave.addr, outPos, currentColor, dataOut);
+          }
+        }
+      master.updateScrollPos();
     }
-    master.updateScrollPos();
 
+    
     i2cUpdateFlag = false;
   }
 
+
   master.readSensorData();
-  Serial.println(master.frameRate);
   
   // Check for available data from ESP
   if(Serial1.available() > 1) {
       int transmitType = Serial1.read();
-
 
       switch(transmitType) {
         case CHANGE_COLOR:
@@ -115,6 +135,11 @@ void loop() {
           master.setTextData(textData, textDataSize);//This should be done by Sanket's code
           break;
         }
+        case CHANGE_OPERATION_MODE:
+        {
+          master.setOperationMode(Serial1.read());
+        }
+
         default:
           // DO NOTHING
           break;
@@ -127,6 +152,8 @@ Interrupt Subroutine on a timer.
 Toggles the i2cUpdateFlag at a frequency of MATRIX_FRAME_RATE
 */
 void i2cUpdate() {
+  ++currentFrame;
+  if (currentFrame > 30) currentFrame = 1;
   i2cUpdateFlag = true;
 }
 

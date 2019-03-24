@@ -36,5 +36,6 @@ const uint8_t MIRROR_MODE = 3;
 //ESP32 CODES
 const uint8_t CHANGE_TEXT  = 1;
 const uint8_t CHANGE_COLOR = 2;
+const uint8_t CHANGE_OPERATION_MODE = 3;
 
 #endif

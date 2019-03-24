@@ -21,8 +21,8 @@ void setup()
 
   //I2C Setup
   Wire.begin(I2C_DEFAULT);         // join i2c bus with the default address
-  Wire.onRequest(requestEvent); // register event
-  Wire.onReceive(receiveAddress); // register event
+  Wire.onRequest(requestEvent);    // register event
+  Wire.onReceive(receiveAddress);  // register event
 
   //  Serial Setup - for output
   Serial.begin(57600);    

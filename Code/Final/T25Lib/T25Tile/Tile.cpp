@@ -13,7 +13,10 @@ Tile::Tile(uint8_t addr) {
   data.addr = addr;
 
   // SET FRAME RATE
-  frameRate = 1;
+  frameRate = 30;
+
+  // SET SCROLL SPEED
+  scrollSpeed = 1;
 
   // SENSOR SETUP
   sensorRow = 0;
@@ -67,9 +70,9 @@ void Tile::setCursor(int8_t x, int8_t y) {
 }
 
 /*
-setOperationMode - sets the cursor relative to the top left of the tile matrix
+setOperationMode -
   Inputs:
-    mode - the horizontal offset from the left edge of the tile matrix
+    mode - 
   Outputs:
     void
 */

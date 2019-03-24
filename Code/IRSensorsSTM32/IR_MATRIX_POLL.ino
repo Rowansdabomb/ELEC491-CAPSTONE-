@@ -43,11 +43,6 @@ volatile bool interruptFlag = false;
 HardwareTimer timer(2);
 
 void setup() {
-  
-  #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000L)
-  clock_prescale_set(clock_div_1); // Enable 16 MHz on Trinket
-  #endif
-  
   matrix.begin(); // Initialize pins for output
   matrix.setBrightness(64); // Set max brightness (out of 255)
 
@@ -108,6 +103,7 @@ void printSensorData() {
   }
   Serial.println();
 }
+
 int Color_Brightness(int sensorData){
   uint16_t color = matrix.Color(sensorData, 0, 0); 
   return color; 

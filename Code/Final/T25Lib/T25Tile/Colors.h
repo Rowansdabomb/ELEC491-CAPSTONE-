@@ -9,6 +9,11 @@ const uint8_t BGR = 1;
 const uint8_t COLOR_ORDER = RGB; 
 
 uint16_t makeColor(uint8_t r, uint8_t g, uint8_t b);
+float * rgbToHsl(uint8_t rgb[]);
+uint8_t * hslToRgb(float hsl[]);
+float getMax(float arr[], const uint8_t size);
+float getMin(float arr[], const uint8_t size);
+float lerp(float v0, float v1, float t)
 
 const uint8_t RED = 0;
 const uint8_t GREEN = 1;

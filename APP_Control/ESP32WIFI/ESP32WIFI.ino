@@ -6,6 +6,7 @@
 //#include <FirebaseESP32.h>
 #include <HardwareSerial.h>
 #include <string.h>
+#include <Wire_slave.h>
 
 HardwareSerial ESPSerial(1);
 
