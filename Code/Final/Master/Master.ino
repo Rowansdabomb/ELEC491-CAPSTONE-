@@ -75,20 +75,72 @@ void loop() {
         uint8_t tileID = master.getOrderedTileID(i);
 
 
-        //   uint8_t rgb1[3] = {255, 0, 0};
-        //   uint8_t rgb2[3] = {0, 255, 0};
-        //   float * hsl1;
-        //   float * hsl2;
+          uint8_t rgb1[3] = {255, 0, 0};
+          uint8_t rgb2[3] = {0, 255, 0};
+          float hsl1[3];
+          float hsl2[3];
           
-        //   hsl1 = rgbToHsl(rgb1);
-        //   hsl2 = rgbToHsl(rgb2);
-        //   float h = lerp(hsl1[0], hsl2[0], (float) currentFrame / master.frameRate);
-          
-        //   hsl1[0] = h;
-        //   uint8_t *rgb;
-        //   rgb = hslToRgb(hsl1);
+          rgbToHsl(rgb1, hsl1);
+          rgbToHsl(rgb2, hsl2);
 
-          // master.changeColor(makeColor(rgb[0], rgb[1], rgb[2]));
+          Serial.print("RGB1 = ");
+          for(int cnt = 0; cnt < 3; ++cnt){
+            Serial.print(rgb1[cnt]);
+            Serial.print(" ");
+          }
+          Serial.println();
+          
+          Serial.print("RGB2 = ");
+          for(int cnt = 0; cnt < 3; ++cnt){
+            Serial.print(rgb2[cnt]);
+            Serial.print(" ");
+          }
+          Serial.println();
+
+          Serial.print("HSL1 = ");
+          for(int cnt = 0; cnt < 3; ++cnt){
+            Serial.print(hsl1[cnt]);
+            Serial.print(" ");
+          }
+          Serial.println();
+
+          Serial.print("HSL2 = ");
+          for(int cnt = 0; cnt < 3; ++cnt){
+            Serial.print(hsl2[cnt]);
+            Serial.print(" ");
+          }
+          Serial.println();
+          
+          // uint8_t *rgb1_2;
+          // rgb1_2 = hslToRgb(hsl1);
+          // uint8_t *rgb2_2;
+          // rgb2_2 = hslToRgb(hsl2);
+
+          // Serial.print("RGB1 = ");
+          // for(int cnt = 0; cnt < 3; ++cnt){
+          //   Serial.print(rgb1_2[cnt]);
+          //   Serial.print(" ");
+          // }
+          // Serial.println();
+          
+          // Serial.print("RGB2 = ");
+          // for(int cnt = 0; cnt < 3; ++cnt){
+          //   Serial.print(rgb2_2[cnt]);
+          //   Serial.print(" ");
+          // }
+          Serial.println();
+          Serial.println();
+          Serial.println();
+          
+          float h = lerp(hsl1[0], hsl2[0], (float) currentFrame / master.frameRate);
+          
+          hsl1[0] = h;
+          uint8_t *rgb;
+          hslToRgb(hsl1, rgb);
+
+
+
+          master.changeColor(makeColor(rgb[0], rgb[1], rgb[2]));
 
 
           if (tileID == MASTER_TILE_ID) {

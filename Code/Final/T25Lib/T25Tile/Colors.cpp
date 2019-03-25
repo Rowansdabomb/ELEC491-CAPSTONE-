@@ -1,6 +1,7 @@
 #include "Colors.h"
+#include <cmath>
 
-#define max(r, g, b)
+//#define max(r, g, b)
 
 uint16_t makeColor(uint8_t r, uint8_t g, uint8_t b) {
   switch(COLOR_ORDER) {
@@ -23,69 +24,119 @@ rgbToHsl - converts rgb color to hsl color, modifies the incoming array and retu
   Outputs:
     hsl
 */
-float * rgbToHsl(uint8_t rgb[]) {
+void rgbToHsl(uint8_t rgb[], float hsl[]) {
   float r = rgb[0]/255;
   float g = rgb[1]/255;
   float b = rgb[2]/255;
-  float _rgb[3] = {r, g, b};
-  float cmax = getMax(_rgb, 3);
-  float cmin = getMin(_rgb, 3);
-  float delta = cmax - cmin;
 
-  float L = (cmax + cmin) / 2;
-  float S;
-  if (delta = 0) {
-    S = 0;
-  } else {
-    S = delta / (1 - abs((2 * L) - 1));
-  }
+  Serial.print("RGB: ");
+  Serial.print(r);
+  Serial.print(' ');
+  Serial.print(g);
+  Serial.print(' ');
+  Serial.print(b);
+  Serial.print(' ');
+  Serial.println();
+
+
+  float _rgb[3] = {r, g, b};
+
+  float cMax = getMax(_rgb, 3);
+  float cMin = getMin(_rgb, 3);
+  float delta = cMax - cMin;
+
   float H;
-  if (delta = 0) {
+  float S;
+  float L;
+  L = (cMax + cMin) * 0.50;
+  if(delta == 0 ){ // This is likely to unhappen consider using tolerances for float
+    S = 0;
     H = 0;
-  } else if (cmax = r) {
-    H = 60 * (((g - b)/delta) % 6);
-  } else if (cmax = g) {
-    H = 60 * (((b - r)/delta) + 2);
-  } else {
-    H = 60 * (((r - g)/delta) + 4);
+  }
+  else{
+    S = ( L > 0.5) ? (delta / (cMax + cMin)): (delta / (2 - delta));
+    if(cMax == r) H = ( g - b ) / delta;
+    // Serial.print("cMax == r: ");
+    // Serial.println(cMax == r);
+    // Serial.print("g - b: ");
+    // Serial.print( g - b );
+    // Serial.print(" Delta: ");
+    // Serial.println( delta );
+
+    if(cMax == g) H = 2 + ( b - r ) / delta;
+    if(cMax == b) H = 4 + ( r - g ) / delta;
+    // Serial.print("H: ");
+    // Serial.print(H);
+    H = H * 60;
+    if( H < 0){
+      H = H + 360;
+    }
+    // Serial.print(" ");
+    // Serial.println(H);
   }
   
-  float hsl[3];
   hsl[0] = H;
   hsl[1] = S;
   hsl[2] = L;
 
-  return hsl;
 }
 
 /*
 converts hsl to rgb colors
 */
-uint8_t * hslToRgb(float hsl[]) {
-  float C = (1 - abs(2 * hsl[2] - 1) * hsl[1];
-  float X = C * (1 - abs((hsl[0] / 60) % 2 - 1));
-  float m = hsl[2] - C/2;
-  float _rgb[3];
-  if (0 <= hsl[0] && hsl[0] < 60) {
-    _rgb[0] = C; _rgb[1] = X; _rgb[2] = 0;
-  } else if (60 <= hsl[0] && hsl[0] < 120) {
-    _rgb[0] = X; _rgb[1] = C; _rgb[2] = 0;
-  } else if (120 <= hsl[0] && hsl[0] < 180) {
-    _rgb[0] = 0; _rgb[1] = C; _rgb[2] = X;
-  } else if (180 <= hsl[0] && hsl[0] < 240) {
-    _rgb[0] = 0; _rgb[1] = X; _rgb[2] = C;
-  } else if (240 <= hsl[0] && hsl[0] < 300) {
-    _rgb[0] = X; _rgb[1] = 0; _rgb[2] = C;
-  } else if (300 <= hsl[0] && hsl[0] < 360) {
-    _rgb[0] = C; _rgb[1] = 0; _rgb[2] = X;
-  }
+void hslToRgb(float hsl[], uint8_t rgb[]) {
+  // static uint8_t rgb[3];
 
-  uint8_t rgb[3];
-  for (uint8_t i = 0; i < 3; i++) {
-    rgb[i] = (uint8_t) (_rgb[i] + m)*255;
+  float H = hsl[0] / 360;
+  float S = hsl[1];
+  float L = hsl[2];
+
+  float temp1;
+  float temp2;
+
+  float r;
+  float g;
+  float b;
+
+  if( S == 0 ) {
+    rgb[0] = (uint8_t) round(L * 255);
+    rgb[1] = (uint8_t) round(L * 255);
+    rgb[2] = (uint8_t) round(L * 255);
+  }else{
+    temp1 = ( L < 0.5) ? (L * (1 + S)):(L + S - L * S);
+    temp2 = 2 * L - temp1;
+    r = boundRGB(H + 0.333);
+    g = boundRGB(H);
+    b = boundRGB(H - 0.333);    
+    rgb[0] = finalizeRGB(r, temp1, temp2);
+    rgb[1] = finalizeRGB(g, temp1, temp2);
+    rgb[2] = finalizeRGB(b, temp1, temp2);
+  }  
+} 
+
+float boundRGB(float rgb){
+  if (rgb < 0){
+    rgb++;
+  }
+  else if (rgb > 1){
+    rgb--;
   }
   return rgb;
-} 
+}
+
+uint8_t finalizeRGB(float rgb, const float &t1, const float &t2){
+  float finalValue;
+  if( (6 * rgb) < 1 ){
+    finalValue = t2 + (t1 - t2) * 6 * rgb;
+  }else if((2 * rgb) < 1){
+    finalValue = t1;
+  }else if((3 * rgb) < 2){
+    finalValue = t2 + (t1 - t2) * (0.666 - rgb) * 6;
+  }else{
+    finalValue = t2;
+  }
+  return round(finalValue * 255);
+}
 
 float getMax(float arr[], const uint8_t size) {
   float result = 0;
