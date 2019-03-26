@@ -25,9 +25,9 @@ rgbToHsl - converts rgb color to hsl color, modifies the incoming array and retu
     hsl
 */
 void rgbToHsl(uint8_t rgb[], float hsl[]) {
-  float r = rgb[0]/255;
-  float g = rgb[1]/255;
-  float b = rgb[2]/255;
+  float r = rgb[0]/255.0;
+  float g = rgb[1]/255.0;
+  float b = rgb[2]/255.0;
 
   Serial.print("RGB: ");
   Serial.print(r);
@@ -49,12 +49,13 @@ void rgbToHsl(uint8_t rgb[], float hsl[]) {
   float S;
   float L;
   L = (cMax + cMin) * 0.50;
+
   if(delta == 0 ){ // This is likely to unhappen consider using tolerances for float
     S = 0;
     H = 0;
   }
   else{
-    S = ( L > 0.5) ? (delta / (cMax + cMin)): (delta / (2 - delta));
+    S = ( L > 0.5) ? (delta / (cMax + cMin)):(delta / (2 - cMax - cMin));
     if(cMax == r) H = ( g - b ) / delta;
     // Serial.print("cMax == r: ");
     // Serial.println(cMax == r);
@@ -75,7 +76,7 @@ void rgbToHsl(uint8_t rgb[], float hsl[]) {
     // Serial.println(H);
   }
   
-  hsl[0] = H;
+  hsl[0] = round(H);
   hsl[1] = S;
   hsl[2] = L;
 
@@ -87,7 +88,7 @@ converts hsl to rgb colors
 void hslToRgb(float hsl[], uint8_t rgb[]) {
   // static uint8_t rgb[3];
 
-  float H = hsl[0] / 360;
+  float H = hsl[0] / 360.0;
   float S = hsl[1];
   float L = hsl[2];
 
