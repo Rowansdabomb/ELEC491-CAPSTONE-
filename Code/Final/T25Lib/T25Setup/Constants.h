@@ -8,7 +8,6 @@
 const uint8_t MASTER_TILE_ID = 9;
 
 const uint8_t I2C_DEFAULT = 0x42;
-const uint8_t WIFI_SLAVE_ADDR = 0x0f;
 
 // SENSOR POLLING
 const uint8_t MUX_ROW_SELECT[3] = {MROW_0, MROW_1, MROW_2}; 
@@ -23,8 +22,6 @@ const uint8_t TILE_MAP_SIZE  = 7;
 
 const uint8_t MAX_DISPLAY_CHARS = 2;
 
-const uint8_t MAX_STRING_SIZE = 255;
-
 //last set as default 
 const uint8_t addr_lst[TILE_MAX] = {0x08, 0x10, 0x18, 0x20, 0x28};
 
@@ -33,10 +30,5 @@ const uint8_t SCROLL_MODE = 0;
 const uint8_t GESTURE_MODE = 1;
 const uint8_t DIRECTION_TEST = 2;
 const uint8_t MIRROR_MODE = 3;
-
-//ESP32 CODES
-const uint8_t CHANGE_TEXT  = 1;
-const uint8_t CHANGE_COLOR = 2;
-const uint8_t CHANGE_OPERATION_MODE = 3;
 
 #endif

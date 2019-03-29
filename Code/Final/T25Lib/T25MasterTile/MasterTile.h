@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include <T25Tile.h>
 #include <T25Setup.h>
+#include <T25Common.h>
 
 struct TILEMAP {
   uint8_t grid[TILE_MAP_SIZE][TILE_MAP_SIZE];
