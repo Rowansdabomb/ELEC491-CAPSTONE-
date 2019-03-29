@@ -183,6 +183,9 @@ void updateFromDataBase() {
       Serial.print(" ");
     }
   }
+  while(Wire.available()){
+    Wire.read();
+  }
   Serial.print("msgCount: ");
   Serial.println(metaData[1]);
   Serial.println();
