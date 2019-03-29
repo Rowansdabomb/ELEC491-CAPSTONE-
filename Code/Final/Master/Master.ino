@@ -169,51 +169,42 @@ void sensorRead() {
 
 void updateFromDataBase() {
   uint8_t metaData[2] = {255}; // [0] is transmitType, [1] is size of data to be transmitted
-  
-  uint8_t metaCount = 0;
-  uint8_t temp = Wire.requestFrom(WIFI_SLAVE_ADDR, 2);
-  Serial.print("temp: ");
-  Serial.println(temp);
-  
-  while(Wire.available()) {
-    metaData[metaCount] = Wire.read();
-    ++metaCount;
-  }
-
-  // may have issues if metaData[1] (size) is over 32
-  Serial.print("transmit type: ");
-  Serial.println(metaData[0]);
-  Serial.print("Address ");
-  Serial.println(WIFI_SLAVE_ADDR);
-  
-  uint8_t msgCount = 0;
   char msgBuf[MAX_STRING_SIZE] = {'\0'};
-  Wire.requestFrom(WIFI_SLAVE_ADDR, metaData[1]);
-  while (Wire.available()) {
-    msgBuf[msgCount] = Wire.read();
-    ++msgCount;
-    if (msgCount > metaData[1] || msgCount > 254) break;
+  Wire.requestFrom(WIFI_SLAVE_ADDR, 255);
+  if(Wire.available()){
+    metaData[0] = Wire.read();
+    metaData[1] = Wire.read();
   }
 
-  switch(metaData[0]) {
-    case CHANGE_COLOR:
-    {
-      currentColor = makeColor(msgBuf[0], msgBuf[1], msgBuf[2]);
-      master.changeColor(currentColor);
-      break;
+  for(int msgCount = 0; msgCount < metaData[1]; ++msgCount){
+    if(Wire.available()){
+      msgBuf[msgCount] = Wire.read();
+      Serial.print(msgBuf[msgCount], HEX);;
+      Serial.print(" ");
     }
-    case CHANGE_TEXT:
-    {
-      master.setTextData(msgBuf, metaData[1]); //This should be done by Sanket's code
-      break;
-    }
-    case CHANGE_OPERATION_MODE:
-    {
-      master.setOperationMode(msgBuf[0]);
-    }
-
-    default:
-      // DO NOTHING
-      break;
   }
+  Serial.print("msgCount: ");
+  Serial.println(metaData[1]);
+  Serial.println();
+  // switch(msgData[0]) {
+  //   case CHANGE_COLOR:
+  //   {
+  //     currentColor = makeColor(msgBuf[0], msgBuf[1], msgBuf[2]);
+  //     master.changeColor(currentColor);
+  //     break;
+  //   }
+  //   case CHANGE_TEXT:
+  //   {
+  //     master.setTextData(msgBuf, metaData[1]); //This should be done by Sanket's code
+  //     break;
+  //   }
+  //   case CHANGE_OPERATION_MODE:
+  //   {
+  //     master.setOperationMode(msgBuf[0]);
+  //   }
+
+  //   default:
+  //     // DO NOTHING
+  //     break;
+  // }
 }
