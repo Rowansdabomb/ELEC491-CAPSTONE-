@@ -9,9 +9,11 @@ const uint8_t MATRIX_CLK_PIN = PB10;
 const uint8_t CHAR_WIDTH = 6;
 const uint8_t CHAR_HEIGHT = 8;
 
+const uint8_t MAX_BRIGHTNESS = 32;
+
 // Size of each tile matrix
-const uint8_t MATRIX_WIDTH = 4;
-const uint8_t MATRIX_HEIGHT = 4;
+const uint8_t MATRIX_WIDTH = 8;
+const uint8_t MATRIX_HEIGHT = 8;
 
 // Number of tile matrices
 const uint8_t TILES_X = 1;

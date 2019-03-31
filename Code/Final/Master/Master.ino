@@ -28,9 +28,9 @@ void setup() {
   // Flag initialization
   i2cUpdateFlag = false;
   // Serial Setup - for output
-  Serial.begin(57600); 
+  Serial.begin(115200); 
   // Serial Setup - for ESP32
-  Serial1.begin(57600);
+  Serial1.begin(115200);
 
   ///////////////// TILE BEGIN /////////////////////
   master.beginMasterTile();
@@ -68,16 +68,16 @@ void loop() {
     master.handleDisplayShape();
 
     if (currentFrame % (master.frameRate) == 0) {
-      Serial.println("Try data base update");
-      updateFromDataBase();
+      Serial.println("Try database update");
+      master.updateFromDataBase();
     }
 
-    if (currentFrame % (master.frameRate / master.scrollSpeed) == 0) {
+    if (currentFrame % (master.frameRate / master.scrollRate) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
         char dataOut[MAX_DISPLAY_CHARS];
 
         struct POS outPos = master.getOutputData(dataOut, i);
-        outPos.y = -2;
+        // outPos.y = -2;
         
         uint8_t tileID = master.getOrderedTileID(i);
 
@@ -165,46 +165,4 @@ void i2cUpdate() {
 
 void sensorRead() {
   master.ISR_sensorRead();
-}
-
-void updateFromDataBase() {
-  uint8_t metaData[2] = {255}; // [0] is transmitType, [1] is size of data to be transmitted
-  char msgBuf[MAX_STRING_SIZE] = {'\0'};
-  Wire.requestFrom(WIFI_SLAVE_ADDR, 255);
-  if(Wire.available()){
-    metaData[0] = Wire.read();
-    metaData[1] = Wire.read();
-  }
-
-  for(int msgCount = 0; msgCount < metaData[1]; ++msgCount){
-    if(Wire.available()){
-      msgBuf[msgCount] = Wire.read();
-      Serial.print(msgBuf[msgCount], HEX);;
-      Serial.print(" ");
-    }
-  }
-  Serial.print("msgCount: ");
-  Serial.println(metaData[1]);
-  Serial.println();
-  // switch(msgData[0]) {
-  //   case CHANGE_COLOR:
-  //   {
-  //     currentColor = makeColor(msgBuf[0], msgBuf[1], msgBuf[2]);
-  //     master.changeColor(currentColor);
-  //     break;
-  //   }
-  //   case CHANGE_TEXT:
-  //   {
-  //     master.setTextData(msgBuf, metaData[1]); //This should be done by Sanket's code
-  //     break;
-  //   }
-  //   case CHANGE_OPERATION_MODE:
-  //   {
-  //     master.setOperationMode(msgBuf[0]);
-  //   }
-
-  //   default:
-  //     // DO NOTHING
-  //     break;
-  // }
 }
