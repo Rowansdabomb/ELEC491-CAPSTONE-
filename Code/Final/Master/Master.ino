@@ -51,7 +51,7 @@ void setup() {
   ///////////////// SENSOR POLL TIMER SETUP ////////////////////
   sensorTimer.pause();
 
-  sensorTimer.setPeriod(SENSOR_POLL_PERIOD); // in microseconds
+  sensorTimer.setPeriod(1*1000); // in microseconds
 
   sensorTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   sensorTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
@@ -61,16 +61,21 @@ void setup() {
 
   sensorTimer.resume();
   ///////////////////////////////////////////////////
+  pinMode(PB9, OUTPUT);
+  pinMode(PB8, OUTPUT);
+
+  digitalWrite(PB9, HIGH);
+  digitalWrite(PB8, LOW);
 }
 
 void loop() {
   if(i2cUpdateFlag) {
     master.handleDisplayShape();
 
-    if (currentFrame % (master.frameRate) == 0) {
-      Serial.println("Try database update");
-      master.updateFromDataBase();
-    }
+    // if (currentFrame % (master.frameRate) == 0) {
+    //   Serial.println("Try database update");
+    //   master.updateFromDataBase();
+    // }
 
     if (currentFrame % (master.frameRate / master.scrollRate) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
@@ -111,46 +116,7 @@ void loop() {
     i2cUpdateFlag = false;
   }
 
-
   master.readSensorData();
-  
-  // Check for available data from ESP
-  // if(Serial1.available() > 1) {
-  //     int transmitType = Serial1.read();
-
-  //     switch(transmitType) {
-  //       case CHANGE_COLOR:
-  //       {
-  //         uint8_t rgb[3];
-
-  //         for(uint8_t i = 0; i < 3; i++) {
-  //           rgb[i] = Serial1.read();
-  //           delay(10);
-  //         }
-
-  //         currentColor = makeColor(rgb[0], rgb[1], rgb[2]);
-  //         master.changeColor(currentColor);
-  //         break;
-  //       }
-  //       case CHANGE_TEXT:
-  //       {
-  //         char textData[MAX_STRING_SIZE];
-  //         int textDataSize = Serial1.readBytesUntil('\0', textData, MAX_STRING_SIZE);
-  //         textData[textDataSize] = '\0';
-            
-  //         master.setTextData(textData, textDataSize);//This should be done by Sanket's code
-  //         break;
-  //       }
-  //       case CHANGE_OPERATION_MODE:
-  //       {
-  //         master.setOperationMode(Serial1.read());
-  //       }
-
-  //       default:
-  //         // DO NOTHING
-  //         break;
-  //     }
-  // }
 }
 
 /*

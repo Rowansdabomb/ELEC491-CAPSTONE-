@@ -13,7 +13,7 @@ const uint8_t I2C_DEFAULT = 0x42;
 const uint8_t MUX_ROW_SELECT[3] = {MROW_0, MROW_1, MROW_2}; 
 const uint8_t MUX_COL_SELECT[3] = {MCOL_0, MCOL_1, MCOL_2}; 
 
-const uint8_t SENSOR_POLL_PERIOD = 50;
+const uint8_t SENSOR_POLL_PERIOD = 500;
 
 // TILE
 const uint8_t TILE_MAX = 5;

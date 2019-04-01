@@ -54,6 +54,9 @@ void Tile::beginTile() {
   pinMode(PIN_DIR_D, INPUT_PULLDOWN);
   pinMode(PIN_DIR_L, INPUT_PULLDOWN);
   pinMode(PIN_DIR_R, INPUT_PULLDOWN);
+
+  pinMode(PIN_MUX_ENABLE, OUTPUT);
+  digitalWrite(PIN_MUX_ENABLE, HIGH);
   // pinMode(PA2, OUTPUT);
 }
 
