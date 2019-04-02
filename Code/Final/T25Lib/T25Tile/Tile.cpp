@@ -15,7 +15,7 @@ Tile::Tile(uint8_t addr) {
   frameRate = 30;
 
   // SET SCROLL SPEED
-  scrollSpeed = 4;
+  scrollRate = 12;
 
   // SENSOR SETUP
   sensorRow = 0;
@@ -44,7 +44,7 @@ void Tile::beginTile() {
 
   // DotStar Setup
   matrix->begin(); // Initialize pins for output
-  matrix->setBrightness(64); // Set max brightness (out of 255) 
+  matrix->setBrightness(MAX_BRIGHTNESS); // Set max brightness (out of 255) 
   matrix->setTextWrap(false);
   matrix->setTextColor(colors[0]);
   matrix->show();  // Turn all LEDs off ASAP
@@ -295,7 +295,7 @@ void Tile::readSensorData() {
 void Tile::ISR_sensorRead() {
   prevSensorID = sensorID;
   ++sensorID;
-  if (sensorID > MATRIX_WIDTH * MATRIX_HEIGHT) {
+  if (sensorID >= MATRIX_WIDTH * MATRIX_HEIGHT) {
     sensorID = 0;
   }
 }

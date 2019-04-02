@@ -34,15 +34,17 @@ void setup() {
 }
 
 void loop() {
-    Serial.println(WIFI_SLAVE_ADDR);
   // Check for available data from ESP
   if(Serial1.available() > 1) {
+      Serial.println("Serial1 available");
       transmitType = Serial1.read();
+      Serial.print("transmit type: ");
+      Serial.println(transmitType);
 
       switch(transmitType) {
         case CHANGE_COLOR:
         {
-
+            Serial.println("Change Color");
           for(uint8_t i = 0; i < 3; i++) {
             rgb[i] = Serial1.read();
             delay(10);
@@ -52,14 +54,17 @@ void loop() {
         }
         case CHANGE_TEXT:
         {
+            Serial.println("Change Text");
           textDataSize = Serial1.readBytesUntil('\0', textData, MAX_STRING_SIZE);
           textData[textDataSize] = '\0';
             
           break;
         }
         case CHANGE_OPERATION_MODE:
+        {
+            Serial.println("Change Mode");
             mode = Serial1.read();
-
+        }            
         default:
           // DO NOTHING
           break;

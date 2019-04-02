@@ -35,6 +35,7 @@ class MasterTile: public Tile
     void resetTileMapBounds();
     void updateScrollPos();
     uint8_t handleDisplayShape();
+    void updateFromDataBase();
 
     void transmitToSlave(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
     struct POS getOutputData(char dataOut[], const uint8_t tileIndex);
