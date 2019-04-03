@@ -91,8 +91,8 @@ void loop() {
           Serial.println("output to display");
           master.updateTileDisplay(outPos, dataOut);
         } else {
-          struct TILE slave = master.getTile(tileID);
-          master.transmitToSlave(slave.addr, outPos, currentColor, dataOut);
+          // struct TILE slave = master.getTile(tileID);
+          // master.transmitToSlave(slave.addr, outPos, currentColor, dataOut);
         }
       }
       master.updateScrollPos();
