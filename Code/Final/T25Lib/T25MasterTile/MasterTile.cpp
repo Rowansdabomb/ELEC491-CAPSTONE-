@@ -531,13 +531,13 @@ updateFromDataBase -
 void MasterTile::updateFromDataBase() {
   uint8_t metaData[2] = {255}; // [0] is transmitType, [1] is size of data to be transmitted
   char msgBuf[MAX_STRING_SIZE] = {'\0'};
-  Serial.println("before wire.available");
+  // Serial.println("before wire.available");
   Wire.requestFrom(WIFI_SLAVE_ADDR, 255);
   if(Wire.available()){
     metaData[0] = Wire.read();
     metaData[1] = Wire.read();
   }
-  Serial.println("before for loop");
+  // Serial.println("before for loop");
 
   for(int msgCount = 0; msgCount < metaData[1]; ++msgCount){
     if(Wire.available()){
@@ -546,31 +546,34 @@ void MasterTile::updateFromDataBase() {
       Serial.print(" ");
     }
   }
+  Wwhile(Wire.available()){
+    Wire.read(); //Clear I2C bus 
+  }
   Serial.print("Msg type: ");
   Serial.println(metaData[0]);
   Serial.print("msgCount: ");
   Serial.println(metaData[1]);
   Serial.println();
-  // switch(msgData[0]) {
-  //   case CHANGE_COLOR:
-  //   {
-  //     currentColor = makeColor(msgBuf[0], msgBuf[1], msgBuf[2]);
-  //     master.changeColor(currentColor);
-  //     break;
-  //   }
-  //   case CHANGE_TEXT:
-  //   {
-  //     master.setTextData(msgBuf, metaData[1]); //This should be done by Sanket's code
-  //     break;
-  //   }
-  //   case CHANGE_OPERATION_MODE:
-  //   {
-  //     master.setOperationMode(msgBuf[0]);
-  //   }
+  switch(metaData[0]) {
+    case CHANGE_COLOR:
+    {
+      currentColor = makeColor(msgBuf[0], msgBuf[1], msgBuf[2]);
+      changeColor(currentColor);
+      break;
+    }
+    case CHANGE_TEXT:
+    {
+      setTextData(msgBuf, metaData[1]); //This should be done by Sanket's code
+      break;
+    }
+    case CHANGE_OPERATION_MODE:
+    {
+      setOperationMode(msgBuf[0]);
+    }
 
-  //   default:
-  //     // DO NOTHING
-  //     break;
-  // }
+    default:
+      // DO NOTHING
+      break;
+  }
 }
 
