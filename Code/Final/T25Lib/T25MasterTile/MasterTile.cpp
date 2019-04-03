@@ -521,9 +521,11 @@ void MasterTile::updateFromDataBase() {
       Serial.print(" ");
     }
   }
-  Wwhile(Wire.available()){
+  
+  while(Wire.available()){
     Wire.read(); //Clear I2C bus 
   }
+
   Serial.print("Msg type: ");
   Serial.println(metaData[0]);
   Serial.print("msgCount: ");
