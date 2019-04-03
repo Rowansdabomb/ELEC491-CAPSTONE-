@@ -6,6 +6,7 @@
 ***************************************************************************************/
 
 #include <Wire_slave.h>
+#include <T25Setup.h>
 #include <T25Tile.h>
 #include <T25SlaveTile.h>
 
@@ -32,7 +33,7 @@ void setup()
 
 void loop()
 {
-  if (addressUpdateFlag == 1){
+  if (addressUpdateFlag){
     //Turn off I2C and reinitialize
     struct TILE tileData = slave.getData();
     Wire.begin(tileData.addr); //join the i2c bus with a different address
@@ -40,7 +41,7 @@ void loop()
     Wire.onReceive(receiveEvent);
     Serial.print("Attempted Address Change");
     Serial.println(tileData.addr, HEX); 
-    addressUpdateFlag = 0;   
+    addressUpdateFlag = false;   
   }
   slave.findNeighborTiles();
 
@@ -79,11 +80,11 @@ void receiveEvent(int howMany)
     mode = Wire.read();      // receive first byte as a character
   }
   switch(mode){
-    case 'B':
+    case DIRECTION_KEY:
       slave.receiveI2cData();
       slave.setOperationMode(DIRECTION_TEST);
       break;
-    case 'Q':
+    case I2C_CHAR_KEY:
       slave.receiveI2cData();
       slave.setOperationMode(SCROLL_MODE);
       break;
@@ -110,5 +111,5 @@ void receiveAddress(int howMany){
     uint8_t addr = Wire.read();
     slave.setAddress(addr);
   }
-  addressUpdateFlag = 1;
+  addressUpdateFlag = true;
 }

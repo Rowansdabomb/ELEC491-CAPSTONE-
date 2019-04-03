@@ -1,7 +1,7 @@
 #ifndef t25_tile_h
 #define t25_tile_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <T25Setup.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_DotStarMatrix.h>
@@ -42,7 +42,8 @@ class Tile {
     char msgBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     uint8_t frameRate;
-    uint8_t scrollRate;
+    uint8_t targetFrameRate;
+    uint16_t currentColor;
 
     void beginTile();
 
@@ -77,6 +78,7 @@ class Tile {
     uint16_t sensorData[MATRIX_WIDTH * MATRIX_HEIGHT];
 
     void displayChar(const POS &pos, char dataOut[]);
+    void displayMirror();
     void i2cDirectionTest(const uint16_t color);
 };
 

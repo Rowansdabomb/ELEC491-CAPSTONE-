@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include <Arduino.h>
 #include "MasterTile.h"
 #include "PinConfig.h"
 #include "Constants.h"
@@ -446,10 +446,13 @@ transmitToSlave - transmits data to a slave tile depending on operation mode
 void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
     switch(operationMode) {
       case (SCROLL_MODE):
-        transmitI2cCharData(addr, pos, color, data);
+        transmitCharData(addr, pos, color, data);
+        break;
+      case (MIRROR_MODE):
+        transmitMirrorData(addr);
         break;
       case (GESTURE_MODE):
-        // TBD
+        transmitGestureData(addr);
         break;
       case (DIRECTION_TEST):
         // struct POS temp;
@@ -461,7 +464,7 @@ void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, cons
 }
 
 /*
-transmitI2cCharData - Transmits the Character Data to a slave tile.
+transmitCharData - Transmits the Character Data to a slave tile.
   Inputs:
     addr    - address of the slave tile
     pos     - reference position of where character data should start
@@ -470,9 +473,9 @@ transmitI2cCharData - Transmits the Character Data to a slave tile.
   Outputs:
     Return value of endTransmission
 */
-uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
+uint8_t MasterTile::transmitCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
     Wire.beginTransmission(addr);
-    Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily
+    Wire.write(I2C_CHAR_KEY); // New Identifier for sending Character data? using Q arbritrarily
     Wire.write(pos.x);
     Wire.write(pos.y);
     Wire.write((color >> 8) & 0xff);
@@ -481,6 +484,28 @@ uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &po
         Wire.write(data[i]);
     }
     return Wire.endTransmission();
+}
+
+/*
+
+*/
+uint8_t MasterTile::transmitMirrorData(const uint8_t addr) {
+  Wire.write(MIRROR_KEY);
+  Wire.beginTransmission(addr);
+  return Wire.endTransmission();
+}
+
+/*
+transmitGestureData - notifies slave devices to operate in gesture mode
+  Inputs:
+    addr - address of slave device to transmit to
+  Outputs:
+    the error code for the transmission
+*/
+uint8_t MasterTile::transmitGestureData(const uint8_t addr) {
+  Wire.write(GESTURE_KEY);
+  Wire.beginTransmission(addr);
+  return Wire.endTransmission();
 }
 
 /*

@@ -1,7 +1,7 @@
 #ifndef t25_common_constants_h
 #define t25_common_constants_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 // WIFI SLAVE ADDRESS
 const uint8_t WIFI_SLAVE_ADDR = 0x0f;

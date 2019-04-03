@@ -1,7 +1,7 @@
 #ifndef t25_matrix_setup_h
 #define t25_matrix_setup_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 //DotStar Setup
 const uint8_t MATRIX_DATA_PIN = PB11; 

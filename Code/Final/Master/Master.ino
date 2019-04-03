@@ -11,8 +11,8 @@
 #include "T25MasterTile.h"
 #include "T25Common.h"
 
-volatile bool i2cUpdateFlag;
-void i2cUpdate();
+volatile bool newFrameFlag;
+void newFrame();
 
 void sensorRead();
 
@@ -26,7 +26,7 @@ uint8_t currentFrame = 1;
 
 void setup() {
   // Flag initialization
-  i2cUpdateFlag = false;
+  newFrameFlag = false;
   // Serial Setup - for output
   Serial.begin(115200); 
   // Serial Setup - for ESP32
@@ -42,7 +42,7 @@ void setup() {
 
   fpsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   fpsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-  fpsTimer.attachCompare1Interrupt(i2cUpdate);
+  fpsTimer.attachCompare1Interrupt(newFrame);
 
   fpsTimer.refresh();
 
@@ -51,7 +51,7 @@ void setup() {
   ///////////////// SENSOR POLL TIMER SETUP ////////////////////
   sensorTimer.pause();
 
-  sensorTimer.setPeriod(1*1000); // in microseconds
+  sensorTimer.setPeriod(SENSOR_POLL_PERIOD); // in microseconds
 
   sensorTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   sensorTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
@@ -61,15 +61,18 @@ void setup() {
 
   sensorTimer.resume();
   ///////////////////////////////////////////////////
-  pinMode(PB9, OUTPUT);
-  pinMode(PB8, OUTPUT);
+  pinMode(PIN_MCOL_ENABLE, OUTPUT);
+  pinMode(PIN_MROW_ENABLE, OUTPUT);
 
-  digitalWrite(PB9, HIGH);
-  digitalWrite(PB8, LOW);
+  digitalWrite(PIN_MCOL_ENABLE, HIGH);
+  digitalWrite(PIN_MROW_ENABLE, LOW);
+  master.setOperationMode(MIRROR_MODE);
 }
 
 void loop() {
-  if(i2cUpdateFlag) {
+  master.readSensorData();
+
+  if(newFrameFlag) {
     master.handleDisplayShape();
 
     // if (currentFrame % (master.frameRate) == 0) {
@@ -77,56 +80,37 @@ void loop() {
     //   master.updateFromDataBase();
     // }
 
-    if (currentFrame % (master.frameRate / master.scrollRate) == 0) {
+    if (currentFrame % (master.frameRate / master.targetFrameRate) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
         char dataOut[MAX_DISPLAY_CHARS];
 
         struct POS outPos = master.getOutputData(dataOut, i);
-        // outPos.y = -2;
         
         uint8_t tileID = master.getOrderedTileID(i);
-
-
-        //   uint8_t rgb1[3] = {255, 0, 0};
-        //   uint8_t rgb2[3] = {0, 255, 0};
-        //   float * hsl1;
-        //   float * hsl2;
-          
-        //   hsl1 = rgbToHsl(rgb1);
-        //   hsl2 = rgbToHsl(rgb2);
-        //   float h = lerp(hsl1[0], hsl2[0], (float) currentFrame / master.frameRate);
-          
-        //   hsl1[0] = h;
-        //   uint8_t *rgb;
-        //   rgb = hslToRgb(hsl1);
-
-          // master.changeColor(makeColor(rgb[0], rgb[1], rgb[2]));
-
-
-          if (tileID == MASTER_TILE_ID) {
-            master.updateTileDisplay(outPos, dataOut);
-          } else {
-            struct TILE slave = master.getTile(tileID);
-            master.transmitToSlave(slave.addr, outPos, currentColor, dataOut);
-          }
+        if (tileID == MASTER_TILE_ID) {
+          Serial.println("output to display");
+          master.updateTileDisplay(outPos, dataOut);
+        } else {
+          struct TILE slave = master.getTile(tileID);
+          master.transmitToSlave(slave.addr, outPos, currentColor, dataOut);
         }
+      }
       master.updateScrollPos();
     }
-    
-    i2cUpdateFlag = false;
+
+    newFrameFlag = false;
   }
 
-  master.readSensorData();
 }
 
 /*
 Interrupt Subroutine on a timer.
-Toggles the i2cUpdateFlag at a frequency of MATRIX_FRAME_RATE
+Toggles the newFrameFlag at a frequency of master.frameRate
 */
-void i2cUpdate() {
+void newFrame() {
   ++currentFrame;
   if (currentFrame > 30) currentFrame = 1;
-  i2cUpdateFlag = true;
+  newFrameFlag = true;
 }
 
 void sensorRead() {

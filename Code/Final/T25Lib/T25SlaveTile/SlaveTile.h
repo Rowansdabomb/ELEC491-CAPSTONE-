@@ -1,7 +1,7 @@
 #ifndef t25_slave_h
 #define t25_slave_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <T25Tile.h>
 #include <T25Setup.h>
 

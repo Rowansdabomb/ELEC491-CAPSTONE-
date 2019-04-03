@@ -1,7 +1,7 @@
 #ifndef t25_master_h
 #define t25_master_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <T25Tile.h>
 #include <T25Setup.h>
 #include <T25Common.h>
@@ -58,7 +58,9 @@ class MasterTile: public Tile
     void addNewTile(const struct TILE &tile);
     uint8_t assignNewAddress(const uint8_t yFree, const uint8_t xFree); 
     void addressNotFound(struct TILE &tile);
-    uint8_t transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
+    uint8_t transmitCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
+    uint8_t transmitMirrorData(const uint8_t addr);
+    uint8_t transmitGestureData(const uint8_t addr);
     void adjustMapBounds(struct TILE &tile);
     void configTileOrder();
 };

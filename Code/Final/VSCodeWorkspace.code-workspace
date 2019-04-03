@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Common"
+		},
+		{
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Tile"
+		},
+		{
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Setup"
+		},
+		{
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25SlaveTile"
+		},
+		{
+			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25MasterTile"
+		}
+	]
+}
