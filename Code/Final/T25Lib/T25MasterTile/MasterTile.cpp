@@ -1,4 +1,4 @@
-#include <Arduino.h>
+#include "Arduino.h"
 #include "MasterTile.h"
 #include "PinConfig.h"
 #include "Constants.h"
@@ -446,13 +446,16 @@ transmitToSlave - transmits data to a slave tile depending on operation mode
 void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
     switch(operationMode) {
       case (SCROLL_MODE):
-        transmitCharData(addr, pos, color, data);
+        transmitI2cCharData(addr, pos, color, data);
+        break;
+      case (AMBIENT_MODE):
+        // TBD
         break;
       case (MIRROR_MODE):
-        transmitMirrorData(addr);
+        // TBD
         break;
       case (GESTURE_MODE):
-        transmitGestureData(addr);
+        // TBD
         break;
       case (DIRECTION_TEST):
         // struct POS temp;
@@ -464,7 +467,7 @@ void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, cons
 }
 
 /*
-transmitCharData - Transmits the Character Data to a slave tile.
+transmitI2cCharData - Transmits the Character Data to a slave tile.
   Inputs:
     addr    - address of the slave tile
     pos     - reference position of where character data should start
@@ -473,9 +476,9 @@ transmitCharData - Transmits the Character Data to a slave tile.
   Outputs:
     Return value of endTransmission
 */
-uint8_t MasterTile::transmitCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
+uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
     Wire.beginTransmission(addr);
-    Wire.write(I2C_CHAR_KEY); // New Identifier for sending Character data? using Q arbritrarily
+    Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily
     Wire.write(pos.x);
     Wire.write(pos.y);
     Wire.write((color >> 8) & 0xff);
@@ -484,28 +487,6 @@ uint8_t MasterTile::transmitCharData(const uint8_t addr, const struct POS &pos, 
         Wire.write(data[i]);
     }
     return Wire.endTransmission();
-}
-
-/*
-
-*/
-uint8_t MasterTile::transmitMirrorData(const uint8_t addr) {
-  Wire.write(MIRROR_KEY);
-  Wire.beginTransmission(addr);
-  return Wire.endTransmission();
-}
-
-/*
-transmitGestureData - notifies slave devices to operate in gesture mode
-  Inputs:
-    addr - address of slave device to transmit to
-  Outputs:
-    the error code for the transmission
-*/
-uint8_t MasterTile::transmitGestureData(const uint8_t addr) {
-  Wire.write(GESTURE_KEY);
-  Wire.beginTransmission(addr);
-  return Wire.endTransmission();
 }
 
 /*
@@ -531,31 +512,28 @@ updateFromDataBase -
 void MasterTile::updateFromDataBase() {
   uint8_t metaData[2] = {255}; // [0] is transmitType, [1] is size of data to be transmitted
   char msgBuf[MAX_STRING_SIZE] = {'\0'};
-  // Serial.println("before wire.available");
+
   Wire.requestFrom(WIFI_SLAVE_ADDR, 255);
+
   if(Wire.available()){
     metaData[0] = Wire.read();
     metaData[1] = Wire.read();
   }
-  // Serial.println("before for loop");
 
   for(int msgCount = 0; msgCount < metaData[1]; ++msgCount){
-    if(Wire.available()){
+    if (Wire.available()){
       msgBuf[msgCount] = Wire.read();
-      Serial.print(msgBuf[msgCount], HEX);;
-      Serial.print(" ");
     }
   }
   
   while(Wire.available()){
-    Wire.read(); //Clear I2C bus 
+    Wire.read();
   }
-
-  Serial.print("Msg type: ");
-  Serial.println(metaData[0]);
-  Serial.print("msgCount: ");
-  Serial.println(metaData[1]);
-  Serial.println();
+  // Serial.print("Msg type: ");
+  // Serial.println(metaData[0]);
+  // Serial.print("msgCount: ");
+  // Serial.println(metaData[1]);
+  // Serial.println();
   switch(metaData[0]) {
     case CHANGE_COLOR:
     {
@@ -571,7 +549,19 @@ void MasterTile::updateFromDataBase() {
     case CHANGE_OPERATION_MODE:
     {
       setOperationMode(msgBuf[0]);
+      break;
     }
+    case CHANGE_BRIGHTNESS:
+    {
+      setBrightness(msgBuf[0]);
+      break;
+    }
+    case CHANGE_SCROLL_SPEED:
+    {
+      setTargetFrameRate(msgBuf[0]);
+      break;
+    }
+
 
     default:
       // DO NOTHING

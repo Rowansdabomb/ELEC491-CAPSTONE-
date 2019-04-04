@@ -9,6 +9,8 @@ char textData[MAX_STRING_SIZE];
 uint8_t textDataSize;
 uint8_t transmitType;
 uint8_t mode;
+uint8_t brightness;
+uint8_t scrollSpeed;
 
 void setup() {
     Serial.begin(115200);
@@ -64,7 +66,18 @@ void loop() {
         {
             Serial.println("Change Mode");
             mode = Serial1.read();
-        }            
+            break;
+        }  
+        case CHANGE_BRIGHTNESS:
+        {
+            brightness = Serial1.read();
+            break;
+        }     
+        case CHANGE_SCROLL_SPEED:
+        {
+            scrollSpeed = Serial1.read();
+            break;
+        }     
         default:
           // DO NOTHING
           break;
@@ -95,6 +108,18 @@ void requestEvent()
             Wire.write(1);
             Wire.write(mode);
             break;
+        case CHANGE_BRIGHTNESS:
+            Wire.write(CHANGE_BRIGHTNESS);
+            Wire.write(1);
+            Wire.write(brightness);
+            break;
+        case CHANGE_SCROLL_SPEED:
+            Wire.write(CHANGE_SCROLL_SPEED);
+            Wire.write(1);
+            Wire.write(scrollSpeed);
+            break;
+        default:
+            // DO NOTHING
     }
 }
 
@@ -114,12 +139,24 @@ void receiveEvent(int size){
             for (int i = 0; i < textDataSize; i++) {
                 Wire.write(textData[i]);
             }
-        break;
+            break;
         case CHANGE_OPERATION_MODE:
             Wire.write(CHANGE_OPERATION_MODE);
             Wire.write(1);
             Wire.write(mode);
             break;
+        case CHANGE_BRIGHTNESS:
+            Wire.write(CHANGE_BRIGHTNESS);
+            Wire.write(1);
+            Wire.write(brightness);
+            break;
+        case CHANGE_SCROLL_SPEED:
+            Wire.write(CHANGE_SCROLL_SPEED);
+            Wire.write(1);
+            Wire.write(scrollSpeed);
+            break;
+        default:
+            // DO NOTHING
     }
 }
 

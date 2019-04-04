@@ -44,11 +44,14 @@ class Tile {
     uint8_t frameRate;
     uint8_t targetFrameRate;
     uint16_t currentColor;
+    uint8_t currentBrightness;
 
     void beginTile();
 
     void setCursor(int8_t x, int8_t y);
     void setOperationMode(const uint8_t mode);
+    void setBrightness(const uint8_t value);
+    void setTargetFrameRate(const uint8_t rate);
     uint8_t getOperationMode();
     struct TILE getData();
 

@@ -24,10 +24,14 @@ const char* password =  "goaway1234!";       //"goaway1234!"
 // Compare with Stored Value
 String TextM           = "0"; 
 String ColorM          = "0";
-String ModeM          = "0";
-String temp_text       = "ty";
-String temp_color      = "0aef5c"; 
-String temp_mode      = "0";
+String ModeM           = "0";
+String BrightnessM     = "0";
+String ScrollM         = "0";
+String temp_text       = "0";
+String temp_color      = "ffffff"; 
+String temp_mode       = "0";
+String temp_brightness = "0";
+String temp_scroll     = "0";
 
 // volatile uint8_t mode = 0;
 
@@ -39,11 +43,11 @@ void setup() {
  
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.println("Connecting to WiFi..");
+    // Serial.println("Connecting to WiFi..");
   }
  
-  Serial.println("Connected to the WiFi network");
-  Serial.println(WiFi.localIP());
+  // Serial.println("Connected to the WiFi network");
+  // Serial.println(WiFi.localIP());
  
 //  wifiServer.begin();
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
@@ -65,10 +69,22 @@ void loop() {
         textChange();
         temp_text = TextM; 
     }
-//// To Enter Text ///////////////////////////////////////////////////////
+//// To Enter Mode ///////////////////////////////////////////////////////
     ModeM = Firebase.getString("/Mode"); 
     if (temp_mode != ModeM) {
         modeChange();
+    }
+
+//// To Enter Mode ///////////////////////////////////////////////////////
+    BrightnessM = Firebase.getString("/Brightness"); 
+    if (temp_brightness != BrightnessM) {
+        brightnessChange();
+    }
+
+//// To Enter Mode ///////////////////////////////////////////////////////
+    ScrollM = Firebase.getString("/Speedoftext"); 
+    if (temp_scroll != ScrollM) {
+        speedOfTextChange();
     }
 }
 
@@ -91,28 +107,38 @@ void HextoRGB (uint8_t rgb[]) {
 void colorChange(){
   uint8_t rgb[3];
   HextoRGB(rgb);
-  Serial.print("Color change: ");
+  // Serial.print("Color change: ");
   ESPSerial.write(CHANGE_COLOR);
   for(int i  =0; i < 3; i++){
-     Serial.print(rgb[i]);
-     Serial.print(", "); 
+    //  Serial.print(rgb[i]);
+    //  Serial.print(", "); 
      ESPSerial.write(rgb[i]);
   } 
-  Serial.println();
+  // Serial.println();
 }
 
 void textChange() {
-  Serial.print("Text change: ");
-  Serial.println(TextM);
+  // Serial.print("Text change: ");
+  // Serial.println(TextM);
 
   ESPSerial.write(CHANGE_TEXT);
   ESPSerial.write(TextM.c_str());
 }
 
 void modeChange() {
-  Serial.print("Mode Change: ");
-  Serial.println(ModeM);
+  // Serial.print("Mode Change: ");
+  // Serial.println(ModeM);
 
   ESPSerial.write(CHANGE_OPERATION_MODE);
   ESPSerial.write(ModeM.c_str());
+}
+
+void brightnessChange() {
+  ESPSerial.write(CHANGE_BRIGHTNESS);
+  ESPSerial.write(BrightnessM.c_str());
+}
+
+void speedOfTextChange() {
+  ESPSerial.write(CHANGE_SCROLL_SPEED);
+  ESPSerial.write(ScrollM.c_str());
 }

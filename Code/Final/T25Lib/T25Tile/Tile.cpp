@@ -19,7 +19,7 @@ Tile::Tile(uint8_t addr) {
 
   // SENSOR SETUP
   sensorRow = 0;
-  sensorCol = 0;
+  sensorCol = 1;
   sensorID = 0;
   prevSensorID = MATRIX_WIDTH * MATRIX_HEIGHT - 1;
 
@@ -35,8 +35,8 @@ Tile::Tile(uint8_t addr) {
     TILES_Y,
     MATRIX_DATA_PIN, 
     MATRIX_CLK_PIN, 
-    DS_MATRIX_BOTTOM     + DS_MATRIX_LEFT +
-    DS_MATRIX_COLUMNS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
+    DS_MATRIX_TOP  + DS_MATRIX_LEFT   +
+    DS_MATRIX_ROWS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
     DOTSTAR_BGR
   );
 }
@@ -58,23 +58,37 @@ void Tile::beginTile() {
   for (uint8_t i = 0; i < 8; ++i) {
     pinMode(COLUMN_READ_PINS[i], INPUT_ANALOG);
   }
+  // pinMode(PA0, INPUT_ANALOG);
+  // pinMode(PA1, INPUT_ANALOG);
+  // pinMode(PA2, INPUT_ANALOG);
+  // pinMode(PA3, INPUT_ANALOG);
+  // pinMode(PA4, INPUT_ANALOG);
+  // pinMode(PA5, INPUT_ANALOG);
+  // pinMode(PA6, INPUT_ANALOG);
+  // pinMode(PA7, INPUT_ANALOG);
+  // pinMode(PB0, INPUT_ANALOG);
+  // pinMode(PB1, INPUT_ANALOG);
+
 
   // Directional Pin Setup
   pinMode(PIN_DIR_U, INPUT_PULLDOWN);
   pinMode(PIN_DIR_D, INPUT_PULLDOWN);
   pinMode(PIN_DIR_L, INPUT_PULLDOWN);
   pinMode(PIN_DIR_R, INPUT_PULLDOWN);
-  // pinMode(PA2, OUTPUT);
 
-  // pinMode(PIN_MROW_ENABLE, OUTPUT);
-  // pinMode(PIN_MCOL_ENABLE, OUTPUT);
-
+  // ROW MUX SETUP
   pinMode(MROW_0, OUTPUT);
   pinMode(MROW_1, OUTPUT);
   pinMode(MROW_2, OUTPUT);
+  pinMode(PIN_MROW_ENABLE, OUTPUT);
+  digitalWrite(PIN_MROW_ENABLE, LOW);
+
+  // COLUMN MUX SETUP
   pinMode(MCOL_0, OUTPUT);
   pinMode(MCOL_1, OUTPUT);
   pinMode(MCOL_2, OUTPUT);
+  pinMode(PIN_MCOL_ENABLE, OUTPUT);
+  digitalWrite(PIN_MCOL_ENABLE, LOW);
 }
 
 /*
@@ -112,6 +126,28 @@ void Tile::setOperationMode(const uint8_t mode) {
 }
 
 /*
+setBrightness -
+  Inputs:
+    value - an integer to determine the tile matrix brightness
+  Outputs:
+    void
+*/
+void Tile::setBrightness(const uint8_t value) {
+  currentBrightness = value;
+}
+
+/*
+setBrightness -
+  Inputs:
+    rate - an integer to determine the scroll rate of text
+  Outputs:
+    void
+*/
+void Tile::setTargetFrameRate(const uint8_t rate) {
+  targetFrameRate = rate;
+}
+
+/*
 getOperationMode - returns the current operation mode
   Inputs:
     void
@@ -141,9 +177,17 @@ updateTileDisplay - updates the display based on current operation mode
 void Tile::updateTileDisplay(const POS &outPos, char dataOut[]) {
       switch(operationMode) {
         case (SCROLL_MODE):
+          // Turn off muxes
+          digitalWrite(PIN_MCOL_ENABLE, LOW);
+          digitalWrite(PIN_MROW_ENABLE, HIGH);
+
           displayChar(outPos, dataOut);
           break;
         case (MIRROR_MODE):
+          // Turn on muxes
+          digitalWrite(PIN_MCOL_ENABLE, HIGH);
+          digitalWrite(PIN_MROW_ENABLE, LOW);
+
           displayMirror();
           break;
         case (DIRECTION_TEST):
@@ -177,12 +221,13 @@ displayMirror - Lights up LEDs beneath activated sensors
 */
 void Tile::displayMirror(){
   matrix->fillScreen(0);
-  matrix->setCursor(0, 0);
-  for (int i = 0; i < MATRIX_WIDTH * MATRIX_HEIGHT; ++i) { //For 4x4 should be 2
-    const uint8_t SENSOR_THRESHOLD = 200;
+  // matrix->fillRect(0, 0, 4, 4, colors[WHITE]);
+  for (uint8_t i = 0; i < MATRIX_WIDTH * MATRIX_HEIGHT; ++i) { //For 4x4 should be 2
+    const uint8_t SENSOR_THRESHOLD = 160;
     if (sensorData[i] > SENSOR_THRESHOLD) {
-      //first is column, second is row, third is color
-      matrix->fillRect(i / MATRIX_WIDTH, i % MATRIX_HEIGHT, 1, 1, currentColor);
+      const uint8_t pixel_x = (i % MATRIX_WIDTH);
+      const uint8_t pixel_y = (i / MATRIX_HEIGHT);  
+      matrix->fillRect(pixel_x, pixel_y, 1, 1, currentColor);
     }
   }
   matrix->show();
@@ -297,11 +342,6 @@ void Tile::printSensorData() {
   Serial.write(27);
   Serial.print("[H");     // cursor to home command
 
-  // Serial.print("previous sensor: ");
-  // Serial.println(prevSensorID);
-  // Serial.print("current sensor: ");
-  // Serial.println(sensorID);
-
   for (uint8_t i = 0; i < MATRIX_WIDTH; ++i) {
     for(uint8_t j = 0; j < MATRIX_HEIGHT; ++j) {
     // for(uint8_t j = 0; j < 1; ++j) {
@@ -320,12 +360,15 @@ void Tile::printSensorData() {
 readSensorData - 
 */
 void Tile::readSensorData() {
-
   if (sensorID != prevSensorID) {
+    
     // read sensor data, pin map should be 0-7 for A0-A7 so we use sensorCol
     sensorData[sensorCol + sensorRow*MATRIX_WIDTH] = analogRead(COLUMN_READ_PINS[sensorCol]);
 
     ++sensorCol;
+    // if (sensorCol == 2) {
+    //   sensorCol++;
+    // }
     if (sensorCol > MATRIX_HEIGHT - 1) {
       sensorCol = 0;
       // turn on next emitter
@@ -334,7 +377,7 @@ void Tile::readSensorData() {
         sensorRow = 0;
       }
     }
-
+    
     for (uint8_t i = 0; i < MUX_SELECT_SIZE; ++i) {
       if ((sensorRow >> i) & 1) {
         digitalWrite(MUX_ROW_SELECT[i], HIGH);
@@ -349,9 +392,9 @@ void Tile::readSensorData() {
       }
     }
 
-    if (sensorID == 0) {
-      printSensorData();
-    }
+    // if (sensorID == 0) {
+    //   printSensorData();
+    // }
 
     prevSensorID = sensorID;
   }

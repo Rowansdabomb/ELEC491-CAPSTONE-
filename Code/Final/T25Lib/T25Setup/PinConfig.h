@@ -27,7 +27,7 @@ const uint8_t MROW_2 = PB14;
 // MUX COL SELECTS
 const uint8_t MCOL_0 = PB15;
 const uint8_t MCOL_1 = PA8;
-const uint8_t MCOL_2 = PB4; // MAKE PA9 when not using serial
+const uint8_t MCOL_2 = PA9; // MAKE PA9 when not using serial
 
 const uint8_t COLUMN_READ_PINS[MATRIX_WIDTH] = {PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7};
 

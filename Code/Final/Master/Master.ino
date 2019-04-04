@@ -62,8 +62,8 @@ void setup() {
   sensorTimer.resume();
   ///////////////////////////////////////////////////
 
-  // master.setOperationMode(SCROLL_MODE);
-  master.setOperationMode(MIRROR_MODE);
+  master.setOperationMode(SCROLL_MODE);
+  // master.setOperationMode(MIRROR_MODE);
 }
 
 void loop() {
@@ -72,10 +72,10 @@ void loop() {
   if(newFrameFlag) {
     master.handleDisplayShape();
 
-    // if (currentFrame % (master.frameRate) == 0) {
-    //   Serial.println("Try database update");
-    //   master.updateFromDataBase();
-    // }
+    if (currentFrame % (master.frameRate) == 0) {
+      // Serial.println("Try database update");
+      master.updateFromDataBase();
+    }
 
     if (currentFrame % (master.frameRate / master.targetFrameRate) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
