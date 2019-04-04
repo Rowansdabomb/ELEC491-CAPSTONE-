@@ -54,6 +54,11 @@ void Tile::beginTile() {
   matrix->setTextColor(colors[0]);
   matrix->show();  // Turn all LEDs off ASAP
 
+  // ADC SETUP
+  for (uint8_t i = 0; i < 8; ++i) {
+    pinMode(COLUMN_READ_PINS[i], INPUT_ANALOG);
+  }
+
   // Directional Pin Setup
   pinMode(PIN_DIR_U, INPUT_PULLDOWN);
   pinMode(PIN_DIR_D, INPUT_PULLDOWN);
@@ -315,6 +320,7 @@ void Tile::printSensorData() {
 readSensorData - 
 */
 void Tile::readSensorData() {
+
   if (sensorID != prevSensorID) {
     // read sensor data, pin map should be 0-7 for A0-A7 so we use sensorCol
     sensorData[sensorCol + sensorRow*MATRIX_WIDTH] = analogRead(COLUMN_READ_PINS[sensorCol]);

@@ -28,7 +28,7 @@ void setup() {
   // Flag initialization
   newFrameFlag = false;
   // Serial Setup - for output
-  Serial.begin(115200); 
+  // Serial.begin(115200); 
   // Serial Setup - for ESP32
   Serial1.begin(115200);
 
@@ -61,11 +61,8 @@ void setup() {
 
   sensorTimer.resume();
   ///////////////////////////////////////////////////
-  pinMode(PIN_MCOL_ENABLE, OUTPUT);
-  pinMode(PIN_MROW_ENABLE, OUTPUT);
 
-  digitalWrite(PIN_MCOL_ENABLE, HIGH);
-  digitalWrite(PIN_MROW_ENABLE, LOW);
+  // master.setOperationMode(SCROLL_MODE);
   master.setOperationMode(MIRROR_MODE);
 }
 
@@ -88,7 +85,6 @@ void loop() {
         
         uint8_t tileID = master.getOrderedTileID(i);
         if (tileID == MASTER_TILE_ID) {
-          Serial.println("output to display");
           master.updateTileDisplay(outPos, dataOut);
         } else {
           // struct TILE slave = master.getTile(tileID);
