@@ -80,10 +80,6 @@ void receiveEvent(int howMany)
     mode = Wire.read();      // receive first byte as a character
   }
   switch(mode){
-    case DIRECTION_KEY:
-      slave.receiveI2cData();
-      slave.setOperationMode(DIRECTION_TEST);
-      break;
     case I2C_CHAR_KEY:
       slave.receiveI2cData();
       slave.setOperationMode(SCROLL_MODE);

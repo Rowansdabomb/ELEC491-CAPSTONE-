@@ -1,9 +1,6 @@
 {
 	"folders": [
 		{
-			"path": "Final"
-		},
-		{
 			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Tile"
 		},
 		{
@@ -17,6 +14,15 @@
 		},
 		{
 			"path": "C:\\Program Files (x86)\\Arduino\\libraries\\T25Common"
+		},
+		{
+			"path": "Master"
+		},
+		{
+			"path": "Slave"
+		},
+		{
+			"path": "WIFI"
 		}
 	],
 	"settings": {}
