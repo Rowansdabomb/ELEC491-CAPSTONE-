@@ -9,6 +9,7 @@ const uint8_t BGR = 1;
 const uint8_t COLOR_ORDER = RGB; 
 
 uint16_t makeColor(uint8_t r, uint8_t g, uint8_t b);
+uint16_t makeColorComplement(uint16_t color);
 void rgbToHsl(uint8_t rgb[], float hsl[]);
 void hslToRgb(uint8_t rgb[], float hsl[]);
 float nGetMax(float arr[], const uint8_t size);

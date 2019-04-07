@@ -14,6 +14,11 @@ uint16_t makeColor(uint8_t r, uint8_t g, uint8_t b) {
   }
 }
 
+uint16_t makeColorComplement(const uint16_t color) {
+
+  return 0x00ffffff ^ color;
+}
+
 /*
 rgbToHsl - converts rgb color to hsl color, modifies the incoming array and returns it as hsl array
   Inputs:

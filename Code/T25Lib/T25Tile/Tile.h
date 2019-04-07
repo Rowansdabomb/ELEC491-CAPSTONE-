@@ -37,51 +37,65 @@ struct MessageData {
 
 class Tile {
   public:
+    // INITIALIZATION
     Tile(uint8_t addr);
+    void beginTile();
 
+    // ATTRIBUTES
     char msgBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-
-    uint8_t frameRate;
-    uint8_t targetFrameRate;
     uint16_t currentColor;
     uint8_t currentBrightness;
 
-    void beginTile();
-
+    // SETTERS
     void setCursor(int8_t x, int8_t y);
     void setOperationMode(const uint8_t mode);
     void setBrightness(const uint8_t value);
     void setTargetFrameRate(const uint8_t rate);
+
+    // GETTERS
     uint8_t getOperationMode();
     struct TILE getData();
+    uint8_t getFrameRate();
+    uint8_t getTargetFrameRate();
 
     struct TILE findNeighborTiles();
     void debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color);
    
-    void updateTileDisplay(const POS &outPos, char dataOut[]);
+    void updateTileDisplay(const POS &outPos, char dataOut[], const uint8_t currentFrame);
     void changeColor(uint8_t colors[]);
     void changeColor(uint16_t color);
+
+    // SENSORS
     void printSensorData();
     void readSensorData();
 
-    //ISR
     volatile uint8_t sensorID;
     volatile uint8_t prevSensorID;
     void ISR_sensorRead();
 
+    // MATRIX
     Adafruit_DotStarMatrix *matrix;
 
   protected:
     uint8_t operationMode;
     struct TILE data;
     struct POS cursor;
+    uint8_t frameRate;
+    uint8_t targetFrameRate;
+    bool toggleAmbient;
 
     uint8_t sensorRow;
     uint8_t sensorCol;
     uint16_t sensorData[MATRIX_WIDTH * MATRIX_HEIGHT];
+    uint16_t sensorThreshold[MATRIX_WIDTH * MATRIX_HEIGHT];
+    uint8_t sensorThresholdHistory[MATRIX_WIDTH * MATRIX_HEIGHT];
+    uint8_t sensorThresholdCounter;
+    
+    void updateSensorThreshold(uint16_t sensorValue, uint8_t sensorIndex);
 
     void displayChar(const POS &pos, char dataOut[]);
-    void displayMirror();
+    void displayMirror(bool defaultColor = true);
+    void displayAmbient(const uint8_t currentFrame);
     void i2cDirectionTest(const uint16_t color);
 };
 

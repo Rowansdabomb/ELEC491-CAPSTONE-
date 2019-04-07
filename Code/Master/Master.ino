@@ -38,7 +38,7 @@ void setup() {
   ///////////////// MATRIX FPS TIMER SETUP ////////////////////
   fpsTimer.pause();
 
-  fpsTimer.setPeriod(1000*1000/master.frameRate); // in microseconds
+  fpsTimer.setPeriod(1000*1000/master.getFrameRate()); // in microseconds
 
   fpsTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
   fpsTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
@@ -63,6 +63,8 @@ void setup() {
   ///////////////////////////////////////////////////
 
   // master.setOperationMode(SCROLL_MODE);
+  // master.setOperationMode(SCROLL_MIRROR_MODE);
+  // master.setOperationMode(AMBIENT_MODE);
   master.setOperationMode(MIRROR_MODE);
 }
 
@@ -71,13 +73,12 @@ void loop() {
 
   if(newFrameFlag) {
     master.handleDisplayShape();
-    Serial.println(currentFrame);
-    if (currentFrame % (master.frameRate) == 0) {
-      Serial.println("Try database update");
-      master.updateFromDataBase();
-    }
 
-    if (currentFrame % (master.frameRate / master.targetFrameRate) == 0) {
+    // if (currentFrame % (master.getFrameRate()) == 0) {
+    //   master.updateFromDataBase();
+    // }
+
+    if (currentFrame % (master.getFrameRate() / master.getTargetFrameRate()) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
         char dataOut[MAX_DISPLAY_CHARS];
 
@@ -85,7 +86,7 @@ void loop() {
         
         uint8_t tileID = master.getOrderedTileID(i);
         if (tileID == MASTER_TILE_ID) {
-          master.updateTileDisplay(outPos, dataOut);
+          master.updateTileDisplay(outPos, dataOut, currentFrame);
         } else {
           // struct TILE slave = master.getTile(tileID);
           // master.transmitToSlave(slave.addr, outPos, currentColor, dataOut);

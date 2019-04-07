@@ -3,7 +3,7 @@
 #include "Constants.h"
 #include "PinConfig.h"
 #include "Colors.h"
-
+#include "CommonConstants.h"
 Tile::Tile(uint8_t addr) {
   // initialize operationMode
   operationMode = SCROLL_MODE;
@@ -17,6 +17,9 @@ Tile::Tile(uint8_t addr) {
   // SET SCROLL SPEED
   targetFrameRate = 6;
 
+  toggleAmbient = false;
+  sensorThresholdCounter = 0;
+
   // SENSOR SETUP
   sensorRow = 0;
   sensorCol = 1;
@@ -25,6 +28,8 @@ Tile::Tile(uint8_t addr) {
 
   for (uint16_t i = 0; i < MATRIX_WIDTH*MATRIX_HEIGHT; ++i) {
     sensorData[i] = 0;
+    sensorThreshold[i] = 160;
+    sensorThresholdHistory[i] = 0;
   }
 
   //initialize the matrix
@@ -110,6 +115,8 @@ setOperationMode -
     void
 */
 void Tile::setOperationMode(const uint8_t mode) {
+  // Serial.print("set operation mode to ");
+  // Serial.println(mode);
   operationMode = mode;
 
   // sets the speeds for display updates
@@ -119,6 +126,9 @@ void Tile::setOperationMode(const uint8_t mode) {
       break;
     case (MIRROR_MODE):
       targetFrameRate = 10;
+      break;
+    case (AMBIENT_MODE):
+      targetFrameRate = 15;
       break;
     default:
       targetFrameRate = frameRate;
@@ -133,11 +143,12 @@ setBrightness -
     void
 */
 void Tile::setBrightness(const uint8_t value) {
-  currentBrightness = value;
+  currentBrightness = value / 2;
+  matrix->setBrightness(value / 2);
 }
 
 /*
-setBrightness -
+setTargetFrameRate -
   Inputs:
     rate - an integer to determine the scroll rate of text
   Outputs:
@@ -145,6 +156,28 @@ setBrightness -
 */
 void Tile::setTargetFrameRate(const uint8_t rate) {
   targetFrameRate = rate;
+}
+
+/*
+getFrameRate - retrieves the target frame rate
+  Inputs: 
+    void
+  Outputs:
+    frameRate - the max frame rate the tile operates at
+*/
+uint8_t Tile::getFrameRate() {
+  return frameRate;
+}
+
+/*
+getTargetFrameRate - retrieves the target frame rate
+  Inputs: 
+    void
+  Outputs:
+    targetFrameRate - the current framerate to update the display with
+*/
+uint8_t Tile::getTargetFrameRate() {
+  return targetFrameRate;
 }
 
 /*
@@ -160,6 +193,8 @@ uint8_t Tile::getOperationMode() {
 
 /*
 getData - retrieves the Tile's status, address, position, and neighborTiles
+  Inputs:
+    void
   Outputs:
     TILE - a struct describing the tile data
 */
@@ -168,32 +203,49 @@ struct TILE Tile::getData() {
 }
 
 /*
-updateTileDisplay - updates the display based on current operation mode
+updateTileDisplay - selects proper method to update display based on current operation mode
   Inputs:
     outPos - the x and y coordinate of the display offset
     dataOut - an array containing data to be sent to the display
   Outputs:
+    void
 */
-void Tile::updateTileDisplay(const POS &outPos, char dataOut[]) {
-      switch(operationMode) {
-        case (SCROLL_MODE):
-          // Turn off muxes
-          digitalWrite(PIN_MCOL_ENABLE, LOW);
-          digitalWrite(PIN_MROW_ENABLE, HIGH);
+void Tile::updateTileDisplay(const POS &outPos, char dataOut[], const uint8_t currentFrame) {
+  matrix->fillScreen(0);
 
-          displayChar(outPos, dataOut);
-          break;
-        case (MIRROR_MODE):
-          // Turn on muxes
-          digitalWrite(PIN_MCOL_ENABLE, HIGH);
-          digitalWrite(PIN_MROW_ENABLE, LOW);
+  switch(operationMode) {
+    case (SCROLL_MODE):
+      // Turn off muxes
+      digitalWrite(PIN_MCOL_ENABLE, LOW);
+      digitalWrite(PIN_MROW_ENABLE, HIGH);
+      
+      displayChar(outPos, dataOut);
+      break;
+    case (MIRROR_MODE):
+      // Turn on muxes
+      digitalWrite(PIN_MCOL_ENABLE, HIGH);
+      digitalWrite(PIN_MROW_ENABLE, LOW);
 
-          displayMirror();
-          break;
-        case (DIRECTION_TEST):
-          // i2cDirectionTest(colors[data.color]);
-          break;
-      }
+      displayMirror();
+      break;
+    case (SCROLL_MIRROR_MODE):
+      // Turn on muxes
+      digitalWrite(PIN_MCOL_ENABLE, HIGH);
+      digitalWrite(PIN_MROW_ENABLE, LOW);
+
+      displayChar(outPos, dataOut);
+      displayMirror(false);
+      break;
+    case (AMBIENT_MODE): 
+      digitalWrite(PIN_MCOL_ENABLE, HIGH);
+      digitalWrite(PIN_MROW_ENABLE, LOW);
+
+      displayAmbient(currentFrame);
+      displayMirror(false);
+      break;
+  }
+
+  matrix->show();
 }
 
 /*
@@ -204,33 +256,65 @@ displayChar - Shows the visible portion of characters on the matrix
     void
 */
 void Tile::displayChar(const POS &pos, char dataOut[]){
-  matrix->fillScreen(0);
   matrix->setCursor(pos.x, pos.y);
   for (int i = 0; i < MAX_DISPLAY_CHARS; ++i) { //For 4x4 should be 2
     matrix->print(dataOut[i]);
   }
-  matrix->show();
 }
 
 /*
 displayMirror - Lights up LEDs beneath activated sensors
   Inputs:
+    defaultColor - a boolean value to determine which color to use for mirror mode
+  Outputs:
+    void
+*/
+void Tile::displayMirror(bool defaultColor) {
+  for (uint8_t i = 0; i < MATRIX_WIDTH * MATRIX_HEIGHT; ++i) { 
+    // const uint8_t SENSOR_THRESHOLD = 145;
+    if (sensorData[i] > sensorThreshold[i]) {
+      const uint8_t pixel_x = (i % MATRIX_WIDTH);
+      const uint8_t pixel_y = (i / MATRIX_HEIGHT);  
+      if(!defaultColor) {
+        matrix->setBrightness((uint8_t) currentBrightness * 1.5);
+        matrix->fillRect(pixel_x, pixel_y, 1, 1, makeColorComplement(currentColor));
+      } else {
+        matrix->fillRect(pixel_x, pixel_y, 1, 1, currentColor);
+      }
+    }
+  }
+}
+
+/*
+displayAmbient - A simple pulsating light effect
+  Inputs:
     void
   Outputs:
     void
 */
-void Tile::displayMirror(){
-  matrix->fillScreen(0);
-  // matrix->fillRect(0, 0, 4, 4, colors[WHITE]);
-  for (uint8_t i = 0; i < MATRIX_WIDTH * MATRIX_HEIGHT; ++i) { //For 4x4 should be 2
-    const uint8_t SENSOR_THRESHOLD = 160;
-    if (sensorData[i] > SENSOR_THRESHOLD) {
-      const uint8_t pixel_x = (i % MATRIX_WIDTH);
-      const uint8_t pixel_y = (i / MATRIX_HEIGHT);  
-      matrix->fillRect(pixel_x, pixel_y, 1, 1, currentColor);
-    }
+void Tile::displayAmbient(const uint8_t currentFrame) {
+  float modifier;
+  uint8_t speed = targetFrameRate * 2;
+  // uint8_t rgb[3] = {255, 255, 255};
+
+  if (toggleAmbient) {
+    modifier = (currentFrame % speed) / (speed * 1.0);
+    modifier = .5 + (.5 - .5 * modifier);
+  } else {
+    modifier = speed - ((currentFrame % speed) / (speed * 1.0)); 
+    modifier = .5 + (1 - .5 * modifier);
   }
-  matrix->show();
+
+  // for (uint8_t i = 0; i < 3; ++i) {
+  //   rgb[i] = (int) (modifier * rgb[i]);
+  // }
+  // matrix->fillRect(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, makeColor(rgb[0], rgb[1], rgb[2]));
+  matrix->fillRect(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, currentColor);
+  matrix->setBrightness(currentBrightness * modifier);
+
+  if (currentFrame % speed == 0) {
+    toggleAmbient = !toggleAmbient;
+  }
 }
 
 /*
@@ -357,18 +441,31 @@ void Tile::printSensorData() {
 }
 
 /*
-readSensorData - 
+readSensorData - Goes through sensor/emitter matrix left to right, then top down.
+                 Reads the current sensor, then turns off current emitter and turns on next emitter
+  Inputs:
+    void
+  Outputs:
+    void
 */
 void Tile::readSensorData() {
   if (sensorID != prevSensorID) {
     
     // read sensor data, pin map should be 0-7 for A0-A7 so we use sensorCol
-    sensorData[sensorCol + sensorRow*MATRIX_WIDTH] = analogRead(COLUMN_READ_PINS[sensorCol]);
+    uint16_t sensorValue = analogRead(COLUMN_READ_PINS[sensorCol]);
+    uint8_t sensorIndex = sensorCol + sensorRow*MATRIX_WIDTH;
+
+    // set the sensorData 
+    sensorData[sensorIndex] = sensorValue;
+
+    updateSensorThreshold(sensorValue, sensorIndex);
 
     ++sensorCol;
-    // if (sensorCol == 2) {
+    // // Turn off selected column
+    // if (sensorCol == 7) {
     //   sensorCol++;
     // }
+
     if (sensorCol > MATRIX_HEIGHT - 1) {
       sensorCol = 0;
       // turn on next emitter
@@ -399,6 +496,41 @@ void Tile::readSensorData() {
     prevSensorID = sensorID;
   }
 
+}
+
+/*
+updateSensorThreshold - checks if the sensor threshold should update  
+  Input:
+    sensorValue - the value of the current sensor
+    sensorIndex - the index of the current sensor in the sensor matrices
+  Outputs:
+    void
+*/
+
+void Tile::updateSensorThreshold(uint16_t sensorValue, uint8_t sensorIndex) {
+    if (sensorThresholdCounter == 0) {
+      // advance the theshold history
+      sensorThresholdHistory[sensorIndex] = sensorThresholdHistory[sensorIndex] << 1;
+
+      // check if sensor above threshold
+      if (sensorValue > (uint16_t) (sensorThreshold[sensorIndex] / thresholdError) - 1) {
+
+        // set the LSB high
+        sensorThresholdHistory[sensorIndex] = sensorThresholdHistory[sensorIndex] | 0x0001;
+
+        // check if sensor has been consistently above threshold
+        if (sensorThresholdHistory[sensorIndex] == 0xff) {
+          sensorThresholdHistory[sensorIndex] = 0;
+          sensorThreshold[sensorIndex] = (uint16_t) sensorValue;
+        } 
+      } 
+      // check if sensor below threshold
+      else if (sensorValue * thresholdError < sensorThreshold[sensorIndex]) {
+        // set sensorThreshold to new minimum
+        sensorThreshold[sensorIndex] = (uint16_t) sensorValue * thresholdError;
+      }
+    } 
+    ++sensorThresholdCounter;
 }
 
 /*

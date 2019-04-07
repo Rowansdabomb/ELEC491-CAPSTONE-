@@ -17,15 +17,15 @@ struct TILEMAP {
 class MasterTile: public Tile
 {
   public:
+    // INITIALIZATION
     MasterTile(uint8_t addr);
-
     void beginMasterTile();
 
-    // Setters
+    // SETTERS
     void setTileCount(const uint8_t count);
     void setTextData(const char text[], const uint8_t size);
 
-    // Getters
+    // GETTERS
     uint8_t getTileCount();
     uint8_t getOrderedTileID(uint8_t i);
     struct TILE getTile(uint8_t i);
@@ -43,7 +43,6 @@ class MasterTile: public Tile
 
 
   private:
-
     uint16_t textDataLength;
     uint16_t scrollLength;
     struct POS scrollPos;

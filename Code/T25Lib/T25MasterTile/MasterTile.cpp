@@ -4,6 +4,7 @@
 #include "Constants.h"
 #include "MatrixSetup.h"
 #include "Colors.h"
+#include "CommonConstants.h"
 #include <Wire.h>
 
 MasterTile::MasterTile(uint8_t addr):Tile(addr) {
@@ -85,6 +86,10 @@ struct TILE MasterTile::getTile(const uint8_t id) {
 
 /*
 resetTileOrder - sets the tileOrder array to all 0s
+  Inputs:
+    void
+  Outputs:
+    void
 */
 void MasterTile::resetTileOrder() {
   for(uint8_t i = 0; i < TILE_MAX; ++i) {
@@ -121,6 +126,10 @@ uint8_t MasterTile::handleDisplayShape() {
 
 /*
 handleAddedOrRemovedTiles - Determines if any tiles have been added or removed and updates the tile order.
+  Inputs:
+    void
+  Outputs:
+    void
 */
 void MasterTile::handleAddedOrRemovedTiles () {
     tileCount = 1;
@@ -334,65 +343,6 @@ void MasterTile::adjustMapBounds(struct TILE &tile) {
   }
 }
 
-// void MasterTile::getESPData() {
-//   Wire.requestFrom(WIFI_SLAVE_ADDR, 2);
-//   byte transmitType = Wire.read();
-//   uint8_t msgSize = Wire.read();
-
-//   Wire.requestFrom(WIFI_SLAVE_ADDR, msgSize, true);
-  
-//   switch(transmitType) {
-//     case CHANGE_COLOR:
-//     {
-//       uint8_t rgb[3];
-
-//       uint8_t i = 0;
-//       while (Wire.available()) {
-//         rgb[i] = Wire.read();
-//         // delay(1);
-//         ++i;
-//       }
-
-//       currentColor = makeColor(rgb[0], rgb[1], rgb[2]);
-//       master.changeColor(currentColor);
-//       break;
-//     }
-//     case CHANGE_TEXT:
-//     {
-//       char textData[MAX_STRING_SIZE];
-//       // uint8_t textDataSize = Wire.read();
-//       uint8_t i = 0;
-//       while(Wire.available()) {
-//         textData[i] = Wire.read();
-//         ++i;
-//       }
-//       // int textDataSize = Serial1.readBytesUntil('\0', textData, MAX_STRING_SIZE);
-//       // textData[textDataSize] = '\0';
-//       textData[i] = '\0';
-        
-//       master.setTextData(textData, textDataSize);//This should be done by Sanket's code
-//       break;
-//     }
-//     case CHANGE_OPERATION_MODE:
-//     {
-//       // master.setOperationMode(Serial1.read());
-//       uint8_t mode = Wire.read();
-//       master.setOperationMode(mode);
-//     }
-
-//     default:
-//       // DO NOTHING
-//       break;
-//   }
-//   byte size = Wire.read();
-//   delay(1);
-//   Wire.requestFrom(WIFI_SLAVE_ADDR, size);
-//   char espBuff[size];
-//   for(uint8_t i = 0; i < size; i++) {
-//     espBuff[i] = Wire.read();
-//   }
-// }
-
 /*
 configTileOrder - sorts tileOrder with tilIDs from left to right then top to bottom
 
@@ -457,12 +407,6 @@ void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, cons
       case (GESTURE_MODE):
         // TBD
         break;
-      case (DIRECTION_TEST):
-        // struct POS temp;
-        // temp.x = 0;
-        // temp.y = 0;
-        // transmitI2cData(addr, temp, color);
-        break;
     }
 }
 
@@ -510,6 +454,7 @@ updateFromDataBase -
   Outputs: void
 */
 void MasterTile::updateFromDataBase() {
+  Serial.println("Updating from Database");
   uint8_t metaData[2] = {255}; // [0] is transmitType, [1] is size of data to be transmitted
   char msgBuf[MAX_STRING_SIZE] = {'\0'};
 
@@ -529,11 +474,6 @@ void MasterTile::updateFromDataBase() {
   while(Wire.available()){
     Wire.read();
   }
-  // Serial.print("Msg type: ");
-  // Serial.println(metaData[0]);
-  // Serial.print("msgCount: ");
-  // Serial.println(metaData[1]);
-  // Serial.println();
   switch(metaData[0]) {
     case CHANGE_COLOR:
     {
@@ -561,7 +501,6 @@ void MasterTile::updateFromDataBase() {
       setTargetFrameRate(msgBuf[0]);
       break;
     }
-
     default:
       // DO NOTHING
       break;
