@@ -37,7 +37,7 @@ class MasterTile: public Tile
     uint8_t handleDisplayShape();
     void updateFromDataBase();
 
-    void transmitToSlave(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
+    void transmitToSlave(const uint8_t addr, const struct POS &pos, const uint8_t brightness, const uint16_t color, char data[], const uint8_t frame);
     struct POS getOutputData(char dataOut[], const uint8_t tileIndex);
     char textData[MAX_STRING_SIZE];
 
@@ -57,9 +57,10 @@ class MasterTile: public Tile
     void addNewTile(const struct TILE &tile);
     uint8_t assignNewAddress(const uint8_t yFree, const uint8_t xFree); 
     void addressNotFound(struct TILE &tile);
-    uint8_t transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]);
-    uint8_t transmitMirrorData(const uint8_t addr);
-    uint8_t transmitGestureData(const uint8_t addr);
+    uint8_t transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint8_t brightness, const uint16_t color, char data[]);
+    uint8_t transmitMirrorData(const uint8_t addr, const uint8_t brightness, const uint16_t color);
+    uint8_t transmitAmbientData(const uint8_t addr, const uint8_t brightness, const uint16_t color, const uint8_t frame);
+    uint8_t transmitGestureData(const uint8_t addr, const uint8_t brightness, const uint16_t color);
     void adjustMapBounds(struct TILE &tile);
     void configTileOrder();
 };

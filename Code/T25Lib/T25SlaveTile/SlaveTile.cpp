@@ -2,6 +2,8 @@
 #include "Constants.h"
 #include "PinConfig.h"
 #include "Colors.h"
+#include <Wire_slave.h>
+#include <T25Common.h>
 
 SlaveTile::SlaveTile(uint8_t addr):Tile(addr) {
   for (uint8_t i = 0; i < 8; ++i) {
@@ -53,17 +55,27 @@ struct MessageData SlaveTile::getMessageData() {
     struct MessageData msgData;
     switch(operationMode) {
         case SCROLL_MODE:
-            msgData.pos.x = msgBuffer[0];
-            msgData.pos.y = msgBuffer[1];
-            msgData.color = (msgBuffer[2] << 8 ) | (msgBuffer[3] & 0xff);
-            for(uint8_t i = 0; i < MAX_DISPLAY_CHARS; i++) {
-                msgData.text[i] = msgBuffer[4 + i];
-            }
-            break;
+          msgData.pos.x = msgBuffer[0];
+          msgData.pos.y = msgBuffer[1];
+          msgData.color = (msgBuffer[2] << 8 ) | (msgBuffer[3] & 0xff);
+          msgData.brightness = msgBuffer[4];
+          for(uint8_t i = 0; i < MAX_DISPLAY_CHARS; i++) {
+              msgData.text[i] = msgBuffer[5 + i];
+          }
+          break;
+        case MIRROR_MODE:
+          msgData.color = (msgBuffer[0] << 8 ) | (msgBuffer[1] & 0xff);
+          msgData.brightness = msgBuffer[2];
+          break;
+        case AMBIENT_MODE:
+          msgData.color = (msgBuffer[0] << 8 ) | (msgBuffer[1] & 0xff);
+          msgData.brightness = msgBuffer[2];
+          msgData.frame = msgBuffer[3];
+          break;
         case GESTURE_MODE:
-            break;
+          break;
         default:
-            break;
+          break;
     }
 
     return msgData;

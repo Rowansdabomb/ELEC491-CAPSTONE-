@@ -144,7 +144,7 @@ setBrightness -
 */
 void Tile::setBrightness(const uint8_t value) {
   currentBrightness = value / 2;
-  matrix->setBrightness(value / 2);
+  matrix->setBrightness(currentBrightness);
 }
 
 /*

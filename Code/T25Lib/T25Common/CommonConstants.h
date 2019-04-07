@@ -25,7 +25,7 @@ const uint8_t AMBIENT_MODE          = 4;
 
 // OPERATION MODE KEYS
 const char I2C_CHAR_KEY = 'Q';
-const char MIRROR_KEY = 'A';
+const char MIRROR_KEY = 'M';
 const char GESTURE_KEY = 'B';
-
+const char AMBIENT_KEY = 'A';
 #endif

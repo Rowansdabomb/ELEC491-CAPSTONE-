@@ -32,6 +32,8 @@ struct TILE {
 struct MessageData {
     struct POS pos;
     uint16_t color;
+    uint8_t brightness;
+    uint8_t frame;
     char text[MAX_DISPLAY_CHARS];
 };
 
@@ -45,6 +47,7 @@ class Tile {
     char msgBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint16_t currentColor;
     uint8_t currentBrightness;
+    uint8_t currentFrame = 1;
 
     // SETTERS
     void setCursor(int8_t x, int8_t y);

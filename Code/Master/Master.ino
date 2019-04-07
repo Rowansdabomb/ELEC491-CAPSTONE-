@@ -22,7 +22,7 @@ HardwareTimer sensorTimer(3); // time for polling the sensors
 MasterTile master(0xFF);
 
 uint16_t currentColor = colors[RED];
-uint8_t currentFrame = 1;
+//uint8_t currentFrame = 1;
 
 void setup() {
   // Flag initialization
@@ -66,6 +66,7 @@ void setup() {
   // master.setOperationMode(SCROLL_MIRROR_MODE);
   // master.setOperationMode(AMBIENT_MODE);
   master.setOperationMode(MIRROR_MODE);
+
 }
 
 void loop() {
@@ -78,7 +79,7 @@ void loop() {
     //   master.updateFromDataBase();
     // }
 
-    if (currentFrame % (master.getFrameRate() / master.getTargetFrameRate()) == 0) {
+    if (master.currentFrame % (master.getFrameRate() / master.getTargetFrameRate()) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
         char dataOut[MAX_DISPLAY_CHARS];
 
@@ -86,10 +87,10 @@ void loop() {
         
         uint8_t tileID = master.getOrderedTileID(i);
         if (tileID == MASTER_TILE_ID) {
-          master.updateTileDisplay(outPos, dataOut, currentFrame);
+          master.updateTileDisplay(outPos, dataOut, master.currentFrame);
         } else {
-          // struct TILE slave = master.getTile(tileID);
-          // master.transmitToSlave(slave.addr, outPos, currentColor, dataOut);
+          struct TILE slave = master.getTile(tileID);
+          master.transmitToSlave(slave.addr, outPos, master.currentBrightness, currentColor, dataOut, master.currentFrame);
         }
       }
       master.updateScrollPos();
@@ -105,8 +106,8 @@ Interrupt Subroutine on a timer.
 Toggles the newFrameFlag at a frequency of master.frameRate
 */
 void newFrame() {
-  ++currentFrame;
-  if (currentFrame > 30) currentFrame = 1;
+  ++master.currentFrame;
+  if (master.currentFrame > 30) master.currentFrame = 1;
   newFrameFlag = true;
 }
 

@@ -9,12 +9,11 @@
 #include <T25Setup.h>
 #include <T25Tile.h>
 #include <T25SlaveTile.h>
+#include <T25Common.h>
 
 volatile bool addressUpdateFlag;
 
 SlaveTile slave(I2C_DEFAULT);
-
-uint16_t prevColor = 0;
 
 void setup()
 {
@@ -48,18 +47,25 @@ void loop()
   // make color from 2 bytes
   struct MessageData msgData = slave.getMessageData();
 
-  if (msgData.color != prevColor ) {
-    prevColor = msgData.color;
+  if (msgData.color != slave.currentColor ) {
+    slave.currentColor = msgData.color;
     Serial.print("Color from master: ");
     Serial.println(msgData.color);
     slave.changeColor(msgData.color);
+  }
+  if (msgData.brightness != slave.currentBrightness ) {
+    slave.currentBrightness = msgData.brightness;
+    slave.setBrightness(slave.currentBrightness);
+  }
+  if (msgData.frame != slave.currentFrame ){
+    slave.currentFrame = msgData.frame;
   }
 
   Serial.print("pos x: ");
   Serial.print(msgData.pos.x);
   Serial.println();
 
-  slave.updateTileDisplay(msgData.pos, msgData.text);
+  slave.updateTileDisplay(msgData.pos, msgData.text, slave.currentFrame);
 
   delay(10);
 }
@@ -84,6 +90,12 @@ void receiveEvent(int howMany)
       slave.receiveI2cData();
       slave.setOperationMode(SCROLL_MODE);
       break;
+    case MIRROR_KEY:
+      slave.receiveI2cData();
+      slave.setOperationMode(MIRROR_MODE);
+    case AMBIENT_KEY:
+      slave.receiveI2cData();
+      slave.setOperationMode(AMBIENT_MODE);
     default:
       slave.setOperationMode(MIRROR_MODE);
       break;

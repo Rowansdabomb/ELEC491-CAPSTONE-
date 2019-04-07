@@ -393,16 +393,16 @@ transmitToSlave - transmits data to a slave tile depending on operation mode
     color - color to send to the tile
     data  - char array of data to be sent to slave
 */
-void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
+void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, const uint8_t brightness, const uint16_t color, char data[], const uint8_t frame) {
     switch(operationMode) {
       case (SCROLL_MODE):
-        transmitI2cCharData(addr, pos, color, data);
+        transmitI2cCharData(addr, pos, brightness, color, data);
         break;
       case (AMBIENT_MODE):
-        // TBD
+        transmitAmbientData(addr, brightness, color, frame);
         break;
       case (MIRROR_MODE):
-        // TBD
+        transmitMirrorData(addr, brightness, color);
         break;
       case (GESTURE_MODE):
         // TBD
@@ -415,24 +415,63 @@ transmitI2cCharData - Transmits the Character Data to a slave tile.
   Inputs:
     addr    - address of the slave tile
     pos     - reference position of where character data should start
+    brightness - intensity of the LEDs 
     color   - RGB value to display text
     data    - 2 byte character array
   Outputs:
     Return value of endTransmission
 */
-uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint16_t color, char data[]) {
+uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint8_t brightness, const uint16_t color, char data[]) {
     Wire.beginTransmission(addr);
-    Wire.write('Q'); // New Identifier for sending Character data? using Q arbritrarily
+    Wire.write(I2C_CHAR_KEY); // New Identifier for sending Character data? using Q arbritrarily
     Wire.write(pos.x);
     Wire.write(pos.y);
     Wire.write((color >> 8) & 0xff);
     Wire.write(color & 0xff);
+    Wire.write(brightness);
     for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
         Wire.write(data[i]);
     }
     return Wire.endTransmission();
 }
+/*
+transmitMirrorData - Transmits the Data required for Mirror mode to a slave tile 
+  Inputs:
+    addr    - address of the slave tile
+    brightness - intensity of the LEDs 
+    color   - RGB value of color to display in Mirror mode
 
+  Outputs:
+    Return value of endTransmission    
+*/
+uint8_t MasterTile::transmitMirrorData(const uint8_t addr, const uint8_t brightness, const uint16_t color){
+  Wire.beginTransmission(addr);
+  Wire.write(MIRROR_KEY);
+  Wire.write((color >> 8) & 0xff);
+  Wire.write(color & 0xff);
+  Wire.write(brightness);
+  return Wire.endTransmission();
+}
+
+/*
+transmitAmbientData - Transmits the Data required for Ambient mode to a slave tile 
+  Inputs:
+    addr    - address of the slave tile
+    brightness - intensity of the LEDs 
+    color   - RGB value of color to display in Mirror mode
+    frame - exact contents TBD
+  Outputs:
+    Return value of endTransmission    
+*/
+uint8_t MasterTile::transmitAmbientData(const uint8_t addr, const uint8_t brightness, const uint16_t color, const uint8_t frame){
+  Wire.beginTransmission(addr);
+  Wire.write(AMBIENT_KEY);
+  Wire.write((color >> 8) & 0xff);
+  Wire.write(color & 0xff);
+  Wire.write(brightness);
+  Wire.write(frame);
+  return Wire.endTransmission();
+}
 /*
 setTextData - Sets scrollLength, textData, and textDataSize
   Inputs:
@@ -506,4 +545,3 @@ void MasterTile::updateFromDataBase() {
       break;
   }
 }
-
