@@ -24,11 +24,14 @@ receiveI2cData -
 */
 uint8_t SlaveTile::receiveI2cData() {
   uint8_t msgSize = 0;
+  // Serial.println("Recieve I2C data: ");
   while (Wire.available()) {
     msgBuffer[msgSize] = static_cast<uint8_t> (Wire.read());
+    // Serial.print(msgBuffer[msgSize]);
     msgSize++;
     if (msgSize > 254) break;
   }
+  // Serial.println();
   return msgSize;
 }
 
@@ -44,7 +47,7 @@ void SlaveTile::setAddress(const uint8_t addr) {
 }
 
 /*
-getMessageData - serializes message data depending on operation mode
+getMessageData - // Serializes message data depending on operation mode
     Inputs:
         void
     Outputs:

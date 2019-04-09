@@ -3,7 +3,7 @@
 #include <WiFiServer.h>
 #include <WiFiUdp.h>
 #include <IOXhop_FirebaseESP32.h>
-#include <HardwareSerial.h>
+#include <Hardware// Serial.h>
 #include <string.h>
 // #include "T25Setup.h"
 
@@ -13,7 +13,7 @@ const uint8_t CHANGE_COLOR = 2;
 const uint8_t CHANGE_OPERATION_MODE = 3;
 const uint8_t WIFI_SLAVE_ADDR = 0x0f;
 
-HardwareSerial ESPSerial(1);
+Hardware// Serial ESP// Serial(1);
 
 #define FIREBASE_HOST "https://tileapp-ff417.firebaseio.com/"              //database api url
 #define FIREBASE_AUTH "hBWyw9GJqnizmPs9e9MSXW6SCaRDjUY8NGvxAqaq"           //database secret
@@ -36,18 +36,18 @@ String temp_scroll     = "0";
 // volatile uint8_t mode = 0;
 
 void setup() {
-  Serial.begin(115200);
-  ESPSerial.begin(115200,SERIAL_8N1,16,17);
+  // Serial.begin(115200);
+  ESP// Serial.begin(115200,// Serial_8N1,16,17);
  
   WiFi.begin(ssid, password);
  
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    // Serial.println("Connecting to WiFi..");
+    // // Serial.println("Connecting to WiFi..");
   }
  
-  // Serial.println("Connected to the WiFi network");
-  // Serial.println(WiFi.localIP());
+  // // Serial.println("Connected to the WiFi network");
+  // // Serial.println(WiFi.localIP());
  
 //  wifiServer.begin();
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
@@ -107,38 +107,38 @@ void HextoRGB (uint8_t rgb[]) {
 void colorChange(){
   uint8_t rgb[3];
   HextoRGB(rgb);
-  // Serial.print("Color change: ");
-  ESPSerial.write(CHANGE_COLOR);
+  // // Serial.print("Color change: ");
+  ESP// Serial.write(CHANGE_COLOR);
   for(int i  =0; i < 3; i++){
-    //  Serial.print(rgb[i]);
-    //  Serial.print(", "); 
-     ESPSerial.write(rgb[i]);
+    //  // Serial.print(rgb[i]);
+    //  // Serial.print(", "); 
+     ESP// Serial.write(rgb[i]);
   } 
-  // Serial.println();
+  // // Serial.println();
 }
 
 void textChange() {
-  // Serial.print("Text change: ");
-  // Serial.println(TextM);
+  // // Serial.print("Text change: ");
+  // // Serial.println(TextM);
 
-  ESPSerial.write(CHANGE_TEXT);
-  ESPSerial.write(TextM.c_str());
+  ESP// Serial.write(CHANGE_TEXT);
+  ESP// Serial.write(TextM.c_str());
 }
 
 void modeChange() {
-  // Serial.print("Mode Change: ");
-  // Serial.println(ModeM);
+  // // Serial.print("Mode Change: ");
+  // // Serial.println(ModeM);
 
-  ESPSerial.write(CHANGE_OPERATION_MODE);
-  ESPSerial.write(ModeM.c_str());
+  ESP// Serial.write(CHANGE_OPERATION_MODE);
+  ESP// Serial.write(ModeM.c_str());
 }
 
 void brightnessChange() {
-  ESPSerial.write(CHANGE_BRIGHTNESS);
-  ESPSerial.write(BrightnessM.c_str());
+  ESP// Serial.write(CHANGE_BRIGHTNESS);
+  ESP// Serial.write(BrightnessM.c_str());
 }
 
 void speedOfTextChange() {
-  ESPSerial.write(CHANGE_SCROLL_SPEED);
-  ESPSerial.write(ScrollM.c_str());
+  ESP// Serial.write(CHANGE_SCROLL_SPEED);
+  ESP// Serial.write(ScrollM.c_str());
 }

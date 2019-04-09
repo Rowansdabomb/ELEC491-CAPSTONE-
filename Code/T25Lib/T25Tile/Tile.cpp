@@ -16,6 +16,7 @@ Tile::Tile(uint8_t addr) {
 
   // SET SCROLL SPEED
   targetFrameRate = 6;
+  currentFrame = 1;
 
   toggleAmbient = false;
   sensorThresholdCounter = 0;
@@ -63,17 +64,6 @@ void Tile::beginTile() {
   for (uint8_t i = 0; i < 8; ++i) {
     pinMode(COLUMN_READ_PINS[i], INPUT_ANALOG);
   }
-  // pinMode(PA0, INPUT_ANALOG);
-  // pinMode(PA1, INPUT_ANALOG);
-  // pinMode(PA2, INPUT_ANALOG);
-  // pinMode(PA3, INPUT_ANALOG);
-  // pinMode(PA4, INPUT_ANALOG);
-  // pinMode(PA5, INPUT_ANALOG);
-  // pinMode(PA6, INPUT_ANALOG);
-  // pinMode(PA7, INPUT_ANALOG);
-  // pinMode(PB0, INPUT_ANALOG);
-  // pinMode(PB1, INPUT_ANALOG);
-
 
   // Directional Pin Setup
   pinMode(PIN_DIR_U, INPUT_PULLDOWN);
@@ -210,7 +200,7 @@ updateTileDisplay - selects proper method to update display based on current ope
   Outputs:
     void
 */
-void Tile::updateTileDisplay(const POS &outPos, char dataOut[], const uint8_t currentFrame) {
+void Tile::updateTileDisplay(const POS &outPos, char dataOut[]) {
   matrix->fillScreen(0);
 
   switch(operationMode) {
@@ -240,7 +230,7 @@ void Tile::updateTileDisplay(const POS &outPos, char dataOut[], const uint8_t cu
       digitalWrite(PIN_MCOL_ENABLE, HIGH);
       digitalWrite(PIN_MROW_ENABLE, LOW);
 
-      displayAmbient(currentFrame);
+      displayAmbient();
       displayMirror(false);
       break;
   }
@@ -292,7 +282,7 @@ displayAmbient - A simple pulsating light effect
   Outputs:
     void
 */
-void Tile::displayAmbient(const uint8_t currentFrame) {
+void Tile::displayAmbient() {
   float modifier;
   uint8_t speed = targetFrameRate * 2;
   // uint8_t rgb[3] = {255, 255, 255};
@@ -352,16 +342,16 @@ struct TILE Tile::findNeighborTiles() {
 
   // get current ports
   data.ports = 0b0000;
-  if(digitalRead(PIN_DIR_U)){
+  if (digitalRead(PIN_DIR_U)) {
     data.ports = data.ports | CNCT_U;
   }
-  if(digitalRead(PIN_DIR_D)){
+  if (digitalRead(PIN_DIR_D)) {
     data.ports = data.ports | CNCT_D;
   }
-  if(digitalRead(PIN_DIR_L)){
+  if (digitalRead(PIN_DIR_L)) {
     data.ports = data.ports | CNCT_L;
   }
-  if(digitalRead(PIN_DIR_R)){
+  if (digitalRead(PIN_DIR_R)) {
     data.ports = data.ports | CNCT_R;
   }
 
@@ -379,9 +369,9 @@ debugWithMatrix - Displays single pixel on tile matrix corresponding to some err
 */
 void Tile::debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color) {
   matrix->fillScreen(0);
-  matrix->fillRect(x, 1, y, 1, colors[color]);
+  matrix->fillRect(x, y, 2, 2, colors[color]);
   matrix->show();
-  delay(250);
+  // delay(250);
 }
 
 /*
@@ -414,30 +404,30 @@ void Tile::changeColor(uint16_t color) {
 }
 
 /*
-printSensorData - outputs the current sensor data to serial
+printSensorData - outputs the current sensor data to Serial
   Inputs:
     void
   Outputs:
     void
 */
 void Tile::printSensorData() {
-  Serial.write(27);       // ESC command
-  Serial.print("[2J");    // clear screen command
-  Serial.write(27);
-  Serial.print("[H");     // cursor to home command
+  // Serial.write(27);       // ESC command
+  // Serial.print("[2J");    // clear screen command
+  // Serial.write(27);
+  // Serial.print("[H");     // cursor to home command
 
-  for (uint8_t i = 0; i < MATRIX_WIDTH; ++i) {
-    for(uint8_t j = 0; j < MATRIX_HEIGHT; ++j) {
-    // for(uint8_t j = 0; j < 1; ++j) {
-      Serial.print(sensorData[j + i*(MATRIX_HEIGHT)]);
-      if(j < MATRIX_HEIGHT - 1)
-        Serial.print(" | ");
-      else
-        Serial.println();
-    }
-  }
+  // for (uint8_t i = 0; i < MATRIX_WIDTH; ++i) {
+  //   for(uint8_t j = 0; j < MATRIX_HEIGHT; ++j) {
+  //   // for(uint8_t j = 0; j < 1; ++j) {
+  //     Serial.print(sensorData[j + i*(MATRIX_HEIGHT)]);
+  //     if(j < MATRIX_HEIGHT - 1)
+  //       Serial.print(" | ");
+  //     else
+  //       Serial.println();
+  //   }
+  // }
 
-  Serial.println();
+  // Serial.println();
 }
 
 /*

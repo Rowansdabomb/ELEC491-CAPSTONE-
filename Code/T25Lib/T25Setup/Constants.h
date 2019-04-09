@@ -9,7 +9,7 @@ const uint8_t MASTER_TILE_ID = 9;
 
 const uint8_t I2C_DEFAULT = 0x42;
 
-const float thresholdError = 1.05;
+const float thresholdError = 1.02;
 
 // SENSOR POLLING
 const uint8_t MUX_SELECT_SIZE = 3;

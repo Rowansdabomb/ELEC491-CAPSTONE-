@@ -17,6 +17,7 @@ SlaveTile slave(I2C_DEFAULT);
 
 void setup()
 {
+  afio_cfg_debug_ports(AFIO_DEBUG_NONE);
   addressUpdateFlag = false;
 
   //I2C Setup
@@ -24,33 +25,40 @@ void setup()
   Wire.onRequest(requestEvent);    // register event
   Wire.onReceive(receiveAddress);  // register event
 
-  //  Serial Setup - for output
-  Serial.begin(57600);    
+  // Serial Setup - for output
+  // Serial.begin(115200);    
   
   slave.beginSlaveTile();       
 }
 
 void loop()
 {
-  if (addressUpdateFlag){
+  if (addressUpdateFlag) {
+    slave.debugWithMatrix(3, 3, GREEN);
+    delay(125);
     //Turn off I2C and reinitialize
     struct TILE tileData = slave.getData();
     Wire.begin(tileData.addr); //join the i2c bus with a different address
     Wire.onRequest(requestEvent);
     Wire.onReceive(receiveEvent);
-    Serial.print("Attempted Address Change");
-    Serial.println(tileData.addr, HEX); 
     addressUpdateFlag = false;   
   }
-  slave.findNeighborTiles();
+
+  if(slave.getOperationMode() == MIRROR_MODE) {
+    slave.debugWithMatrix(6, 6, BLUE);
+  }
+  if(slave.getOperationMode() == SCROLL_MODE) {
+    slave.debugWithMatrix(4, 6, RED);
+  }
+// DEFUNCT TOPOLOGY PINS
+  // slave.findNeighborTiles();
+// DEFUNCT TOPOLOGY PINS
 
   // make color from 2 bytes
   struct MessageData msgData = slave.getMessageData();
 
   if (msgData.color != slave.currentColor ) {
     slave.currentColor = msgData.color;
-    Serial.print("Color from master: ");
-    Serial.println(msgData.color);
     slave.changeColor(msgData.color);
   }
   if (msgData.brightness != slave.currentBrightness ) {
@@ -61,13 +69,9 @@ void loop()
     slave.currentFrame = msgData.frame;
   }
 
-  Serial.print("pos x: ");
-  Serial.print(msgData.pos.x);
-  Serial.println();
+  slave.updateTileDisplay(msgData.pos, msgData.text);
 
-  slave.updateTileDisplay(msgData.pos, msgData.text, slave.currentFrame);
-
-  delay(10);
+  delay(1);
 }
 
 /*
@@ -87,16 +91,22 @@ void receiveEvent(int howMany)
   }
   switch(mode){
     case I2C_CHAR_KEY:
+      // slave.debugWithMatrix(0, 0, RED);
       slave.receiveI2cData();
       slave.setOperationMode(SCROLL_MODE);
       break;
     case MIRROR_KEY:
+      // slave.debugWithMatrix(3, 3, GREEN);
       slave.receiveI2cData();
       slave.setOperationMode(MIRROR_MODE);
+      break;
     case AMBIENT_KEY:
+      // slave.debugWithMatrix(6, 6, BLUE);
       slave.receiveI2cData();
       slave.setOperationMode(AMBIENT_MODE);
+      break;
     default:
+      // slave.debugWithMatrix(6, 0, YELLOW);
       slave.setOperationMode(MIRROR_MODE);
       break;
   }

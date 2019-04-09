@@ -47,7 +47,7 @@ class Tile {
     char msgBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint16_t currentColor;
     uint8_t currentBrightness;
-    uint8_t currentFrame = 1;
+    uint8_t currentFrame;
 
     // SETTERS
     void setCursor(int8_t x, int8_t y);
@@ -64,7 +64,7 @@ class Tile {
     struct TILE findNeighborTiles();
     void debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color);
    
-    void updateTileDisplay(const POS &outPos, char dataOut[], const uint8_t currentFrame);
+    void updateTileDisplay(const POS &outPos, char dataOut[]);
     void changeColor(uint8_t colors[]);
     void changeColor(uint16_t color);
 
@@ -98,7 +98,7 @@ class Tile {
 
     void displayChar(const POS &pos, char dataOut[]);
     void displayMirror(bool defaultColor = true);
-    void displayAmbient(const uint8_t currentFrame);
+    void displayAmbient();
     void i2cDirectionTest(const uint16_t color);
 };
 

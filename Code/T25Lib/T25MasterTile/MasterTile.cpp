@@ -52,10 +52,16 @@ void MasterTile::beginMasterTile() {
 
   tile[0] = data;
 
-  setTextData("Hello", 5);
+  setTextData(" Hello", 6);
 
   // I2C Master Setup
   Wire.begin();
+
+  // PRECONFIGURED DISPLAY SETUP
+  for (uint8_t i = 0; i < 3; ++i) {
+    preConfiguredDisplay[i].x = 4 + i;
+    preConfiguredDisplay[i].y = 3;
+  }
 }
 
 void MasterTile::setTileCount(const uint8_t count) {
@@ -117,7 +123,9 @@ uint8_t MasterTile::handleDisplayShape() {
     resetTileMapBounds();
 
     //Determine occupied directions
-    findNeighborTiles();
+// DEFUNCT TOPOLOGICAL PINS
+    // findNeighborTiles();
+// DEFUNCT TOPOLOGICAL PINS
     tile[0] = getData();
     handleAddedOrRemovedTiles();
 
@@ -157,25 +165,25 @@ void MasterTile::handleAddedOrRemovedTiles () {
             break;
           case 1:
           // DATA TOO LONG
-            debugWithMatrix(0, 0, RED);
+            debugWithMatrix(6, 0, VIOLET);
             addressNotFound(tile[i]);
             tilesUpdated = true; // Tile removed
             break;
           case 2:
           // NACK ON TRANSMIT OF ADDRESS
-            debugWithMatrix(1, 0, RED);
+            debugWithMatrix(6, 2, ORANGE);
             addressNotFound(tile[i]);
             tilesUpdated = true; // Tile removed
             break;
           case 3:
           // NACK ON TRANSMIT OF DATA
-            debugWithMatrix(1, 0, RED);
+            debugWithMatrix(6, 4, BLUE);
             addressNotFound(tile[i]);
             tilesUpdated = true; // Tile removed
             break;
           case 4:
           // OTHER ERROR
-            debugWithMatrix(2, 0, RED);
+            debugWithMatrix(6, 6, GREEN);
             addressNotFound(tile[i]);
             tilesUpdated = true; // Tile removed
             break;
@@ -186,11 +194,18 @@ void MasterTile::handleAddedOrRemovedTiles () {
         } // END SWITCH
       } // END NOT MASTER IF
 
+// DEFUNCT TOPOLOGICAL PINS
       // Check for new tiles
-      if(tile[i].ports != tile[i].previousPorts){
-        addNewTile(tile[i]);
-        tilesUpdated = true; // Tile added
-      }
+      // if (tile[i].ports != tile[i].previousPorts) {
+      //   addNewTile(tile[i]);
+      //   tilesUpdated = true; // Tile added
+      // }
+      uint8_t response = assignNewAddress(preConfiguredDisplay[tileCount - 1].y, preConfiguredDisplay[tileCount - 1].x);
+      // if (response != SUCCESS) {
+      //   debugWithMatrix(3, 3, YELLOW)
+      // }
+// DEFUNCT TOPOLOGICAL PINS
+
     }// End FOR loop
 
     if(tilesUpdated){
@@ -229,9 +244,6 @@ void MasterTile::addNewTile(const struct TILE &tile) {
     }// END SWITCH
 
     uint8_t response = assignNewAddress(y, x);
-    if(response != SUCCESS) {
-      debugWithMatrix(response, 0, RED);
-    }
 }
 
 /*
@@ -244,10 +256,14 @@ assignNewAddress - assigns an address to a newly connected Tile
 */
 uint8_t MasterTile::assignNewAddress(const uint8_t x, const uint8_t y) {
   // Check if the default address exist
+
   uint8_t response = -1;
   Wire.beginTransmission(I2C_DEFAULT);
   response = Wire.endTransmission();
-  if (response != SUCCESS) return response;
+  if (response != SUCCESS) {
+    return response;
+  } 
+  
 
   Wire.beginTransmission(I2C_DEFAULT);
   Wire.write('A');
@@ -299,8 +315,11 @@ struct POS MasterTile::getOutputData(char dataOut[], uint8_t tileIndex){
   offset.x = charIndex*CHAR_WIDTH - (scrollPos.x + MATRIX_WIDTH * tileIndex);
   offset.y = 0;
   for( int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //TODO: Write function to determine MAX_DISPLAY_CHARS
+    // if (charIndex ==)
     if (charIndex + i >= textDataLength) {
-      dataOut[i] = textData[0]; // TAB
+      // dataOut[i] = textData[0];
+      dataOut[i] = ' ';
+      // offset.x = MATRIX_WIDTH;
     } else {
       dataOut[i] = textData[charIndex + i];
     }
@@ -327,8 +346,11 @@ adjustMapBounds - sets the outer bounds of the tileMap
 void MasterTile::adjustMapBounds(struct TILE &tile) {
   tile.previousPorts = tile.ports;
   //If available request current port status from slave devices
-  Wire.requestFrom(tile.addr, 1);
-  tile.ports = Wire.read();
+
+// DEFUNCT TOPOLOGICAL PINS
+  // Wire.requestFrom(tile.addr, 1);
+  // tile.ports = Wire.read();
+// DEFUNCT TOPOLOGICAL PINS
   if (tile.pos.x < tileMap.xMin){
     tileMap.xMin = tile.pos.x;
   }
@@ -393,16 +415,16 @@ transmitToSlave - transmits data to a slave tile depending on operation mode
     color - color to send to the tile
     data  - char array of data to be sent to slave
 */
-void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, const uint8_t brightness, const uint16_t color, char data[], const uint8_t frame) {
+void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, const uint8_t brightness, char data[], const uint8_t frame) {
     switch(operationMode) {
       case (SCROLL_MODE):
-        transmitI2cCharData(addr, pos, brightness, color, data);
+        transmitI2cCharData(addr, pos, brightness, data);
         break;
       case (AMBIENT_MODE):
-        transmitAmbientData(addr, brightness, color, frame);
+        transmitAmbientData(addr, brightness, frame);
         break;
       case (MIRROR_MODE):
-        transmitMirrorData(addr, brightness, color);
+        transmitMirrorData(addr, brightness);
         break;
       case (GESTURE_MODE):
         // TBD
@@ -421,14 +443,14 @@ transmitI2cCharData - Transmits the Character Data to a slave tile.
   Outputs:
     Return value of endTransmission
 */
-uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, const uint8_t brightness, const uint16_t color, char data[]) {
+uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, char data[]) {
     Wire.beginTransmission(addr);
     Wire.write(I2C_CHAR_KEY); // New Identifier for sending Character data? using Q arbritrarily
     Wire.write(pos.x);
     Wire.write(pos.y);
-    Wire.write((color >> 8) & 0xff);
-    Wire.write(color & 0xff);
-    Wire.write(brightness);
+    Wire.write((currentColor >> 8) & 0xff);
+    Wire.write(currentColor & 0xff);
+    Wire.write(currentBrightness);
     for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
         Wire.write(data[i]);
     }
@@ -444,12 +466,12 @@ transmitMirrorData - Transmits the Data required for Mirror mode to a slave tile
   Outputs:
     Return value of endTransmission    
 */
-uint8_t MasterTile::transmitMirrorData(const uint8_t addr, const uint8_t brightness, const uint16_t color){
+uint8_t MasterTile::transmitMirrorData(const uint8_t addr){
   Wire.beginTransmission(addr);
   Wire.write(MIRROR_KEY);
-  Wire.write((color >> 8) & 0xff);
-  Wire.write(color & 0xff);
-  Wire.write(brightness);
+  Wire.write((currentColor >> 8) & 0xff);
+  Wire.write(currentColor & 0xff);
+  Wire.write(currentBrightness);
   return Wire.endTransmission();
 }
 
@@ -463,12 +485,12 @@ transmitAmbientData - Transmits the Data required for Ambient mode to a slave ti
   Outputs:
     Return value of endTransmission    
 */
-uint8_t MasterTile::transmitAmbientData(const uint8_t addr, const uint8_t brightness, const uint16_t color, const uint8_t frame){
+uint8_t MasterTile::transmitAmbientData(const uint8_t addr, const uint8_t frame){
   Wire.beginTransmission(addr);
   Wire.write(AMBIENT_KEY);
-  Wire.write((color >> 8) & 0xff);
-  Wire.write(color & 0xff);
-  Wire.write(brightness);
+  Wire.write((currentColor >> 8) & 0xff);
+  Wire.write(currentColor & 0xff);
+  Wire.write(currentBrightness);
   Wire.write(frame);
   return Wire.endTransmission();
 }
@@ -493,7 +515,6 @@ updateFromDataBase -
   Outputs: void
 */
 void MasterTile::updateFromDataBase() {
-  Serial.println("Updating from Database");
   uint8_t metaData[2] = {255}; // [0] is transmitType, [1] is size of data to be transmitted
   char msgBuf[MAX_STRING_SIZE] = {'\0'};
 

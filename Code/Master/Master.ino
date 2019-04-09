@@ -21,16 +21,14 @@ HardwareTimer sensorTimer(3); // time for polling the sensors
 
 MasterTile master(0xFF);
 
-uint16_t currentColor = colors[RED];
-//uint8_t currentFrame = 1;
-
 void setup() {
+  afio_cfg_debug_ports(AFIO_DEBUG_NONE);
   // Flag initialization
   newFrameFlag = false;
-  // Serial Setup - for output
-  Serial.begin(115200); 
-  // Serial Setup - for ESP32
-  Serial1.begin(115200);
+  // // Serial Setup - for output
+  // Serial.begin(115200); 
+  // // Serial Setup - for ESP32
+  // // Serial1.begin(115200);
 
   ///////////////// TILE BEGIN /////////////////////
   master.beginMasterTile();
@@ -75,9 +73,9 @@ void loop() {
   if(newFrameFlag) {
     master.handleDisplayShape();
 
-    // if (currentFrame % (master.getFrameRate()) == 0) {
-    //   master.updateFromDataBase();
-    // }
+    if (master.currentFrame % (master.getFrameRate()) == 0) {
+      master.updateFromDataBase();
+    }
 
     if (master.currentFrame % (master.getFrameRate() / master.getTargetFrameRate()) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
@@ -87,10 +85,10 @@ void loop() {
         
         uint8_t tileID = master.getOrderedTileID(i);
         if (tileID == MASTER_TILE_ID) {
-          master.updateTileDisplay(outPos, dataOut, master.currentFrame);
+          master.updateTileDisplay(outPos, dataOut);
         } else {
           struct TILE slave = master.getTile(tileID);
-          master.transmitToSlave(slave.addr, outPos, master.currentBrightness, currentColor, dataOut, master.currentFrame);
+          master.transmitToSlave(slave.addr, outPos, master.currentBrightness, dataOut, master.currentFrame);
         }
       }
       master.updateScrollPos();
@@ -98,7 +96,6 @@ void loop() {
 
     newFrameFlag = false;
   }
-
 }
 
 /*
