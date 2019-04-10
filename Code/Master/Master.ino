@@ -61,7 +61,7 @@ void setup() {
   sensorTimer.resume();
   ///////////////////////////////////////////////////
 
-  master.setOperationMode(SCROLL_MODE);
+  master.setOperationMode(SCROLL_MODE); 
   // master.setOperationMode(SCROLL_MIRROR_MODE);
   // master.setOperationMode(AMBIENT_MODE);
   // master.setOperationMode(MIRROR_MODE);
@@ -98,9 +98,6 @@ void loop() {
 
     newFrameFlag = false;
   }
-  // master.matrix->fillScreen(0);
-  // master.matrix->fillRect(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, colors[RED]);
-  // master.matrix->show();
 }
 
 /*

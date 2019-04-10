@@ -9,7 +9,7 @@
 
 MasterTile::MasterTile(uint8_t addr):Tile(addr) {
   tileID = 0;
-  tileCount = 0;
+  tileCount = 1;
 
   scrollPos.x = 0;
   scrollPos.y = 0;
@@ -128,7 +128,6 @@ uint8_t MasterTile::handleDisplayShape() {
 // DEFUNCT TOPOLOGICAL PINS
     tile[0] = getData();
     handleAddedOrRemovedTiles();
-
     return tileCount;
 }
 

@@ -208,6 +208,8 @@ void Tile::updateTileDisplay(const POS &outPos, char dataOut[]) {
       // Turn off muxes
       digitalWrite(PIN_MCOL_ENABLE, LOW);
       digitalWrite(PIN_MROW_ENABLE, HIGH);
+
+      displayChar(outPos, dataOut);
       break;
     case MIRROR_MODE:
       // Turn on muxes
@@ -219,6 +221,8 @@ void Tile::updateTileDisplay(const POS &outPos, char dataOut[]) {
       // Turn on muxes
       digitalWrite(PIN_MCOL_ENABLE, HIGH);
       digitalWrite(PIN_MROW_ENABLE, LOW);
+
+      displayChar(outPos, dataOut);
       displayMirror(false);
       break;
     case AMBIENT_MODE: 
