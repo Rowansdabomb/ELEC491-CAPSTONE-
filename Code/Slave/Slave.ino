@@ -14,6 +14,7 @@
 volatile bool addressUpdateFlag;
 
 SlaveTile slave(I2C_DEFAULT);
+HardwareTimer sensorTimer(3); // time for polling the sensors
 
 void setup()
 {
@@ -25,6 +26,20 @@ void setup()
   Wire.onRequest(requestEvent);    // register event
   Wire.onReceive(receiveAddress);  // register event
 
+    ///////////////// SENSOR POLL TIMER SETUP ////////////////////
+  sensorTimer.pause();
+
+  sensorTimer.setPeriod(SENSOR_POLL_PERIOD); // in microseconds
+
+  sensorTimer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+  sensorTimer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+  sensorTimer.attachCompare1Interrupt(sensorRead);
+
+  sensorTimer.refresh();
+
+  sensorTimer.resume();
+  ///////////////////////////////////////////////////
+
   // Serial Setup - for output
   // Serial.begin(115200);    
   
@@ -33,6 +48,8 @@ void setup()
 
 void loop()
 {
+  slave.readSensorData();
+  
   if (addressUpdateFlag) {
     slave.debugWithMatrix(3, 3, GREEN);
     delay(125);
@@ -44,12 +61,12 @@ void loop()
     addressUpdateFlag = false;   
   }
 
-  if(slave.getOperationMode() == MIRROR_MODE) {
-    slave.debugWithMatrix(6, 6, BLUE);
-  }
-  if(slave.getOperationMode() == SCROLL_MODE) {
-    slave.debugWithMatrix(4, 6, RED);
-  }
+  // if(slave.getOperationMode() == MIRROR_MODE) {
+  //   slave.debugWithMatrix(6, 6, BLUE);
+  // }
+  // if(slave.getOperationMode() == SCROLL_MODE) {
+  //   slave.debugWithMatrix(4, 6, RED);
+  // }
 // DEFUNCT TOPOLOGY PINS
   // slave.findNeighborTiles();
 // DEFUNCT TOPOLOGY PINS
@@ -59,18 +76,17 @@ void loop()
 
   if (msgData.color != slave.currentColor ) {
     slave.currentColor = msgData.color;
-    slave.changeColor(msgData.color);
+    // slave.changeColor(msgData.color);
   }
   if (msgData.brightness != slave.currentBrightness ) {
     slave.currentBrightness = msgData.brightness;
-    slave.setBrightness(slave.currentBrightness);
+    // slave.setBrightness(slave.currentBrightness);
   }
+  // UPDATE DISPLAY
   if (msgData.frame != slave.currentFrame ){
     slave.currentFrame = msgData.frame;
+    slave.updateTileDisplay(msgData.pos, msgData.text);
   }
-
-  slave.updateTileDisplay(msgData.pos, msgData.text);
-
   delay(1);
 }
 
@@ -130,4 +146,8 @@ void receiveAddress(int howMany){
     slave.setAddress(addr);
   }
   addressUpdateFlag = true;
+}
+
+void sensorRead() {
+  slave.ISR_sensorRead();
 }

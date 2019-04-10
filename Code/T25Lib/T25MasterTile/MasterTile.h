@@ -37,7 +37,8 @@ class MasterTile: public Tile
     uint8_t handleDisplayShape();
     void updateFromDataBase();
 
-    void transmitToSlave(const uint8_t addr, const struct POS &pos, char data[], const uint8_t frame);
+    void transmitToSlave(const uint8_t addr, const struct POS &pos, char data[]);
+    void writeMetaData();
     struct POS getOutputData(char dataOut[], const uint8_t tileIndex);
     char textData[MAX_STRING_SIZE];
 
@@ -58,9 +59,9 @@ class MasterTile: public Tile
     void addNewTile(const struct TILE &tile);
     uint8_t assignNewAddress(const uint8_t yFree, const uint8_t xFree); 
     void addressNotFound(struct TILE &tile);
-    uint8_t transmitI2cCharData(const uint8_t addr, const struct POS &pos, char data[]);
-    uint8_t transmitMirrorData(const uint8_t addr);
-    uint8_t transmitAmbientData(const uint8_t addr, const uint8_t frame);
+    void writeI2cCharData(const struct POS &pos, char data[]);
+    void writeMirrorData();
+    void writeAmbientData();
     uint8_t transmitGestureData(const uint8_t addr);
     void adjustMapBounds(struct TILE &tile);
     void configTileOrder();

@@ -204,32 +204,26 @@ void Tile::updateTileDisplay(const POS &outPos, char dataOut[]) {
   matrix->fillScreen(0);
 
   switch(operationMode) {
-    case (SCROLL_MODE):
+    case SCROLL_MODE:
       // Turn off muxes
       digitalWrite(PIN_MCOL_ENABLE, LOW);
       digitalWrite(PIN_MROW_ENABLE, HIGH);
-      
-      displayChar(outPos, dataOut);
       break;
-    case (MIRROR_MODE):
+    case MIRROR_MODE:
       // Turn on muxes
       digitalWrite(PIN_MCOL_ENABLE, HIGH);
       digitalWrite(PIN_MROW_ENABLE, LOW);
-
       displayMirror();
       break;
-    case (SCROLL_MIRROR_MODE):
+    case SCROLL_MIRROR_MODE:
       // Turn on muxes
       digitalWrite(PIN_MCOL_ENABLE, HIGH);
       digitalWrite(PIN_MROW_ENABLE, LOW);
-
-      displayChar(outPos, dataOut);
       displayMirror(false);
       break;
-    case (AMBIENT_MODE): 
+    case AMBIENT_MODE: 
       digitalWrite(PIN_MCOL_ENABLE, HIGH);
       digitalWrite(PIN_MROW_ENABLE, LOW);
-
       displayAmbient();
       displayMirror(false);
       break;
@@ -264,7 +258,7 @@ void Tile::displayMirror(bool defaultColor) {
     // const uint8_t SENSOR_THRESHOLD = 145;
     if (sensorData[i] > sensorThreshold[i]) {
       const uint8_t pixel_x = (i % MATRIX_WIDTH);
-      const uint8_t pixel_y = (i / MATRIX_HEIGHT);  
+      const uint8_t pixel_y = (i / MATRIX_HEIGHT);
       if(!defaultColor) {
         matrix->setBrightness((uint8_t) currentBrightness * 1.5);
         matrix->fillRect(pixel_x, pixel_y, 1, 1, makeColorComplement(currentColor));
@@ -404,7 +398,6 @@ void Tile::changeColor(uint16_t color) {
 }
 
 /*
-printSensorData - outputs the current sensor data to Serial
   Inputs:
     void
   Outputs:

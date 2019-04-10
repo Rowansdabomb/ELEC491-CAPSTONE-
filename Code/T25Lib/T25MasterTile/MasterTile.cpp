@@ -263,7 +263,6 @@ uint8_t MasterTile::assignNewAddress(const uint8_t x, const uint8_t y) {
   if (response != SUCCESS) {
     return response;
   } 
-  
 
   Wire.beginTransmission(I2C_DEFAULT);
   Wire.write('A');
@@ -412,88 +411,87 @@ transmitToSlave - transmits data to a slave tile depending on operation mode
   Inputs:
     addr  - address of the slave tile to update
     pos   - cursor offset for slave tile
-    color - color to send to the tile
     data  - char array of data to be sent to slave
 */
-void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, const uint8_t brightness, char data[], const uint8_t frame) {
+void MasterTile::transmitToSlave(const uint8_t addr, const struct POS &pos, char data[]) {
+    Wire.beginTransmission(addr);
     switch(operationMode) {
       case (SCROLL_MODE):
-        transmitI2cCharData(addr, pos, brightness, data);
+        writeI2cCharData(pos, data);
         break;
       case (AMBIENT_MODE):
-        transmitAmbientData(addr, brightness, frame);
+        writeAmbientData();
         break;
       case (MIRROR_MODE):
-        transmitMirrorData(addr, brightness);
+        writeMirrorData();
         break;
       case (GESTURE_MODE):
         // TBD
         break;
     }
+    Wire.endTransmission();
 }
 
 /*
-transmitI2cCharData - Transmits the Character Data to a slave tile.
+writeI2cCharData - Transmits the Character Data to a slave tile.
   Inputs:
     addr    - address of the slave tile
     pos     - reference position of where character data should start
-    brightness - intensity of the LEDs 
-    color   - RGB value to display text
     data    - 2 byte character array
   Outputs:
-    Return value of endTransmission
+    void
 */
-uint8_t MasterTile::transmitI2cCharData(const uint8_t addr, const struct POS &pos, char data[]) {
-    Wire.beginTransmission(addr);
+void MasterTile::writeI2cCharData(const struct POS &pos, char data[]) {
     Wire.write(I2C_CHAR_KEY); // New Identifier for sending Character data? using Q arbritrarily
+    
+    writeMetaData();
     Wire.write(pos.x);
     Wire.write(pos.y);
-    Wire.write((currentColor >> 8) & 0xff);
-    Wire.write(currentColor & 0xff);
-    Wire.write(currentBrightness);
+
     for(int i = 0; i < MAX_DISPLAY_CHARS; ++i){ //For 4x4 should be 2
         Wire.write(data[i]);
     }
-    return Wire.endTransmission();
 }
 /*
-transmitMirrorData - Transmits the Data required for Mirror mode to a slave tile 
+writeMirrorData - Transmits the Data required for Mirror mode to a slave tile 
   Inputs:
     addr    - address of the slave tile
     brightness - intensity of the LEDs 
     color   - RGB value of color to display in Mirror mode
 
   Outputs:
-    Return value of endTransmission    
+    void
 */
-uint8_t MasterTile::transmitMirrorData(const uint8_t addr){
-  Wire.beginTransmission(addr);
+void MasterTile::writeMirrorData(){
   Wire.write(MIRROR_KEY);
-  Wire.write((currentColor >> 8) & 0xff);
-  Wire.write(currentColor & 0xff);
-  Wire.write(currentBrightness);
-  return Wire.endTransmission();
+  writeMetaData();
 }
 
 /*
-transmitAmbientData - Transmits the Data required for Ambient mode to a slave tile 
+writeAmbientData - Transmits the Data required for Ambient mode to a slave tile 
   Inputs:
     addr    - address of the slave tile
-    brightness - intensity of the LEDs 
-    color   - RGB value of color to display in Mirror mode
-    frame - exact contents TBD
   Outputs:
-    Return value of endTransmission    
+    void 
 */
-uint8_t MasterTile::transmitAmbientData(const uint8_t addr, const uint8_t frame){
-  Wire.beginTransmission(addr);
+void MasterTile::writeAmbientData(){
   Wire.write(AMBIENT_KEY);
+  writeMetaData();
+}
+
+/*
+writeMetaData - a helper function to ensure meta data is always transmitted as
+  1. Color
+  2. brightness
+  3. frame
+*/
+void MasterTile::writeMetaData() {
   Wire.write((currentColor >> 8) & 0xff);
   Wire.write(currentColor & 0xff);
   Wire.write(currentBrightness);
-  Wire.write(frame);
-  return Wire.endTransmission();
+  Wire.write(currentFrame);
 }
+
 /*
 setTextData - Sets scrollLength, textData, and textDataSize
   Inputs:

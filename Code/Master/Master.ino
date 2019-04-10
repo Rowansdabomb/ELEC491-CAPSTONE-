@@ -10,6 +10,7 @@
 #include "T25Tile.h"
 #include "T25MasterTile.h"
 #include "T25Common.h"
+#include <string.h>
 
 volatile bool newFrameFlag;
 void newFrame();
@@ -60,10 +61,10 @@ void setup() {
   sensorTimer.resume();
   ///////////////////////////////////////////////////
 
-  // master.setOperationMode(SCROLL_MODE);
+  master.setOperationMode(SCROLL_MODE);
   // master.setOperationMode(SCROLL_MIRROR_MODE);
   // master.setOperationMode(AMBIENT_MODE);
-  master.setOperationMode(MIRROR_MODE);
+  // master.setOperationMode(MIRROR_MODE);
 
 }
 
@@ -72,10 +73,10 @@ void loop() {
 
   if(newFrameFlag) {
     master.handleDisplayShape();
-
-    if (master.currentFrame % (master.getFrameRate()) == 0) {
-      master.updateFromDataBase();
-    }
+    
+    // if (master.currentFrame % (master.getFrameRate()) == 0) {
+    //   master.updateFromDataBase();
+    // }
 
     if (master.currentFrame % (master.getFrameRate() / master.getTargetFrameRate()) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
@@ -84,11 +85,12 @@ void loop() {
         struct POS outPos = master.getOutputData(dataOut, i);
         
         uint8_t tileID = master.getOrderedTileID(i);
+
         if (tileID == MASTER_TILE_ID) {
           master.updateTileDisplay(outPos, dataOut);
         } else {
-          struct TILE slave = master.getTile(tileID);
-          master.transmitToSlave(slave.addr, outPos, master.currentBrightness, dataOut, master.currentFrame);
+          // struct TILE slave = master.getTile(tileID);
+          // master.transmitToSlave(slave.addr, outPos, dataOut);
         }
       }
       master.updateScrollPos();
@@ -96,6 +98,9 @@ void loop() {
 
     newFrameFlag = false;
   }
+  // master.matrix->fillScreen(0);
+  // master.matrix->fillRect(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, colors[RED]);
+  // master.matrix->show();
 }
 
 /*

@@ -56,25 +56,22 @@ getMessageData - // Serializes message data depending on operation mode
 */
 struct MessageData SlaveTile::getMessageData() {
     struct MessageData msgData;
+
+    msgData.color = (msgBuffer[0] << 8 ) | (msgBuffer[1] & 0xff);
+    msgData.brightness = msgBuffer[2];
+    msgData.frame = msgBuffer[3];
+
     switch(operationMode) {
         case SCROLL_MODE:
-          msgData.pos.x = msgBuffer[0];
-          msgData.pos.y = msgBuffer[1];
-          msgData.color = (msgBuffer[2] << 8 ) | (msgBuffer[3] & 0xff);
-          msgData.brightness = msgBuffer[4];
+          msgData.pos.x = msgBuffer[4];
+          msgData.pos.y = msgBuffer[5];
+          
           for(uint8_t i = 0; i < MAX_DISPLAY_CHARS; i++) {
-              msgData.text[i] = msgBuffer[5 + i];
+              msgData.text[i] = msgBuffer[6 + i];
           }
           break;
         case MIRROR_MODE:
-          msgData.color = (msgBuffer[0] << 8 ) | (msgBuffer[1] & 0xff);
-          msgData.brightness = msgBuffer[2];
-          break;
         case AMBIENT_MODE:
-          msgData.color = (msgBuffer[0] << 8 ) | (msgBuffer[1] & 0xff);
-          msgData.brightness = msgBuffer[2];
-          msgData.frame = msgBuffer[3];
-          break;
         case GESTURE_MODE:
           break;
         default:
