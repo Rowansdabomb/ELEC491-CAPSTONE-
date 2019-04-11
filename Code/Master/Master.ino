@@ -59,13 +59,11 @@ void setup() {
   sensorTimer.resume();
   ///////////////////////////////////////////////////
 
-  // master.setOperationMode(SCROLL_MODE); 
+  master.setOperationMode(SCROLL_MODE); 
   // master.setOperationMode(SCROLL_MIRROR_MODE);
   // master.setOperationMode(AMBIENT_MODE);
-  master.setOperationMode(MIRROR_MODE);
+  // master.setOperationMode(MIRROR_MODE);
   
-  // CHANGE IF BROKEN
-  // master.bootAnimation(800);
 }
 
 void loop() {
