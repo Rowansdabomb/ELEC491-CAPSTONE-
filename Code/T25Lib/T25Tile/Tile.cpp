@@ -4,6 +4,7 @@
 #include "PinConfig.h"
 #include "Colors.h"
 #include "CommonConstants.h"
+
 Tile::Tile(uint8_t addr) {
   // initialize operationMode
   operationMode = SCROLL_MODE;
@@ -34,17 +35,32 @@ Tile::Tile(uint8_t addr) {
   }
 
   //initialize the matrix
-  matrix = new Adafruit_DotStarMatrix(
-    MATRIX_WIDTH, 
-    MATRIX_HEIGHT, 
-    TILES_X, 
-    TILES_Y,
-    MATRIX_DATA_PIN, 
-    MATRIX_CLK_PIN, 
-    DS_MATRIX_TOP  + DS_MATRIX_LEFT   +
-    DS_MATRIX_ROWS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
-    DOTSTAR_BGR
-  );
+  if (ROTATED_MATRIX) {
+    matrix = new Adafruit_DotStarMatrix(
+      MATRIX_WIDTH,
+      MATRIX_HEIGHT,
+      TILES_X,
+      TILES_Y,
+      MATRIX_DATA_PIN,
+      MATRIX_CLK_PIN,
+      DS_MATRIX_TOP + DS_MATRIX_RIGHT  +
+      DS_MATRIX_COLUMNS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
+      DOTSTAR_BGR
+    );
+  } else {
+    matrix = new Adafruit_DotStarMatrix(
+      MATRIX_WIDTH,
+      MATRIX_HEIGHT,
+      TILES_X,
+      TILES_Y,
+      MATRIX_DATA_PIN,
+      MATRIX_CLK_PIN,
+      DS_MATRIX_TOP  + DS_MATRIX_LEFT   +
+      DS_MATRIX_ROWS + DS_MATRIX_ZIGZAG + DS_TILE_PROGRESSIVE,
+      DOTSTAR_BGR
+    );
+  }
+
 }
 
 void Tile::beginTile() {
@@ -55,7 +71,7 @@ void Tile::beginTile() {
 
   // DotStar Setup
   matrix->begin(); // Initialize pins for output
-  matrix->setBrightness(MAX_BRIGHTNESS); // Set max brightness (out of 255) 
+  matrix->setBrightness(MAX_BRIGHTNESS); // Set max brightness (out of 255)
   matrix->setTextWrap(false);
   matrix->setTextColor(colors[0]);
   matrix->show();  // Turn all LEDs off ASAP
@@ -84,6 +100,8 @@ void Tile::beginTile() {
   pinMode(MCOL_2, OUTPUT);
   pinMode(PIN_MCOL_ENABLE, OUTPUT);
   digitalWrite(PIN_MCOL_ENABLE, LOW);
+
+  bootAnimation(800);
 }
 
 /*
@@ -109,12 +127,15 @@ void Tile::setOperationMode(const uint8_t mode) {
   // Serial.println(mode);
   operationMode = mode;
 
+  matrix->setRotation(0);
   // sets the speeds for display updates
   switch(mode) {
     case (SCROLL_MODE):
+      
       targetFrameRate = 6;
       break;
     case (MIRROR_MODE):
+      if (ROTATED_MATRIX) matrix->setRotation(1);
       targetFrameRate = 10;
       break;
     case (AMBIENT_MODE):
@@ -133,7 +154,7 @@ setBrightness -
     void
 */
 void Tile::setBrightness(const uint8_t value) {
-  currentBrightness = value / 2;
+  currentBrightness = value;
   matrix->setBrightness(currentBrightness);
 }
 
@@ -150,7 +171,7 @@ void Tile::setTargetFrameRate(const uint8_t rate) {
 
 /*
 getFrameRate - retrieves the target frame rate
-  Inputs: 
+  Inputs:
     void
   Outputs:
     frameRate - the max frame rate the tile operates at
@@ -161,7 +182,7 @@ uint8_t Tile::getFrameRate() {
 
 /*
 getTargetFrameRate - retrieves the target frame rate
-  Inputs: 
+  Inputs:
     void
   Outputs:
     targetFrameRate - the current framerate to update the display with
@@ -225,7 +246,7 @@ void Tile::updateTileDisplay(const POS &outPos, char dataOut[]) {
       displayChar(outPos, dataOut);
       displayMirror(false);
       break;
-    case AMBIENT_MODE: 
+    case AMBIENT_MODE:
       digitalWrite(PIN_MCOL_ENABLE, HIGH);
       digitalWrite(PIN_MROW_ENABLE, LOW);
       displayAmbient();
@@ -258,7 +279,7 @@ displayMirror - Lights up LEDs beneath activated sensors
     void
 */
 void Tile::displayMirror(bool defaultColor) {
-  for (uint8_t i = 0; i < MATRIX_WIDTH * MATRIX_HEIGHT; ++i) { 
+  for (uint8_t i = 0; i < MATRIX_WIDTH * MATRIX_HEIGHT; ++i) {
     // const uint8_t SENSOR_THRESHOLD = 145;
     if (sensorData[i] > sensorThreshold[i]) {
       const uint8_t pixel_x = (i % MATRIX_WIDTH);
@@ -289,7 +310,7 @@ void Tile::displayAmbient() {
     modifier = (currentFrame % speed) / (speed * 1.0);
     modifier = .5 + (.5 - .5 * modifier);
   } else {
-    modifier = speed - ((currentFrame % speed) / (speed * 1.0)); 
+    modifier = speed - ((currentFrame % speed) / (speed * 1.0));
     modifier = .5 + (1 - .5 * modifier);
   }
 
@@ -333,8 +354,8 @@ findNeighborTiles - checks each port of the tile for a neighbor and updates the 
   Outputs:
     struct TILE - data including updated ports of the current tile and previous ports of current tile
 */
-// void getOccupiedDirections() {  
-struct TILE Tile::findNeighborTiles() {  
+// void getOccupiedDirections() {
+struct TILE Tile::findNeighborTiles() {
   // remember previous ports
   data.previousPorts = data.ports;
 
@@ -370,6 +391,28 @@ void Tile::debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color
   matrix->fillRect(x, y, 2, 2, colors[color]);
   matrix->show();
   // delay(250);
+}
+/*
+bootAnimation - Displays a short boot animation on startup of a tile
+  Inputs:
+    bootTime - the total length of time for the boot
+  Outputs:
+    Void
+*/
+void Tile::bootAnimation(int bootTime){
+  matrix->fillScreen(0);
+  matrix->fillRect(0, 0, 4, 4, colors[RED]);
+  matrix->show();
+  delay(bootTime/4);
+  matrix->fillRect(4, 0, 4, 4, colors[GREEN]);
+  matrix->show();
+  delay(bootTime/4);
+  matrix->fillRect(4, 4, 4, 4, colors[YELLOW]);
+  matrix->show();
+  delay(bootTime/4);
+  matrix->fillRect(0, 4, 4, 4, colors[BLUE]);
+  matrix->show();
+  delay(bootTime/4);
 }
 
 /*
@@ -408,23 +451,23 @@ void Tile::changeColor(uint16_t color) {
     void
 */
 void Tile::printSensorData() {
-  // Serial.write(27);       // ESC command
-  // Serial.print("[2J");    // clear screen command
-  // Serial.write(27);
-  // Serial.print("[H");     // cursor to home command
+  Serial.write(27);       // ESC command
+  Serial.print("[2J");    // clear screen command
+  Serial.write(27);
+  Serial.print("[H");     // cursor to home command
 
-  // for (uint8_t i = 0; i < MATRIX_WIDTH; ++i) {
-  //   for(uint8_t j = 0; j < MATRIX_HEIGHT; ++j) {
-  //   // for(uint8_t j = 0; j < 1; ++j) {
-  //     Serial.print(sensorData[j + i*(MATRIX_HEIGHT)]);
-  //     if(j < MATRIX_HEIGHT - 1)
-  //       Serial.print(" | ");
-  //     else
-  //       Serial.println();
-  //   }
-  // }
+  for (uint8_t i = 0; i < MATRIX_WIDTH; ++i) {
+    for(uint8_t j = 0; j < MATRIX_HEIGHT; ++j) {
+    // for(uint8_t j = 0; j < 1; ++j) {
+      Serial.print(sensorData[j + i*(MATRIX_HEIGHT)]);
+      if(j < MATRIX_HEIGHT - 1)
+        Serial.print(" | ");
+      else
+        Serial.println();
+    }
+  }
 
-  // Serial.println();
+  Serial.println();
 }
 
 /*
@@ -437,12 +480,12 @@ readSensorData - Goes through sensor/emitter matrix left to right, then top down
 */
 void Tile::readSensorData() {
   if (sensorID != prevSensorID) {
-    
+
     // read sensor data, pin map should be 0-7 for A0-A7 so we use sensorCol
     uint16_t sensorValue = analogRead(COLUMN_READ_PINS[sensorCol]);
     uint8_t sensorIndex = sensorCol + sensorRow*MATRIX_WIDTH;
 
-    // set the sensorData 
+    // set the sensorData
     sensorData[sensorIndex] = sensorValue;
 
     updateSensorThreshold(sensorValue, sensorIndex);
@@ -461,14 +504,14 @@ void Tile::readSensorData() {
         sensorRow = 0;
       }
     }
-    
+
     for (uint8_t i = 0; i < MUX_SELECT_SIZE; ++i) {
       if ((sensorRow >> i) & 1) {
         digitalWrite(MUX_ROW_SELECT[i], HIGH);
       } else {
         digitalWrite(MUX_ROW_SELECT[i], LOW);
       }
-      
+
       if ((sensorCol >> i) & 1) {
         digitalWrite(MUX_COL_SELECT[i], HIGH);
       } else {
@@ -486,7 +529,7 @@ void Tile::readSensorData() {
 }
 
 /*
-updateSensorThreshold - checks if the sensor threshold should update  
+updateSensorThreshold - checks if the sensor threshold should update
   Input:
     sensorValue - the value of the current sensor
     sensorIndex - the index of the current sensor in the sensor matrices
@@ -509,14 +552,14 @@ void Tile::updateSensorThreshold(uint16_t sensorValue, uint8_t sensorIndex) {
         if (sensorThresholdHistory[sensorIndex] == 0xff) {
           sensorThresholdHistory[sensorIndex] = 0;
           sensorThreshold[sensorIndex] = (uint16_t) sensorValue;
-        } 
-      } 
+        }
+      }
       // check if sensor below threshold
       else if (sensorValue * thresholdError < sensorThreshold[sensorIndex]) {
         // set sensorThreshold to new minimum
         sensorThreshold[sensorIndex] = (uint16_t) sensorValue * thresholdError;
       }
-    } 
+    }
     ++sensorThresholdCounter;
 }
 

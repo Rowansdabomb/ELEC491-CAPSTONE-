@@ -13,7 +13,7 @@ uint8_t brightness;
 uint8_t scrollSpeed;
 
 void setup() {
-    // Serial.begin(115200);
+    Serial.begin(115200);
     // Serial Setup - for ESP32
     Serial1.begin(115200);
 
@@ -37,18 +37,19 @@ void setup() {
 
 void loop() {
   // Check for available data from ESP
+//   Serial.println("running");
   if (Serial1.available() > 1) {
-      // Serial.println("// Serial1 available");
-      transmitType = // Serial1.read();
-      // Serial.print("transmit type: ");
-      // Serial.println(transmitType);
+      // Serial.println("// Serial available");
+      transmitType = Serial1.read();
+      Serial.print("transmit type: ");
+      Serial.println(transmitType);
 
       switch(transmitType) {
         case CHANGE_COLOR:
         {
             // Serial.println("Change Color");
           for(uint8_t i = 0; i < 3; i++) {
-            rgb[i] = // Serial1.read();
+            rgb[i] = Serial1.read();
             delay(10);
           }
 
@@ -56,30 +57,30 @@ void loop() {
         }
         case CHANGE_TEXT:
         {
-            // Serial.println("Change Text");
-          textDataSize = // Serial1.readBytesUntil('\0', textData, MAX_STRING_SIZE);
+            Serial.println("Change Text");
+          textDataSize = Serial1.readBytesUntil('\0', textData, MAX_STRING_SIZE);
           textData[textDataSize] = '\0';
             
           break;
         }
         case CHANGE_OPERATION_MODE:
         {
-            // Serial.println("Change Mode");
-            mode = // Serial1.read();
+             Serial.println("Change Mode");
+            mode = Serial1.read();
             break;
         }  
         case CHANGE_BRIGHTNESS:
         {
-            // Serial.println("Change Brightness");
-            brightness = // Serial1.read();
-            // Serial.println(brightness);
+            Serial.println("Change Brightness");
+            brightness = Serial1.read();
+            Serial.println(brightness);
             break;
         }     
         case CHANGE_SCROLL_SPEED:
         {
-            // Serial.println("Change Scroll Speed");
-            scrollSpeed = // Serial1.read();
-            // Serial.println(scrollSpeed);
+            Serial.println("Change Scroll Speed");
+            scrollSpeed = Serial1.read();
+            Serial.println(scrollSpeed);
             break;
         }     
         default:

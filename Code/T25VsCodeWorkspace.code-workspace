@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "WIFI"
+		},
+		{
+			"path": "C:\\Users\\rowan\\AppData\\Local\\Arduino15\\packages\\stm32duino\\hardware\\STM32F1\\2019.3.31\\libraries\\Wire"
 		}
 	],
 	"settings": {}

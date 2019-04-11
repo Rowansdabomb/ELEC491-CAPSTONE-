@@ -63,6 +63,7 @@ class Tile {
 
     struct TILE findNeighborTiles();
     void debugWithMatrix(const uint8_t x, const uint8_t y, const uint8_t color);
+    void bootAnimation(int bootTime);
    
     void updateTileDisplay(const POS &outPos, char dataOut[]);
     void changeColor(uint8_t colors[]);

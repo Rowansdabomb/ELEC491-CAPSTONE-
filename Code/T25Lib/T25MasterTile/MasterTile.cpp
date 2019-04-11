@@ -59,7 +59,7 @@ void MasterTile::beginMasterTile() {
 
   // PRECONFIGURED DISPLAY SETUP
   for (uint8_t i = 0; i < 3; ++i) {
-    preConfiguredDisplay[i].x = 4 + i;
+    preConfiguredDisplay[i].x = 2 - i;
     preConfiguredDisplay[i].y = 3;
   }
 }
@@ -150,8 +150,11 @@ void MasterTile::handleAddedOrRemovedTiles () {
       if ( i != 0 ) {
         uint8_t response = 5;
         if ( tile[i].active ) {
+          // debugWithMatrix(0, 0, RED);
           Wire.beginTransmission(tile[i].addr);
+          // debugWithMatrix(0, 0, YELLOW);
           response = Wire.endTransmission();
+          // debugWithMatrix(0, 0, GREEN);
         } else {
           tileID = i;
         }
@@ -258,6 +261,8 @@ uint8_t MasterTile::assignNewAddress(const uint8_t x, const uint8_t y) {
 
   uint8_t response = -1;
   Wire.beginTransmission(I2C_DEFAULT);
+  // debugWithMatrix(3, 3, YELLOW);
+  // delay(250);
   response = Wire.endTransmission();
   if (response != SUCCESS) {
     return response;
@@ -442,8 +447,8 @@ writeI2cCharData - Transmits the Character Data to a slave tile.
 */
 void MasterTile::writeI2cCharData(const struct POS &pos, char data[]) {
     Wire.write(I2C_CHAR_KEY); // New Identifier for sending Character data? using Q arbritrarily
-    
     writeMetaData();
+    
     Wire.write(pos.x);
     Wire.write(pos.y);
 

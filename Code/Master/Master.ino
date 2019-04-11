@@ -28,8 +28,6 @@ void setup() {
   newFrameFlag = false;
   // // Serial Setup - for output
   // Serial.begin(115200); 
-  // // Serial Setup - for ESP32
-  // // Serial1.begin(115200);
 
   ///////////////// TILE BEGIN /////////////////////
   master.beginMasterTile();
@@ -61,11 +59,13 @@ void setup() {
   sensorTimer.resume();
   ///////////////////////////////////////////////////
 
-  master.setOperationMode(SCROLL_MODE); 
+  // master.setOperationMode(SCROLL_MODE); 
   // master.setOperationMode(SCROLL_MIRROR_MODE);
   // master.setOperationMode(AMBIENT_MODE);
-  // master.setOperationMode(MIRROR_MODE);
-
+  master.setOperationMode(MIRROR_MODE);
+  
+  // CHANGE IF BROKEN
+  // master.bootAnimation(800);
 }
 
 void loop() {
@@ -74,9 +74,9 @@ void loop() {
   if(newFrameFlag) {
     master.handleDisplayShape();
     
-    // if (master.currentFrame % (master.getFrameRate()) == 0) {
-    //   master.updateFromDataBase();
-    // }
+    if (master.currentFrame % (master.getFrameRate()) == 0) {
+      master.updateFromDataBase();
+    }
 
     if (master.currentFrame % (master.getFrameRate() / master.getTargetFrameRate()) == 0) {
       for(uint8_t i = 0; i < master.getTileCount(); ++i) {
@@ -89,8 +89,8 @@ void loop() {
         if (tileID == MASTER_TILE_ID) {
           master.updateTileDisplay(outPos, dataOut);
         } else {
-          // struct TILE slave = master.getTile(tileID);
-          // master.transmitToSlave(slave.addr, outPos, dataOut);
+          struct TILE slave = master.getTile(tileID);
+          master.transmitToSlave(slave.addr, outPos, dataOut);
         }
       }
       master.updateScrollPos();
